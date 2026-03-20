@@ -75,6 +75,19 @@ button:hover {
     color: @theme_selected_fg_color;
 }
 
+/* Reset HeaderBar buttons — prevent global button style from breaking CSD window controls */
+headerbar button {
+    border: none;
+    padding: 4px;
+    background-color: transparent;
+    font-weight: normal;
+    min-height: 0;
+}
+
+headerbar button:hover {
+    background-color: alpha(@theme_fg_color, 0.1);
+}
+
 
 
 

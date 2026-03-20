@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 - Action buttons (Remove, Clean, Autoremove) now re-enable after failed or cancelled operations instead of remaining permanently disabled.
 - Progress bar in Kernels tab now closes after cleanup completes.
 - Translatable strings in GPU Drivers and Firmware tabs were hardcoded in Spanish; corrected to English as required by the i18n system.
+- **Temp Files**: Socket files, named pipes and symlinks (D-Bus, MCP, systemd) are now excluded from the scanner — they are active session files and must not be deleted.
+- **Temp Files**: Deletion of root-owned files now uses a single `pkexec` fallback call instead of silently failing with `PermissionError`.
+- **APT Cache**: Scanner was only counting `.deb` files, always showing 0 on clean systems. It now also measures the package lists (`/var/lib/apt/lists/`) populated by `apt update`.
+- **APT Cache**: "Remove orphaned packages" button is now hidden instead of visually active when there are no orphans — the XFCE theme did not grey out `destructive-action` buttons correctly.
+- **Overview**: System usage metrics timer moved to a background thread to prevent UI freezes after scan.
+- **Languages tab**: Widget creation deferred until the tab is first opened (lazy loading). Previously, 500–1000+ GTK widgets were created synchronously on scan completion, causing the entire application to freeze on any subsequent interaction.
 
 ### 🔧 Improved
 - Shared utility function `fmt_size()` consolidated in `utils/constants.py`, eliminating duplication across 6 tab files.
@@ -31,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 - Unused functions removed: `get_autoremove_size_kb()`, `_get_size()`, `get_total_temp_size()`.
 - Misplaced and unused imports cleaned up across all UI and scanner modules.
 - Logging in `application.py` unified through the `logger` module (replaced `print()` calls).
+- Overview card strings (`items`, `family(s)`, `removable`) are now translatable across all 8 languages.
 
 ---
 

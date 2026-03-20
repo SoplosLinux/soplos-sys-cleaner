@@ -5,8 +5,6 @@
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
-*A system cleaning and optimization utility designed specifically for Soplos Linux.*
-
 ## 📝 Description
 
 Soplos Sys Cleaner is an advanced system maintenance tool for Soplos Linux distributions (like Boro, Tyron, and Tyson). It safely removes unnecessary files, clears cache, uninstalls old kernels, and optimizes the system while utilizing `dracut.conf.d/soplos.conf` for initramfs integration.
@@ -115,5 +113,12 @@ Contact: info@soploslinux.com
 - Fixed: action buttons now re-enable after failed or cancelled operations.
 - Fixed: progress bar now closes after kernel cleanup completes.
 - Fixed: translatable strings in GPU Drivers and Firmware tabs corrected to English.
+- Fixed: socket files and symlinks (D-Bus, MCP) excluded from Temp Files scanner.
+- Fixed: temp file deletion now uses `pkexec` fallback for root-owned files.
+- Fixed: APT Cache scanner now includes package lists size (`/var/lib/apt/lists/`).
+- Fixed: "Remove orphaned packages" button hidden when no orphans are present.
+- Fixed: Languages tab uses lazy loading — widgets created only when tab is opened, eliminating post-scan UI freeze.
+- Fixed: system usage metrics timer moved to background thread to prevent interaction lag.
 - Improved: `fmt_size()` consolidated in `utils/constants.py`, eliminating duplication across 6 files.
 - Improved: duplicate constants and unused functions removed.
+- Improved: Overview card strings fully translatable in all 8 languages.

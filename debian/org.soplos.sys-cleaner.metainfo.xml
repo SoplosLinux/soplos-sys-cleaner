@@ -276,64 +276,112 @@
           <li>Fixed: action buttons now re-enable after failed or cancelled operations</li>
           <li>Fixed: progress bar now closes after kernel cleanup completes</li>
           <li>Fixed: translatable strings in GPU Drivers and Firmware tabs corrected to English</li>
+          <li>Fixed: socket files and symlinks excluded from Temp Files scanner</li>
+          <li>Fixed: temp file deletion uses pkexec fallback for root-owned files</li>
+          <li>Fixed: APT Cache scanner now includes package lists size</li>
+          <li>Fixed: Languages tab uses lazy loading to prevent post-scan UI freeze</li>
+          <li>Fixed: system usage metrics timer moved to background thread</li>
           <li>Improved: fmt_size() consolidated in utils/constants.py, eliminating duplication across 6 files</li>
           <li>Improved: duplicate constants and unused functions removed</li>
+          <li>Improved: Overview card strings fully translatable in all 8 languages</li>
 
           <li xml:lang="es">Atajos de teclado añadidos: Ctrl+W para cerrar, Ctrl+R para reescanear, Ctrl+1–7 para navegar entre pestañas</li>
           <li xml:lang="es">Icono de escaneo en la pestaña General ampliado a 128px para mayor visibilidad</li>
           <li xml:lang="es">Corregido: los botones de acción se reactivan tras operaciones fallidas o canceladas</li>
           <li xml:lang="es">Corregido: la barra de progreso se cierra tras completar la limpieza de kernels</li>
           <li xml:lang="es">Corregido: textos traducibles en las pestañas de Drivers GPU y Firmware corregidos a inglés</li>
+          <li xml:lang="es">Corregido: archivos de socket y enlaces simbólicos excluidos del escáner de archivos temporales</li>
+          <li xml:lang="es">Corregido: eliminación de temporales usa pkexec para archivos de root</li>
+          <li xml:lang="es">Corregido: la caché APT ahora incluye el tamaño de las listas de paquetes</li>
+          <li xml:lang="es">Corregido: pestaña Idiomas usa carga diferida para evitar el freeze post-escaneo</li>
+          <li xml:lang="es">Corregido: métricas del sistema movidas a hilo en segundo plano</li>
           <li xml:lang="es">Mejorado: fmt_size() consolidada en utils/constants.py, eliminando duplicación en 6 archivos</li>
           <li xml:lang="es">Mejorado: constantes duplicadas y funciones sin uso eliminadas</li>
+          <li xml:lang="es">Mejorado: cadenas de las tarjetas del Resumen totalmente traducibles en los 8 idiomas</li>
 
           <li xml:lang="fr">Raccourcis clavier ajoutés : Ctrl+W pour fermer, Ctrl+R pour relancer l'analyse, Ctrl+1–7 pour naviguer entre les onglets</li>
           <li xml:lang="fr">Icône d'analyse dans l'onglet Aperçu agrandie à 128px pour une meilleure visibilité</li>
           <li xml:lang="fr">Corrigé : les boutons d'action se réactivent après des opérations échouées ou annulées</li>
           <li xml:lang="fr">Corrigé : la barre de progression se ferme après la fin du nettoyage du noyau</li>
           <li xml:lang="fr">Corrigé : les chaînes traduisibles dans les onglets Pilotes GPU et Micrologiciel corrigées en anglais</li>
+          <li xml:lang="fr">Corrigé : fichiers socket et liens symboliques exclus du scanner de fichiers temporaires</li>
+          <li xml:lang="fr">Corrigé : suppression des temporaires utilise pkexec pour les fichiers root</li>
+          <li xml:lang="fr">Corrigé : le cache APT inclut désormais la taille des listes de paquets</li>
+          <li xml:lang="fr">Corrigé : l'onglet Langues utilise le chargement différé pour éviter le gel post-analyse</li>
+          <li xml:lang="fr">Corrigé : métriques système déplacées dans un thread d'arrière-plan</li>
           <li xml:lang="fr">Amélioré : fmt_size() consolidée dans utils/constants.py, supprimant la duplication dans 6 fichiers</li>
           <li xml:lang="fr">Amélioré : constantes dupliquées et fonctions inutilisées supprimées</li>
+          <li xml:lang="fr">Amélioré : chaînes des cartes de la vue d'ensemble entièrement traduisibles dans les 8 langues</li>
 
           <li xml:lang="de">Tastaturkürzel hinzugefügt: Strg+W zum Schließen, Strg+R zum erneuten Scannen, Strg+1–7 zur Tab-Navigation</li>
           <li xml:lang="de">Scan-Symbol auf der Übersicht-Registerkarte auf 128px vergrößert für bessere Sichtbarkeit</li>
           <li xml:lang="de">Behoben: Aktionsschaltflächen werden nach fehlgeschlagenen oder abgebrochenen Vorgängen wieder aktiviert</li>
           <li xml:lang="de">Behoben: Die Fortschrittsleiste schließt sich nach abgeschlossener Kernel-Bereinigung</li>
           <li xml:lang="de">Behoben: Übersetzbare Zeichenfolgen in GPU-Treiber- und Firmware-Registerkarten auf Englisch korrigiert</li>
+          <li xml:lang="de">Behoben: Socket-Dateien und Symlinks vom Temp-Scanner ausgeschlossen</li>
+          <li xml:lang="de">Behoben: Temp-Löschung nutzt pkexec-Fallback für Root-Dateien</li>
+          <li xml:lang="de">Behoben: APT-Cache-Scanner enthält jetzt die Größe der Paketlisten</li>
+          <li xml:lang="de">Behoben: Sprachen-Registerkarte verwendet Lazy Loading zur Vermeidung von UI-Hänger nach dem Scan</li>
+          <li xml:lang="de">Behoben: Systemmetriken in Hintergrund-Thread verschoben</li>
           <li xml:lang="de">Verbessert: fmt_size() in utils/constants.py konsolidiert, Duplizierung in 6 Dateien beseitigt</li>
           <li xml:lang="de">Verbessert: Doppelte Konstanten und ungenutzte Funktionen entfernt</li>
+          <li xml:lang="de">Verbessert: Übersichtskarten-Strings in allen 8 Sprachen vollständig übersetzbar</li>
 
           <li xml:lang="pt">Atalhos de teclado adicionados: Ctrl+W para fechar, Ctrl+R para reescanear, Ctrl+1–7 para navegar entre separadores</li>
           <li xml:lang="pt">Ícone de análise no separador Visão Geral aumentado para 128px para maior visibilidade</li>
           <li xml:lang="pt">Corrigido: os botões de ação voltam a ficar ativos após operações falhadas ou canceladas</li>
           <li xml:lang="pt">Corrigido: a barra de progresso fecha após a conclusão da limpeza de kernels</li>
           <li xml:lang="pt">Corrigido: textos traduzíveis nos separadores Drivers GPU e Firmware corrigidos para inglês</li>
+          <li xml:lang="pt">Corrigido: ficheiros socket e links simbólicos excluídos do scanner de ficheiros temporários</li>
+          <li xml:lang="pt">Corrigido: eliminação de temporários usa pkexec para ficheiros root</li>
+          <li xml:lang="pt">Corrigido: cache APT inclui agora o tamanho das listas de pacotes</li>
+          <li xml:lang="pt">Corrigido: separador Idiomas usa carregamento diferido para evitar freeze pós-análise</li>
+          <li xml:lang="pt">Corrigido: métricas do sistema movidas para thread em segundo plano</li>
           <li xml:lang="pt">Melhorado: fmt_size() consolidada em utils/constants.py, eliminando duplicação em 6 ficheiros</li>
           <li xml:lang="pt">Melhorado: constantes duplicadas e funções sem uso removidas</li>
+          <li xml:lang="pt">Melhorado: strings dos cartões da visão geral totalmente traduzíveis nos 8 idiomas</li>
 
           <li xml:lang="it">Scorciatoie da tastiera aggiunte: Ctrl+W per chiudere, Ctrl+R per ripetere la scansione, Ctrl+1–7 per navigare tra le schede</li>
           <li xml:lang="it">Icona di scansione nella scheda Panoramica ingrandita a 128px per una migliore visibilità</li>
           <li xml:lang="it">Corretto: i pulsanti di azione si riattivano dopo operazioni non riuscite o annullate</li>
           <li xml:lang="it">Corretto: la barra di avanzamento si chiude al termine della pulizia del kernel</li>
           <li xml:lang="it">Corretto: le stringhe traducibili nelle schede Driver GPU e Firmware corrette in inglese</li>
+          <li xml:lang="it">Corretto: file socket e link simbolici esclusi dallo scanner dei file temporanei</li>
+          <li xml:lang="it">Corretto: eliminazione temporanei usa pkexec per file di root</li>
+          <li xml:lang="it">Corretto: cache APT include ora la dimensione delle liste pacchetti</li>
+          <li xml:lang="it">Corretto: scheda Lingue usa caricamento lazy per evitare freeze post-scansione</li>
+          <li xml:lang="it">Corretto: metriche di sistema spostate in thread in background</li>
           <li xml:lang="it">Migliorato: fmt_size() consolidata in utils/constants.py, eliminando la duplicazione in 6 file</li>
           <li xml:lang="it">Migliorato: costanti duplicate e funzioni inutilizzate rimosse</li>
+          <li xml:lang="it">Migliorato: stringhe delle schede panoramica completamente traducibili in tutte le 8 lingue</li>
 
           <li xml:lang="ro">Comenzi rapide adăugate: Ctrl+W pentru închidere, Ctrl+R pentru rescanare, Ctrl+1–7 pentru navigarea între file</li>
           <li xml:lang="ro">Pictograma de scanare din fila Prezentare generală mărită la 128px pentru o mai bună vizibilitate</li>
           <li xml:lang="ro">Rezolvat: butoanele de acțiune se reactivează după operațiuni eșuate sau anulate</li>
           <li xml:lang="ro">Rezolvat: bara de progres se închide după finalizarea curățării kernel-ului</li>
           <li xml:lang="ro">Rezolvat: șirurile traductibile din filele Drivere GPU și Firmware corectate în engleză</li>
+          <li xml:lang="ro">Rezolvat: fișierele socket și legăturile simbolice excluse din scanerul de fișiere temporare</li>
+          <li xml:lang="ro">Rezolvat: ștergerea temporarelor folosește pkexec pentru fișierele root</li>
+          <li xml:lang="ro">Rezolvat: cache-ul APT include acum dimensiunea listelor de pachete</li>
+          <li xml:lang="ro">Rezolvat: fila Limbi folosește încărcare leneșă pentru a preveni înghețarea după scanare</li>
+          <li xml:lang="ro">Rezolvat: metricile sistemului mutate într-un fir de fundal</li>
           <li xml:lang="ro">Îmbunătățit: fmt_size() consolidată în utils/constants.py, eliminând duplicarea în 6 fișiere</li>
           <li xml:lang="ro">Îmbunătățit: constante duplicate și funcții neutilizate eliminate</li>
+          <li xml:lang="ro">Îmbunătățit: șirurile cardurilor din prezentarea generală complet traductibile în toate cele 8 limbi</li>
 
           <li xml:lang="ru">Добавлены сочетания клавиш: Ctrl+W — закрыть, Ctrl+R — повторить сканирование, Ctrl+1–7 — навигация по вкладкам</li>
           <li xml:lang="ru">Значок сканирования на вкладке «Обзор» увеличен до 128px для лучшей видимости</li>
           <li xml:lang="ru">Исправлено: кнопки действий снова активируются после неудачных или отменённых операций</li>
           <li xml:lang="ru">Исправлено: полоса прогресса закрывается после завершения очистки ядер</li>
           <li xml:lang="ru">Исправлено: переводимые строки во вкладках «Драйверы GPU» и «Прошивки» исправлены на английский</li>
+          <li xml:lang="ru">Исправлено: файлы сокетов и символические ссылки исключены из сканера временных файлов</li>
+          <li xml:lang="ru">Исправлено: удаление временных файлов использует pkexec для файлов root</li>
+          <li xml:lang="ru">Исправлено: сканер кэша APT теперь учитывает размер списков пакетов</li>
+          <li xml:lang="ru">Исправлено: вкладка «Языки» использует отложенную загрузку для предотвращения зависания после сканирования</li>
+          <li xml:lang="ru">Исправлено: метрики системы перенесены в фоновый поток</li>
           <li xml:lang="ru">Улучшено: fmt_size() вынесена в utils/constants.py, устранено дублирование в 6 файлах</li>
           <li xml:lang="ru">Улучшено: удалены дублирующиеся константы и неиспользуемые функции</li>
+          <li xml:lang="ru">Улучшено: строки карточек обзора полностью переводимы на все 8 языков</li>
         </ul>
       </description>
     </release>
