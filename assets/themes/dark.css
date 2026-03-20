@@ -26,6 +26,32 @@ notebook > header tab:hover { background-color: #333; color: @soplos_light_text;
 notebook > header tab:checked { background-color: @soplos_dark_bg; color: @soplos_orange; border-top: 3px solid @soplos_orange; }
 notebook > stack { background-color: @soplos_dark_bg; }
 
+/* HeaderBar */
+headerbar,
+.titlebar {
+    background-color: @soplos_darker_bg;
+    color: @soplos_light_text;
+    border-bottom: 1px solid @soplos_border;
+    box-shadow: none;
+}
+
+headerbar button.titlebutton {
+    color: @soplos_light_text;
+    background: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+}
+
+headerbar button.titlebutton:hover {
+    background-color: #444444;
+}
+
+headerbar button.titlebutton.close:hover {
+    background-color: @soplos_error;
+    color: white;
+}
+
 button { background-color: #333; color: @soplos_light_text; border: 1px solid @soplos_border; border-radius: 4px; }
 button:hover { background-color: #444; border-color: @soplos_orange; }
 button.suggested-action { background-color: @soplos_orange; color: #000; border-color: @soplos_orange_hover; font-weight: bold; }

@@ -5,10 +5,11 @@ Compatible with X11, Wayland, GNOME, KDE, XFCE.
 """
 
 import threading
+from pathlib import Path
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib, Gdk
+from gi.repository import Gtk, GLib, Gdk, GdkPixbuf
 
 from core.i18n_manager import _
 from utils.constants import (
@@ -235,10 +236,44 @@ class MainWindow(Gtk.ApplicationWindow):
         bind('w', 'CONTROL', lambda: self.application.quit())
         bind('r', 'CONTROL', self._on_scan_clicked)
         bind('F5', None, self._on_scan_clicked)
+        bind('F1', None, self._show_about)
         # Tab navigation: Ctrl+1..7
         for i in range(7):
             idx = i
             bind(str(i + 1), 'CONTROL', lambda n=idx: self.notebook.set_current_page(n))
+
+        # Ctrl+Tab / Ctrl+Shift+Tab via key-press-event (AccelGroup can't catch Tab)
+        self.connect('key-press-event', self._on_key_press)
+
+    def _show_about(self):
+        dialog = Gtk.AboutDialog()
+        dialog.set_transient_for(self)
+        dialog.set_modal(True)
+        dialog.set_program_name(_(APPLICATION_NAME))
+        dialog.set_version(APPLICATION_VERSION)
+        dialog.set_comments(_("Advanced system cleaner and optimizer for Soplos Linux."))
+        dialog.set_website("https://soplos.org")
+        dialog.set_website_label("soplos.org")
+        dialog.set_authors(["Sergi Perich <info@soploslinux.com>"])
+        dialog.set_license_type(Gtk.License.GPL_3_0)
+        icon_path = Path(__file__).parent.parent / 'assets' / 'icons' / '64x64' / 'org.soplos.sys-cleaner.png'
+        if icon_path.exists():
+            dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(str(icon_path)))
+        dialog.run()
+        dialog.destroy()
+
+    def _on_key_press(self, widget, event):
+        ctrl = event.state & Gdk.ModifierType.CONTROL_MASK
+        shift = event.state & Gdk.ModifierType.SHIFT_MASK
+        if ctrl and event.keyval in (Gdk.KEY_Tab, Gdk.KEY_ISO_Left_Tab):
+            n = self.notebook.get_n_pages()
+            current = self.notebook.get_current_page()
+            if shift:
+                self.notebook.set_current_page((current - 1) % n)
+            else:
+                self.notebook.set_current_page((current + 1) % n)
+            return True
+        return False
 
     # ─────────────────────────── Public API ───────────────────────────
 

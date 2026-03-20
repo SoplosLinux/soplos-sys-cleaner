@@ -376,3 +376,6 @@ msgstr "{} familie(i)"
 
 msgid "{} removable"
 msgstr "{} detașabil(e)"
+
+msgid "Advanced system cleaner and optimizer for Soplos Linux."
+msgstr "Curățător și optimizator avansat de sistem pentru Soplos Linux."

@@ -376,3 +376,6 @@ msgstr "{} famiglia/e"
 
 msgid "{} removable"
 msgstr "{} rimovibile/i"
+
+msgid "Advanced system cleaner and optimizer for Soplos Linux."
+msgstr "Pulitore e ottimizzatore di sistema avanzato per Soplos Linux."
