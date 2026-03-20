@@ -1,0 +1,378 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-03-20 04:02+0100\n"
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "No packages to remove."
+msgstr "Нет пакетов для удаления."
+
+msgid "Preparing administrative tasks..."
+msgstr "Подготовка административных задач..."
+
+msgid "Authentication cancelled."
+msgstr "Аутентификация отменена."
+
+msgid "Tasks completed successfully."
+msgstr "Задачи выполнены успешно."
+
+msgid "Unexpected error: {}"
+msgstr "Неожиданная ошибка: {}"
+
+msgid "Cleaning APT cache..."
+msgstr "Очистка кэша APT..."
+
+msgid "APT cache cleaned successfully."
+msgstr "Кэш APT успешно очищен."
+
+msgid "Error cleaning cache: {}"
+msgstr "Ошибка при очистке кэша: {}"
+
+msgid "Removing orphaned packages..."
+msgstr "Удаление осиротевших пакетов..."
+
+msgid "Orphaned packages removed."
+msgstr "Осиротевшие пакеты удалены."
+
+msgid "Removing {}..."
+msgstr "Удаление {}..."
+
+msgid "Permission denied: {}"
+msgstr "Доступ запрещён: {}"
+
+msgid "Error in {}: {}"
+msgstr "Ошибка в {}: {}"
+
+msgid "{} item(s) removed."
+msgstr "{} элемент(ов) удалено."
+
+msgid "{} error(s)."
+msgstr "{} ошибка(ок)."
+
+msgid "Regenerating initramfs with dracut..."
+msgstr "Восстановление initramfs с помощью dracut..."
+
+msgid "dracut error: {}"
+msgstr "Ошибка dracut: {}"
+
+msgid "initramfs regenerated successfully."
+msgstr "initramfs успешно восстановлен."
+
+msgid "dracut not found on the system."
+msgstr "dracut не найден в системе."
+
+msgid "No firmwares to remove."
+msgstr "Нет прошивок для удаления."
+
+msgid "Preparing firmware removal..."
+msgstr "Подготовка удаления прошивки..."
+
+msgid "Firmware removed and initramfs regenerated."
+msgstr "Прошивка удалена и initramfs восстановлен."
+
+msgid "No items selected for removal."
+msgstr "Не выбрано элементов для удаления."
+
+msgid "Cleaning localization and documentation files..."
+msgstr "Очистка файлов локализации и документации..."
+
+msgid "Localization and documentation cleaned successfully."
+msgstr "Локализация и документация успешно очищены."
+
+msgid "Scan system"
+msgstr "Сканировать систему"
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "GPU Drivers"
+msgstr "Драйверы GPU"
+
+msgid "Firmwares"
+msgstr "Прошивки"
+
+msgid "Kernels"
+msgstr "Ядра"
+
+msgid "Languages"
+msgstr "Языки"
+
+msgid "APT Cache"
+msgstr "Кэш APT"
+
+msgid "Temp Files"
+msgstr "Временные файлы"
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "Running on {} ({})"
+msgstr "Запущено на {} ({})"
+
+msgid "Scanning system..."
+msgstr "Сканирование системы..."
+
+msgid "Detecting hardware..."
+msgstr "Определение оборудования..."
+
+msgid "Scanning GPU drivers..."
+msgstr "Сканирование драйверов GPU..."
+
+msgid "Scanning firmwares..."
+msgstr "Сканирование прошивок..."
+
+msgid "Scanning kernels..."
+msgstr "Сканирование ядер..."
+
+msgid "Scanning APT cache..."
+msgstr "Сканирование кэша APT..."
+
+msgid "Scanning temporary files..."
+msgstr "Сканирование временных файлов..."
+
+msgid "Scanning languages and docs..."
+msgstr "Сканирование языков и документации..."
+
+msgid "Error during scan: {}"
+msgstr "Ошибка при сканировании: {}"
+
+msgid "Scan completed"
+msgstr "Сканирование завершено"
+
+msgid "APT Package Cache"
+msgstr "Кэш пакетов APT"
+
+msgid "Click «Scan» to view cache status"
+msgstr "Нажмите «Сканировать», чтобы увидеть состояние кэша"
+
+msgid "Clean APT Cache"
+msgstr "Очистить кэш APT"
+
+msgid "Orphaned Packages"
+msgstr "Осиротевшие пакеты"
+
+msgid "Click «Scan» to view orphaned packages"
+msgstr "Нажмите «Сканировать», чтобы увидеть осиротевшие пакеты"
+
+msgid "Remove Orphaned Packages"
+msgstr "Удалить осиротевшие пакеты"
+
+msgid "{} cached .deb files — {} | Package lists: {}"
+msgstr "{} файлов .deb в кэше — {} | Списки пакетов: {}"
+
+msgid "No cached .deb files | Package lists: {}"
+msgstr "Нет .deb-файлов в кэше | Списки пакетов: {}"
+
+msgid "No orphaned packages"
+msgstr "Нет осиротевших пакетов"
+
+msgid "{} orphaned package(s) detected"
+msgstr "Обнаружено {} осиротевших пакетов"
+
+msgid "Remove orphaned packages?"
+msgstr "Удалить осиротевшие пакеты?"
+
+msgid "Detected GPU: —"
+msgstr "Обнаружен GPU: —"
+
+msgid "Select all"
+msgstr "Выбрать всё"
+
+msgid "Remove Selected"
+msgstr "Удалить выбранное"
+
+msgid "Detected GPU: {}"
+msgstr "Обнаружен GPU: {}"
+
+msgid "Generic"
+msgstr "Общий"
+
+msgid "No unnecessary drivers found"
+msgstr "Ненужные драйверы не найдены"
+
+msgid "Remove selected packages?"
+msgstr "Удалить выбранные пакеты?"
+
+msgid "{} package(s) will be removed and the initramfs will be regenerated."
+msgstr "{} пакет(ов) будет удалено и initramfs будет восстановлен."
+
+msgid "Removing drivers and regenerating initramfs..."
+msgstr "Удаление драйверов и восстановление initramfs..."
+
+msgid ""
+"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
+"the initrd"
+msgstr "Прошивки сети/Wi-Fi заблокированы — soplos.conf всегда включает их в initrd"
+
+msgid "Remove selected firmwares"
+msgstr "Удалить выбранные прошивки"
+
+msgid "{} firmware families detected"
+msgstr "Обнаружено {} семейств прошивок"
+
+msgid ""
+"Protected: soplos.conf includes this firmware in the initrd to ensure "
+"connectivity"
+msgstr "Защищено: soplos.conf включает эту прошивку в initrd для обеспечения подключения"
+
+msgid "Protected network firmware"
+msgstr "Защищённая сетевая прошивка"
+
+msgid "Remove selected firmwares?"
+msgstr "Удалить выбранные прошивки?"
+
+msgid ""
+"{} firmware family(s) will be removed from /lib/firmware/\n"
+"The initramfs will be regenerated automatically."
+msgstr ""
+"{} семейств(о) прошивок будет удалено из /lib/firmware/\n"
+"Initramfs будет восстановлен автоматически."
+
+msgid "Removing firmwares and regenerating initramfs..."
+msgstr "Удаление прошивок и восстановление initramfs..."
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "Image"
+msgstr "Образ"
+
+msgid "Headers"
+msgstr "Заголовки"
+
+msgid "Sources"
+msgstr "Исходники"
+
+msgid "Size"
+msgstr "Размер"
+
+msgid "{} kernel(s) installed, {} removable"
+msgstr "Установлено {} ядер, {} можно удалить"
+
+msgid "Remove selected kernel packages?"
+msgstr "Удалить выбранные пакеты ядра?"
+
+msgid ""
+"{} package(s) to remove:\n"
+"{}"
+msgstr ""
+"{} пакет(ов) для удаления:\n"
+"{}"
+
+msgid "Removing kernel packages..."
+msgstr "Удаление пакетов ядра..."
+
+msgid "Select items to remove"
+msgstr "Выберите элементы для удаления"
+
+msgid "Keep only my languages"
+msgstr "Сохранить только мои языки"
+
+msgid "Unselect current language and English, select everything else"
+msgstr "Снять выбор с текущего языка и английского, выбрать всё остальное"
+
+msgid "System Documentation"
+msgstr "Системная документация"
+
+msgid "Standard Locales"
+msgstr "Стандартные локали"
+
+msgid "Gnome Help files"
+msgstr "Файлы справки Gnome"
+
+msgid "KDE Documentation"
+msgstr "Документация KDE"
+
+msgid "Protected: current language or system default"
+msgstr "Защищено: текущий язык или системный по умолчанию"
+
+msgid "Remove selected localization and documentation?"
+msgstr "Удалить выбранную локализацию и документацию?"
+
+msgid "{} items will be permanently deleted from the system."
+msgstr "{} элементов будет навсегда удалено из системы."
+
+msgid "Cleaning locales and docs..."
+msgstr "Очистка локалей и документации..."
+
+msgid "Click the icon to analyze the system"
+msgstr "Нажмите на иконку для анализа системы"
+
+msgid "The scan may take a few seconds"
+msgstr "Анализ может занять несколько секунд"
+
+msgid "Scan Summary"
+msgstr "Сводка сканирования"
+
+msgid "Unnecessary GPU Drivers"
+msgstr "Ненужные драйверы GPU"
+
+msgid "Old Kernels"
+msgstr "Старые ядра"
+
+msgid "Temporary Files"
+msgstr "Временные файлы"
+
+msgid "Firmware Families"
+msgstr "Семейства прошивок"
+
+msgid "Generic/Unknown"
+msgstr "Общий/Неизвестный"
+
+msgid "Detected Hardware"
+msgstr "Обнаруженное оборудование"
+
+msgid "Active Drivers"
+msgstr "Активные драйверы"
+
+msgid "Languages & Docs"
+msgstr "Языки и документация"
+
+msgid "Total Reclaimable Space"
+msgstr "Всего освобождаемое место"
+
+msgid "Ready to clean"
+msgstr "Готово к очистке"
+
+msgid "System Usage"
+msgstr "Использование системы"
+
+msgid "Keep files from the last:"
+msgstr "Хранить файлы за последние:"
+
+msgid "1 day"
+msgstr "1 день"
+
+msgid "7 days"
+msgstr "7 дней"
+
+msgid "30 days"
+msgstr "30 дней"
+
+msgid "DO NOT KEEP (Delete all)"
+msgstr "НЕ ХРАНИТЬ (Удалить всё)"
+
+msgid "{} item(s) — {}"
+msgstr "{} элемент(ов) — {}"
+
+msgid "No temporary files matching this filter"
+msgstr "Нет временных файлов для этого фильтра"
+
+msgid "Remove selected temporary files?"
+msgstr "Удалить выбранные временные файлы?"
+
+msgid "{} item(s) to remove."
+msgstr "{} элемент(ов) для удаления."
+
+msgid "Removing temporary files..."
+msgstr "Удаление временных файлов..."
+
+msgid "{} item(s)"
+msgstr "{} элемент(ов)"
+
+msgid "{} family(s)"
+msgstr "{} семейство(в)"
+
+msgid "{} removable"
+msgstr "{} можно удалить"

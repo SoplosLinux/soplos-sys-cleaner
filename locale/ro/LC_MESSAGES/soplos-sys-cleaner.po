@@ -1,0 +1,378 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-03-20 04:02+0100\n"
+"Language: ro\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "No packages to remove."
+msgstr "Nu există pachete de eliminat."
+
+msgid "Preparing administrative tasks..."
+msgstr "Se pregătesc sarcinile administrative..."
+
+msgid "Authentication cancelled."
+msgstr "Autentificare anulată."
+
+msgid "Tasks completed successfully."
+msgstr "Sarcini finalizate cu succes."
+
+msgid "Unexpected error: {}"
+msgstr "Eroare neașteptată: {}"
+
+msgid "Cleaning APT cache..."
+msgstr "Se curăță cache-ul APT..."
+
+msgid "APT cache cleaned successfully."
+msgstr "Cache APT curățat cu succes."
+
+msgid "Error cleaning cache: {}"
+msgstr "Eroare la curățarea cache-ului: {}"
+
+msgid "Removing orphaned packages..."
+msgstr "Se elimină pachetele orfane..."
+
+msgid "Orphaned packages removed."
+msgstr "Pachete orfane eliminate."
+
+msgid "Removing {}..."
+msgstr "Se elimină {}..."
+
+msgid "Permission denied: {}"
+msgstr "Permisiune refuzată: {}"
+
+msgid "Error in {}: {}"
+msgstr "Eroare în {}: {}"
+
+msgid "{} item(s) removed."
+msgstr "{} element(e) eliminat(e)."
+
+msgid "{} error(s)."
+msgstr "{} eroare(i)."
+
+msgid "Regenerating initramfs with dracut..."
+msgstr "Se regenerează initramfs cu dracut..."
+
+msgid "dracut error: {}"
+msgstr "Eroare dracut: {}"
+
+msgid "initramfs regenerated successfully."
+msgstr "initramfs regenerat cu succes."
+
+msgid "dracut not found on the system."
+msgstr "dracut nu a fost găsit pe sistem."
+
+msgid "No firmwares to remove."
+msgstr "Nu există firmware de eliminat."
+
+msgid "Preparing firmware removal..."
+msgstr "Se pregătește eliminarea firmware-ului..."
+
+msgid "Firmware removed and initramfs regenerated."
+msgstr "Firmware eliminat și initramfs regenerat."
+
+msgid "No items selected for removal."
+msgstr "Nu sunt elemente selectate pentru eliminare."
+
+msgid "Cleaning localization and documentation files..."
+msgstr "Se curăță fișierele de localizare și documentație..."
+
+msgid "Localization and documentation cleaned successfully."
+msgstr "Localizare și documentație curățate cu succes."
+
+msgid "Scan system"
+msgstr "Scanare sistem"
+
+msgid "Overview"
+msgstr "Prezentare generală"
+
+msgid "GPU Drivers"
+msgstr "Drivere GPU"
+
+msgid "Firmwares"
+msgstr "Firmware"
+
+msgid "Kernels"
+msgstr "Kerneluri"
+
+msgid "Languages"
+msgstr "Limbi"
+
+msgid "APT Cache"
+msgstr "Cache APT"
+
+msgid "Temp Files"
+msgstr "Fișiere temporare"
+
+msgid "Ready"
+msgstr "Gata"
+
+msgid "Running on {} ({})"
+msgstr "Rulează pe {} ({})"
+
+msgid "Scanning system..."
+msgstr "Se scanează sistemul..."
+
+msgid "Detecting hardware..."
+msgstr "Se detectează hardware-ul..."
+
+msgid "Scanning GPU drivers..."
+msgstr "Se scanează driverele GPU..."
+
+msgid "Scanning firmwares..."
+msgstr "Se scanează firmware-ul..."
+
+msgid "Scanning kernels..."
+msgstr "Se scanează kernelurile..."
+
+msgid "Scanning APT cache..."
+msgstr "Se scanează cache-ul APT..."
+
+msgid "Scanning temporary files..."
+msgstr "Se scanează fișierele temporare..."
+
+msgid "Scanning languages and docs..."
+msgstr "Se scanează limbile și documentația..."
+
+msgid "Error during scan: {}"
+msgstr "Eroare în timpul scanării: {}"
+
+msgid "Scan completed"
+msgstr "Scanare finalizată"
+
+msgid "APT Package Cache"
+msgstr "Cache de pachete APT"
+
+msgid "Click «Scan» to view cache status"
+msgstr "Faceți clic pe «Scanare» pentru a vedea starea cache-ului"
+
+msgid "Clean APT Cache"
+msgstr "Curățare cache APT"
+
+msgid "Orphaned Packages"
+msgstr "Pachete orfane"
+
+msgid "Click «Scan» to view orphaned packages"
+msgstr "Faceți clic pe «Scanare» pentru a vedea pachetele orfane"
+
+msgid "Remove Orphaned Packages"
+msgstr "Eliminare pachete orfane"
+
+msgid "{} cached .deb files — {} | Package lists: {}"
+msgstr "{} fișiere .deb în cache — {} | Liste de pachete: {}"
+
+msgid "No cached .deb files | Package lists: {}"
+msgstr "Niciun fișier .deb în cache | Liste de pachete: {}"
+
+msgid "No orphaned packages"
+msgstr "Nu există pachete orfane"
+
+msgid "{} orphaned package(s) detected"
+msgstr "{} pachet(e) orfan(e) detectat(e)"
+
+msgid "Remove orphaned packages?"
+msgstr "Eliminați pachetele orfane?"
+
+msgid "Detected GPU: —"
+msgstr "GPU detectat: —"
+
+msgid "Select all"
+msgstr "Selectare tot"
+
+msgid "Remove Selected"
+msgstr "Eliminare selecție"
+
+msgid "Detected GPU: {}"
+msgstr "GPU detectat: {}"
+
+msgid "Generic"
+msgstr "Generic"
+
+msgid "No unnecessary drivers found"
+msgstr "Nu s-au găsit drivere inutile"
+
+msgid "Remove selected packages?"
+msgstr "Eliminați pachetele selectate?"
+
+msgid "{} package(s) will be removed and the initramfs will be regenerated."
+msgstr "{} pachet(e) vor fi eliminate și initramfs-ul va fi regenerat."
+
+msgid "Removing drivers and regenerating initramfs..."
+msgstr "Se elimină driverele și se regenerează initramfs..."
+
+msgid ""
+"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
+"the initrd"
+msgstr "Firmware-urile de rețea/Wi-Fi sunt blocate — soplos.conf le injectează întotdeauna în initrd"
+
+msgid "Remove selected firmwares"
+msgstr "Eliminare firmware selectat"
+
+msgid "{} firmware families detected"
+msgstr "{} familii de firmware detectate"
+
+msgid ""
+"Protected: soplos.conf includes this firmware in the initrd to ensure "
+"connectivity"
+msgstr "Protejat: soplos.conf include acest firmware în initrd pentru a asigura conectivitatea"
+
+msgid "Protected network firmware"
+msgstr "Firmware de rețea protejat"
+
+msgid "Remove selected firmwares?"
+msgstr "Eliminați firmware-urile selectate?"
+
+msgid ""
+"{} firmware family(s) will be removed from /lib/firmware/\n"
+"The initramfs will be regenerated automatically."
+msgstr ""
+"{} familie(ii) de firmware vor fi eliminate din /lib/firmware/\n"
+"Initramfs-ul va fi regenerat automat."
+
+msgid "Removing firmwares and regenerating initramfs..."
+msgstr "Se elimină firmware-urile și se regenerează initramfs..."
+
+msgid "Version"
+msgstr "Versiune"
+
+msgid "Image"
+msgstr "Imagine"
+
+msgid "Headers"
+msgstr "Antete"
+
+msgid "Sources"
+msgstr "Surse"
+
+msgid "Size"
+msgstr "Dimensiune"
+
+msgid "{} kernel(s) installed, {} removable"
+msgstr "{} kernel(uri) instalat(e), {} de eliminat"
+
+msgid "Remove selected kernel packages?"
+msgstr "Eliminați pachetele de kernel selectate?"
+
+msgid ""
+"{} package(s) to remove:\n"
+"{}"
+msgstr ""
+"{} pachet(e) de eliminat:\n"
+"{}"
+
+msgid "Removing kernel packages..."
+msgstr "Se elimină pachetele de kernel..."
+
+msgid "Select items to remove"
+msgstr "Selectați elementele de eliminat"
+
+msgid "Keep only my languages"
+msgstr "Păstrați doar limbile mele"
+
+msgid "Unselect current language and English, select everything else"
+msgstr "Deselectați limba curentă și engleza, selectați tot restul"
+
+msgid "System Documentation"
+msgstr "Documentație sistem"
+
+msgid "Standard Locales"
+msgstr "Locale standard"
+
+msgid "Gnome Help files"
+msgstr "Fișiere de ajutor Gnome"
+
+msgid "KDE Documentation"
+msgstr "Documentație KDE"
+
+msgid "Protected: current language or system default"
+msgstr "Protejat: limba curentă sau implicită a sistemului"
+
+msgid "Remove selected localization and documentation?"
+msgstr "Eliminați localizarea și documentația selectate?"
+
+msgid "{} items will be permanently deleted from the system."
+msgstr "{} elemente vor fi șterse permanent din sistem."
+
+msgid "Cleaning locales and docs..."
+msgstr "Se curăță localizarea și documentația..."
+
+msgid "Click the icon to analyze the system"
+msgstr "Faceți clic pe pictogramă pentru a analiza sistemul"
+
+msgid "The scan may take a few seconds"
+msgstr "Analiza poate dura câteva secunde"
+
+msgid "Scan Summary"
+msgstr "Rezumat scanare"
+
+msgid "Unnecessary GPU Drivers"
+msgstr "Drivere GPU inutile"
+
+msgid "Old Kernels"
+msgstr "Kerneluri vechi"
+
+msgid "Temporary Files"
+msgstr "Fișiere temporare"
+
+msgid "Firmware Families"
+msgstr "Familii de firmware"
+
+msgid "Generic/Unknown"
+msgstr "Generic/Necunoscut"
+
+msgid "Detected Hardware"
+msgstr "Hardware detectat"
+
+msgid "Active Drivers"
+msgstr "Drivere active"
+
+msgid "Languages & Docs"
+msgstr "Limbi și documentație"
+
+msgid "Total Reclaimable Space"
+msgstr "Spațiu total recuperabil"
+
+msgid "Ready to clean"
+msgstr "Gata de curățare"
+
+msgid "System Usage"
+msgstr "Utilizare sistem"
+
+msgid "Keep files from the last:"
+msgstr "Păstrați fișierele din ultimele:"
+
+msgid "1 day"
+msgstr "1 zi"
+
+msgid "7 days"
+msgstr "7 zile"
+
+msgid "30 days"
+msgstr "30 de zile"
+
+msgid "DO NOT KEEP (Delete all)"
+msgstr "NU PĂSTRA (Șterge tot)"
+
+msgid "{} item(s) — {}"
+msgstr "{} element(e) — {}"
+
+msgid "No temporary files matching this filter"
+msgstr "Nu există fișiere temporare pentru acest filtru"
+
+msgid "Remove selected temporary files?"
+msgstr "Eliminați fișierele temporare selectate?"
+
+msgid "{} item(s) to remove."
+msgstr "{} element(e) de eliminat."
+
+msgid "Removing temporary files..."
+msgstr "Se elimină fișierele temporare..."
+
+msgid "{} item(s)"
+msgstr "{} element(e)"
+
+msgid "{} family(s)"
+msgstr "{} familie(i)"
+
+msgid "{} removable"
+msgstr "{} detașabil(e)"

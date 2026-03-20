@@ -1,0 +1,182 @@
+/* Base Theme for Soplos Sys Cleaner - GTK3 Compatible */
+
+/* Application Window */
+.soplos-window {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+}
+
+/* Notebook and Tabs */
+notebook {
+    border: 1px solid @borders;
+    background-color: @theme_base_color;
+}
+
+notebook>stack {
+    background-color: @theme_base_color;
+    border-top: 1px solid @borders;
+}
+
+notebook header {
+    background-color: transparent;
+    border: none;
+    padding: 4px 8px 0 8px;
+}
+
+notebook header tabs {
+    border: none;
+    background-color: transparent;
+}
+
+notebook header tab {
+    padding: 10px 18px;
+    border: 1px solid @borders;
+    border-bottom: none;
+    background-color: @theme_unfocused_bg_color;
+    color: @theme_fg_color;
+    margin: 0 2px -1px 0;
+    border-radius: 6px 6px 0 0;
+    font-weight: 400;
+    min-height: 28px;
+}
+
+notebook header tab:hover {
+    background-color: @theme_bg_color;
+}
+
+notebook header tab:checked {
+    background-color: @theme_base_color;
+    border-bottom: none;
+    font-weight: 500;
+    margin-bottom: -1px;
+}
+
+notebook header tab label {
+    color: inherit;
+}
+
+notebook header tab image {
+    margin-right: 6px;
+    min-height: 16px;
+}
+
+/* Buttons */
+button {
+    border-radius: 6px;
+    padding: 8px 16px;
+    border: 1px solid @borders;
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    font-weight: 500;
+}
+
+button:hover {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+
+
+
+button.suggested-action {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+    border: none;
+    font-weight: bold;
+}
+
+button.destructive-action {
+    background-color: @error_color;
+    color: white;
+    border: none;
+}
+
+/* Cards */
+.soplos-card {
+    background-color: @theme_base_color;
+    border: 1px solid @borders;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px;
+}
+
+
+.dim-label {
+    color: @insensitive_fg_color;
+}
+
+/* Lists */
+list,
+treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+}
+
+list row:hover,
+treeview row:hover {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+list row:selected,
+treeview row:selected {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+/* CheckButton */
+checkbutton label {
+    color: @theme_fg_color;
+}
+
+/* Scrolled windows */
+scrolledwindow {
+    background-color: @theme_base_color;
+}
+
+scrolledwindow viewport {
+    background-color: @theme_base_color;
+}
+
+/* ProgressBar */
+progressbar {
+    border-radius: 4px;
+}
+
+/* Separator */
+separator {
+    background-color: @borders;
+    margin: 8px 0;
+}
+
+/* Overview summary cards */
+.summary-card {
+    border-radius: 10px;
+    padding: 12px;
+    margin: 0px;
+    border: 1px solid @borders;
+    background-color: @theme_base_color;
+}
+
+.summary-card-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.summary-card-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: @theme_selected_bg_color;
+}
+
+/* Protected item (locked) */
+.item-protected {
+    color: @insensitive_fg_color;
+    font-style: italic;
+}
+
+/* Active kernel badge */
+.kernel-active {
+    color: @theme_selected_bg_color;
+    font-weight: bold;
+}

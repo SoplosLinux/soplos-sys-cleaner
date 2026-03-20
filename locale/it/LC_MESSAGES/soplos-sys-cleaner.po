@@ -1,0 +1,378 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-03-20 04:02+0100\n"
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "No packages to remove."
+msgstr "Nessun pacchetto da rimuovere."
+
+msgid "Preparing administrative tasks..."
+msgstr "Preparazione attività amministrative..."
+
+msgid "Authentication cancelled."
+msgstr "Autenticazione annullata."
+
+msgid "Tasks completed successfully."
+msgstr "Attività completate con successo."
+
+msgid "Unexpected error: {}"
+msgstr "Errore imprevisto: {}"
+
+msgid "Cleaning APT cache..."
+msgstr "Pulizia cache APT..."
+
+msgid "APT cache cleaned successfully."
+msgstr "Cache APT pulita con successo."
+
+msgid "Error cleaning cache: {}"
+msgstr "Errore durante la pulizia della cache: {}"
+
+msgid "Removing orphaned packages..."
+msgstr "Rimozione pacchetti orfani..."
+
+msgid "Orphaned packages removed."
+msgstr "Pacchetti orfani rimossi."
+
+msgid "Removing {}..."
+msgstr "Rimozione di {}..."
+
+msgid "Permission denied: {}"
+msgstr "Permesso negato: {}"
+
+msgid "Error in {}: {}"
+msgstr "Errore in {}: {}"
+
+msgid "{} item(s) removed."
+msgstr "{} elemento/i rimosso/i."
+
+msgid "{} error(s)."
+msgstr "{} errore/i."
+
+msgid "Regenerating initramfs with dracut..."
+msgstr "Rigenerazione initramfs con dracut..."
+
+msgid "dracut error: {}"
+msgstr "Errore dracut: {}"
+
+msgid "initramfs regenerated successfully."
+msgstr "initramfs rigenerato con successo."
+
+msgid "dracut not found on the system."
+msgstr "dracut non trovato nel sistema."
+
+msgid "No firmwares to remove."
+msgstr "Nessun firmware da rimuovere."
+
+msgid "Preparing firmware removal..."
+msgstr "Preparazione rimozione firmware..."
+
+msgid "Firmware removed and initramfs regenerated."
+msgstr "Firmware rimosso e initramfs rigenerato."
+
+msgid "No items selected for removal."
+msgstr "Nessun elemento selezionato per la rimozione."
+
+msgid "Cleaning localization and documentation files..."
+msgstr "Pulizia file di localizzazione e documentazione..."
+
+msgid "Localization and documentation cleaned successfully."
+msgstr "Localizzazione e documentazione pulite con successo."
+
+msgid "Scan system"
+msgstr "Scansiona sistema"
+
+msgid "Overview"
+msgstr "Panoramica"
+
+msgid "GPU Drivers"
+msgstr "Driver GPU"
+
+msgid "Firmwares"
+msgstr "Firmware"
+
+msgid "Kernels"
+msgstr "Kernel"
+
+msgid "Languages"
+msgstr "Lingue"
+
+msgid "APT Cache"
+msgstr "Cache APT"
+
+msgid "Temp Files"
+msgstr "File temporanei"
+
+msgid "Ready"
+msgstr "Pronto"
+
+msgid "Running on {} ({})"
+msgstr "In esecuzione su {} ({})"
+
+msgid "Scanning system..."
+msgstr "Scansione sistema..."
+
+msgid "Detecting hardware..."
+msgstr "Rilevamento hardware..."
+
+msgid "Scanning GPU drivers..."
+msgstr "Scansione driver GPU..."
+
+msgid "Scanning firmwares..."
+msgstr "Scansione firmware..."
+
+msgid "Scanning kernels..."
+msgstr "Scansione kernel..."
+
+msgid "Scanning APT cache..."
+msgstr "Scansione cache APT..."
+
+msgid "Scanning temporary files..."
+msgstr "Scansione file temporanei..."
+
+msgid "Scanning languages and docs..."
+msgstr "Scansione lingue e documentazione..."
+
+msgid "Error during scan: {}"
+msgstr "Errore durante la scansione: {}"
+
+msgid "Scan completed"
+msgstr "Scansione completata"
+
+msgid "APT Package Cache"
+msgstr "Cache pacchetti APT"
+
+msgid "Click «Scan» to view cache status"
+msgstr "Clicca «Scansiona» per visualizzare lo stato della cache"
+
+msgid "Clean APT Cache"
+msgstr "Pulisci cache APT"
+
+msgid "Orphaned Packages"
+msgstr "Pacchetti orfani"
+
+msgid "Click «Scan» to view orphaned packages"
+msgstr "Clicca «Scansiona» per visualizzare i pacchetti orfani"
+
+msgid "Remove Orphaned Packages"
+msgstr "Rimuovi pacchetti orfani"
+
+msgid "{} cached .deb files — {} | Package lists: {}"
+msgstr "{} file .deb in cache — {} | Liste pacchetti: {}"
+
+msgid "No cached .deb files | Package lists: {}"
+msgstr "Nessun file .deb in cache | Liste pacchetti: {}"
+
+msgid "No orphaned packages"
+msgstr "Nessun pacchetto orfano"
+
+msgid "{} orphaned package(s) detected"
+msgstr "{} pacchetto/i orfano/i rilevato/i"
+
+msgid "Remove orphaned packages?"
+msgstr "Rimuovere i pacchetti orfani?"
+
+msgid "Detected GPU: —"
+msgstr "GPU rilevata: —"
+
+msgid "Select all"
+msgstr "Seleziona tutto"
+
+msgid "Remove Selected"
+msgstr "Rimuovi selezionati"
+
+msgid "Detected GPU: {}"
+msgstr "GPU rilevata: {}"
+
+msgid "Generic"
+msgstr "Generico"
+
+msgid "No unnecessary drivers found"
+msgstr "Nessun driver non necessario trovato"
+
+msgid "Remove selected packages?"
+msgstr "Rimuovere i pacchetti selezionati?"
+
+msgid "{} package(s) will be removed and the initramfs will be regenerated."
+msgstr "{} pacchetto/i verrà/verranno rimosso/i e l'initramfs verrà rigenerato."
+
+msgid "Removing drivers and regenerating initramfs..."
+msgstr "Rimozione driver e rigenerazione initramfs..."
+
+msgid ""
+"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
+"the initrd"
+msgstr "I firmware di rete/Wi-Fi sono bloccati — soplos.conf li inserisce sempre nell'initrd"
+
+msgid "Remove selected firmwares"
+msgstr "Rimuovi firmware selezionati"
+
+msgid "{} firmware families detected"
+msgstr "{} famiglie di firmware rilevate"
+
+msgid ""
+"Protected: soplos.conf includes this firmware in the initrd to ensure "
+"connectivity"
+msgstr "Protetto: soplos.conf include questo firmware nell'initrd per garantire la connettività"
+
+msgid "Protected network firmware"
+msgstr "Firmware di rete protetto"
+
+msgid "Remove selected firmwares?"
+msgstr "Rimuovere i firmware selezionati?"
+
+msgid ""
+"{} firmware family(s) will be removed from /lib/firmware/\n"
+"The initramfs will be regenerated automatically."
+msgstr ""
+"{} famiglia/e di firmware verrà/verranno rimossa/e da /lib/firmware/\n"
+"L'initramfs verrà rigenerato automaticamente."
+
+msgid "Removing firmwares and regenerating initramfs..."
+msgstr "Rimozione firmware e rigenerazione initramfs..."
+
+msgid "Version"
+msgstr "Versione"
+
+msgid "Image"
+msgstr "Immagine"
+
+msgid "Headers"
+msgstr "Header"
+
+msgid "Sources"
+msgstr "Sorgenti"
+
+msgid "Size"
+msgstr "Dimensione"
+
+msgid "{} kernel(s) installed, {} removable"
+msgstr "{} kernel installato/i, {} rimovibile/i"
+
+msgid "Remove selected kernel packages?"
+msgstr "Rimuovere i pacchetti kernel selezionati?"
+
+msgid ""
+"{} package(s) to remove:\n"
+"{}"
+msgstr ""
+"{} pacchetto/i da rimuovere:\n"
+"{}"
+
+msgid "Removing kernel packages..."
+msgstr "Rimozione pacchetti kernel..."
+
+msgid "Select items to remove"
+msgstr "Seleziona elementi da rimuovere"
+
+msgid "Keep only my languages"
+msgstr "Mantieni solo le mie lingue"
+
+msgid "Unselect current language and English, select everything else"
+msgstr "Deseleziona lingua corrente e inglese, seleziona tutto il resto"
+
+msgid "System Documentation"
+msgstr "Documentazione di sistema"
+
+msgid "Standard Locales"
+msgstr "Locale standard"
+
+msgid "Gnome Help files"
+msgstr "File di aiuto Gnome"
+
+msgid "KDE Documentation"
+msgstr "Documentazione KDE"
+
+msgid "Protected: current language or system default"
+msgstr "Protetto: lingua corrente o predefinita del sistema"
+
+msgid "Remove selected localization and documentation?"
+msgstr "Rimuovere localizzazione e documentazione selezionate?"
+
+msgid "{} items will be permanently deleted from the system."
+msgstr "{} elementi verranno eliminati definitivamente dal sistema."
+
+msgid "Cleaning locales and docs..."
+msgstr "Pulizia locale e documentazione..."
+
+msgid "Click the icon to analyze the system"
+msgstr "Clicca sull'icona per analizzare il sistema"
+
+msgid "The scan may take a few seconds"
+msgstr "L'analisi potrebbe richiedere alcuni secondi"
+
+msgid "Scan Summary"
+msgstr "Riepilogo scansione"
+
+msgid "Unnecessary GPU Drivers"
+msgstr "Driver GPU non necessari"
+
+msgid "Old Kernels"
+msgstr "Kernel obsoleti"
+
+msgid "Temporary Files"
+msgstr "File temporanei"
+
+msgid "Firmware Families"
+msgstr "Famiglie di firmware"
+
+msgid "Generic/Unknown"
+msgstr "Generico/Sconosciuto"
+
+msgid "Detected Hardware"
+msgstr "Hardware rilevato"
+
+msgid "Active Drivers"
+msgstr "Driver attivi"
+
+msgid "Languages & Docs"
+msgstr "Lingue e documentazione"
+
+msgid "Total Reclaimable Space"
+msgstr "Spazio totale recuperabile"
+
+msgid "Ready to clean"
+msgstr "Pronto per la pulizia"
+
+msgid "System Usage"
+msgstr "Utilizzo del sistema"
+
+msgid "Keep files from the last:"
+msgstr "Mantieni i file degli ultimi:"
+
+msgid "1 day"
+msgstr "1 giorno"
+
+msgid "7 days"
+msgstr "7 giorni"
+
+msgid "30 days"
+msgstr "30 giorni"
+
+msgid "DO NOT KEEP (Delete all)"
+msgstr "NON MANTENERE (Elimina tutto)"
+
+msgid "{} item(s) — {}"
+msgstr "{} elemento/i — {}"
+
+msgid "No temporary files matching this filter"
+msgstr "Nessun file temporaneo corrispondente a questo filtro"
+
+msgid "Remove selected temporary files?"
+msgstr "Rimuovere i file temporanei selezionati?"
+
+msgid "{} item(s) to remove."
+msgstr "{} elemento/i da rimuovere."
+
+msgid "Removing temporary files..."
+msgstr "Rimozione file temporanei..."
+
+msgid "{} item(s)"
+msgstr "{} elemento/i"
+
+msgid "{} family(s)"
+msgstr "{} famiglia/e"
+
+msgid "{} removable"
+msgstr "{} rimovibile/i"

@@ -1,0 +1,497 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-03-20 04:02+0100\n"
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: cleaner/remover.py:25
+msgid "No packages to remove."
+msgstr "Keine Pakete zum Entfernen."
+
+#: cleaner/remover.py:28
+msgid "Preparing administrative tasks..."
+msgstr "Verwaltungsaufgaben werden vorbereitet..."
+
+#: cleaner/remover.py:52 cleaner/remover.py:125 cleaner/remover.py:157
+#: cleaner/remover.py:188
+msgid "Authentication cancelled."
+msgstr "Authentifizierung abgebrochen."
+
+#: cleaner/remover.py:55
+msgid "Tasks completed successfully."
+msgstr "Aufgaben erfolgreich abgeschlossen."
+
+#: cleaner/remover.py:58 cleaner/remover.py:131 cleaner/remover.py:163
+#: cleaner/remover.py:194
+msgid "Unexpected error: {}"
+msgstr "Unerwarteter Fehler: {}"
+
+#: cleaner/remover.py:64 ui/tabs/cache_tab.py:122
+msgid "Cleaning APT cache..."
+msgstr "APT-Cache wird geleert..."
+
+#: cleaner/remover.py:67
+msgid "APT cache cleaned successfully."
+msgstr "APT-Cache erfolgreich geleert."
+
+#: cleaner/remover.py:69
+msgid "Error cleaning cache: {}"
+msgstr "Fehler beim Leeren des Caches: {}"
+
+#: cleaner/remover.py:75 ui/tabs/cache_tab.py:146
+msgid "Removing orphaned packages..."
+msgstr "Verwaiste Pakete werden entfernt..."
+
+#: cleaner/remover.py:83
+msgid "Orphaned packages removed."
+msgstr "Verwaiste Pakete entfernt."
+
+#: cleaner/remover.py:96
+msgid "Removing {}..."
+msgstr "{} wird entfernt..."
+
+#: cleaner/remover.py:104
+msgid "Permission denied: {}"
+msgstr "Zugriff verweigert: {}"
+
+#: cleaner/remover.py:106
+msgid "Error in {}: {}"
+msgstr "Fehler in {}: {}"
+
+#: cleaner/remover.py:108
+msgid "{} item(s) removed."
+msgstr "{} Element(e) entfernt."
+
+#: cleaner/remover.py:110
+msgid "{} error(s)."
+msgstr "{} Fehler."
+
+#: cleaner/remover.py:117
+msgid "Regenerating initramfs with dracut..."
+msgstr "initramfs wird mit dracut neu generiert..."
+
+#: cleaner/remover.py:126
+msgid "dracut error: {}"
+msgstr "dracut-Fehler: {}"
+
+#: cleaner/remover.py:127
+msgid "initramfs regenerated successfully."
+msgstr "initramfs erfolgreich neu generiert."
+
+#: cleaner/remover.py:129
+msgid "dracut not found on the system."
+msgstr "dracut nicht auf dem System gefunden."
+
+#: cleaner/remover.py:139
+msgid "No firmwares to remove."
+msgstr "Keine Firmware zum Entfernen."
+
+#: cleaner/remover.py:142
+msgid "Preparing firmware removal..."
+msgstr "Firmware-Entfernung wird vorbereitet..."
+
+#: cleaner/remover.py:160
+msgid "Firmware removed and initramfs regenerated."
+msgstr "Firmware entfernt und initramfs neu generiert."
+
+#: cleaner/remover.py:171
+msgid "No items selected for removal."
+msgstr "Keine Elemente zur Entfernung ausgewählt."
+
+#: cleaner/remover.py:174
+msgid "Cleaning localization and documentation files..."
+msgstr "Lokalisierungs- und Dokumentationsdateien werden geleert..."
+
+#: cleaner/remover.py:191
+msgid "Localization and documentation cleaned successfully."
+msgstr "Lokalisierung und Dokumentation erfolgreich geleert."
+
+#: ui/main_window.py:83 ui/tabs/overview_tab.py:38
+msgid "Scan system"
+msgstr "System scannen"
+
+#: ui/main_window.py:114
+msgid "Overview"
+msgstr "Übersicht"
+
+#: ui/main_window.py:115
+msgid "GPU Drivers"
+msgstr "GPU-Treiber"
+
+#: ui/main_window.py:116
+msgid "Firmwares"
+msgstr "Firmware"
+
+#: ui/main_window.py:117
+msgid "Kernels"
+msgstr "Kernel"
+
+#: ui/main_window.py:118
+msgid "Languages"
+msgstr "Sprachen"
+
+#: ui/main_window.py:119 ui/tabs/overview_tab.py:149
+msgid "APT Cache"
+msgstr "APT-Cache"
+
+#: ui/main_window.py:120
+msgid "Temp Files"
+msgstr "Temporäre Dateien"
+
+#: ui/main_window.py:145
+msgid "Ready"
+msgstr "Bereit"
+
+#: ui/main_window.py:180
+msgid "Running on {} ({})"
+msgstr "Läuft auf {} ({})"
+
+#: ui/main_window.py:263
+msgid "Scanning system..."
+msgstr "System wird gescannt..."
+
+#: ui/main_window.py:274
+msgid "Detecting hardware..."
+msgstr "Hardware wird erkannt..."
+
+#: ui/main_window.py:279
+msgid "Scanning GPU drivers..."
+msgstr "GPU-Treiber werden gescannt..."
+
+#: ui/main_window.py:282
+msgid "Scanning firmwares..."
+msgstr "Firmware wird gescannt..."
+
+#: ui/main_window.py:286
+msgid "Scanning kernels..."
+msgstr "Kernel werden gescannt..."
+
+#: ui/main_window.py:289
+msgid "Scanning APT cache..."
+msgstr "APT-Cache wird gescannt..."
+
+#: ui/main_window.py:293
+msgid "Scanning temporary files..."
+msgstr "Temporäre Dateien werden gescannt..."
+
+#: ui/main_window.py:296
+msgid "Scanning languages and docs..."
+msgstr "Sprachen und Dokumentation werden gescannt..."
+
+#: ui/main_window.py:315
+msgid "Error during scan: {}"
+msgstr "Fehler beim Scannen: {}"
+
+#: ui/main_window.py:318
+msgid "Scan completed"
+msgstr "Scan abgeschlossen"
+
+#: ui/tabs/cache_tab.py:31
+msgid "APT Package Cache"
+msgstr "APT-Paket-Cache"
+
+#: ui/tabs/cache_tab.py:35
+msgid "Click «Scan» to view cache status"
+msgstr "Klicken Sie auf «Scannen», um den Cache-Status anzuzeigen"
+
+#: ui/tabs/cache_tab.py:42
+msgid "Clean APT Cache"
+msgstr "APT-Cache leeren"
+
+#: ui/tabs/cache_tab.py:53
+msgid "Orphaned Packages"
+msgstr "Verwaiste Pakete"
+
+#: ui/tabs/cache_tab.py:57
+msgid "Click «Scan» to view orphaned packages"
+msgstr "Klicken Sie auf «Scannen», um verwaiste Pakete anzuzeigen"
+
+#: ui/tabs/cache_tab.py:73
+msgid "Remove Orphaned Packages"
+msgstr "Verwaiste Pakete entfernen"
+
+#: ui/tabs/cache_tab.py:88
+msgid "{} cached .deb files — {} | Package lists: {}"
+msgstr "{} .deb-Dateien im Cache — {} | Paketlisten: {}"
+
+msgid "No cached .deb files | Package lists: {}"
+msgstr "Keine .deb-Dateien im Cache | Paketlisten: {}"
+
+#: ui/tabs/cache_tab.py:97
+msgid "No orphaned packages"
+msgstr "Keine verwaisten Pakete"
+
+#: ui/tabs/cache_tab.py:112
+msgid "{} orphaned package(s) detected"
+msgstr "{} verwaiste(s) Paket(e) erkannt"
+
+#: ui/tabs/cache_tab.py:136
+msgid "Remove orphaned packages?"
+msgstr "Verwaiste Pakete entfernen?"
+
+#: ui/tabs/drivers_tab.py:32
+msgid "Detected GPU: —"
+msgstr "Erkannte GPU: —"
+
+#: ui/tabs/drivers_tab.py:36 ui/tabs/firmware_tab.py:50 ui/tabs/temp_tab.py:45
+msgid "Select all"
+msgstr "Alle auswählen"
+
+#: ui/tabs/drivers_tab.py:65 ui/tabs/kernels_tab.py:106
+#: ui/tabs/locales_tab.py:71 ui/tabs/temp_tab.py:74
+msgid "Remove Selected"
+msgstr "Auswahl entfernen"
+
+#: ui/tabs/drivers_tab.py:82
+msgid "Detected GPU: {}"
+msgstr "Erkannte GPU: {}"
+
+#: ui/tabs/drivers_tab.py:82
+msgid "Generic"
+msgstr "Generisch"
+
+#: ui/tabs/drivers_tab.py:89
+msgid "No unnecessary drivers found"
+msgstr "Keine unnötigen Treiber gefunden"
+
+#: ui/tabs/drivers_tab.py:146
+msgid "Remove selected packages?"
+msgstr "Ausgewählte Pakete entfernen?"
+
+#: ui/tabs/drivers_tab.py:149
+msgid "{} package(s) will be removed and the initramfs will be regenerated."
+msgstr "{} Paket(e) werden entfernt und initramfs wird neu generiert."
+
+#: ui/tabs/drivers_tab.py:161
+msgid "Removing drivers and regenerating initramfs..."
+msgstr "Treiber werden entfernt und initramfs wird neu generiert..."
+
+#: ui/tabs/firmware_tab.py:32
+msgid ""
+"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
+"the initrd"
+msgstr "Netzwerk-/WLAN-Firmware ist gesperrt — soplos.conf injiziert sie immer in den initrd"
+
+#: ui/tabs/firmware_tab.py:79
+msgid "Remove selected firmwares"
+msgstr "Ausgewählte Firmware entfernen"
+
+#: ui/tabs/firmware_tab.py:98
+msgid "{} firmware families detected"
+msgstr "{} Firmware-Familien erkannt"
+
+#: ui/tabs/firmware_tab.py:116
+msgid ""
+"Protected: soplos.conf includes this firmware in the initrd to ensure "
+"connectivity"
+msgstr "Geschützt: soplos.conf enthält diese Firmware im initrd zur Sicherstellung der Konnektivität"
+
+#: ui/tabs/firmware_tab.py:133
+msgid "Protected network firmware"
+msgstr "Geschützte Netzwerk-Firmware"
+
+#: ui/tabs/firmware_tab.py:159
+msgid "Remove selected firmwares?"
+msgstr "Ausgewählte Firmware entfernen?"
+
+#: ui/tabs/firmware_tab.py:162
+msgid ""
+"{} firmware family(s) will be removed from /lib/firmware/\n"
+"The initramfs will be regenerated automatically."
+msgstr ""
+"{} Firmware-Familie(n) werden aus /lib/firmware/ entfernt\n"
+"Das initramfs wird automatisch neu generiert."
+
+#: ui/tabs/firmware_tab.py:174
+msgid "Removing firmwares and regenerating initramfs..."
+msgstr "Firmware wird entfernt und initramfs wird neu generiert..."
+
+#: ui/tabs/kernels_tab.py:61
+msgid "Version"
+msgstr "Version"
+
+#: ui/tabs/kernels_tab.py:68
+msgid "Image"
+msgstr "Image"
+
+#: ui/tabs/kernels_tab.py:76
+msgid "Headers"
+msgstr "Header"
+
+#: ui/tabs/kernels_tab.py:84
+msgid "Sources"
+msgstr "Quellen"
+
+#: ui/tabs/kernels_tab.py:92
+msgid "Size"
+msgstr "Größe"
+
+#: ui/tabs/kernels_tab.py:122
+msgid "{} kernel(s) installed, {} removable"
+msgstr "{} Kernel installiert, {} entfernbar"
+
+#: ui/tabs/kernels_tab.py:168
+msgid "Remove selected kernel packages?"
+msgstr "Ausgewählte Kernel-Pakete entfernen?"
+
+#: ui/tabs/kernels_tab.py:170
+msgid ""
+"{} package(s) to remove:\n"
+"{}"
+msgstr ""
+"{} zu entfernende(s) Paket(e):\n"
+"{}"
+
+#: ui/tabs/kernels_tab.py:182
+msgid "Removing kernel packages..."
+msgstr "Kernel-Pakete werden entfernt..."
+
+#: ui/tabs/locales_tab.py:37
+msgid "Select items to remove"
+msgstr "Zu entfernende Elemente auswählen"
+
+#: ui/tabs/locales_tab.py:42
+msgid "Keep only my languages"
+msgstr "Nur meine Sprachen behalten"
+
+#: ui/tabs/locales_tab.py:43
+msgid "Unselect current language and English, select everything else"
+msgstr "Aktuelle Sprache und Englisch abwählen, alles andere auswählen"
+
+#: ui/tabs/locales_tab.py:100
+msgid "System Documentation"
+msgstr "Systemdokumentation"
+
+#: ui/tabs/locales_tab.py:104
+msgid "Standard Locales"
+msgstr "Standard-Gebietsschemas"
+
+#: ui/tabs/locales_tab.py:105
+msgid "Gnome Help files"
+msgstr "Gnome-Hilfedateien"
+
+#: ui/tabs/locales_tab.py:106
+msgid "KDE Documentation"
+msgstr "KDE-Dokumentation"
+
+#: ui/tabs/locales_tab.py:159
+msgid "Protected: current language or system default"
+msgstr "Geschützt: aktuelle Sprache oder Systemstandard"
+
+#: ui/tabs/locales_tab.py:210
+msgid "Remove selected localization and documentation?"
+msgstr "Ausgewählte Lokalisierung und Dokumentation entfernen?"
+
+#: ui/tabs/locales_tab.py:212
+msgid "{} items will be permanently deleted from the system."
+msgstr "{} Elemente werden dauerhaft vom System gelöscht."
+
+#: ui/tabs/locales_tab.py:222
+msgid "Cleaning locales and docs..."
+msgstr "Gebietsschemas und Dokumentation werden geleert..."
+
+#: ui/tabs/overview_tab.py:42
+msgid "Click the icon to analyze the system"
+msgstr "Klicken Sie auf das Symbol, um das System zu analysieren"
+
+#: ui/tabs/overview_tab.py:47
+msgid "The scan may take a few seconds"
+msgstr "Die Analyse kann einige Sekunden dauern"
+
+#: ui/tabs/overview_tab.py:126
+msgid "Scan Summary"
+msgstr "Scan-Zusammenfassung"
+
+#: ui/tabs/overview_tab.py:138
+msgid "Unnecessary GPU Drivers"
+msgstr "Unnötige GPU-Treiber"
+
+#: ui/tabs/overview_tab.py:143
+msgid "Old Kernels"
+msgstr "Alte Kernel"
+
+#: ui/tabs/overview_tab.py:154
+msgid "Temporary Files"
+msgstr "Temporäre Dateien"
+
+#: ui/tabs/overview_tab.py:160
+msgid "Firmware Families"
+msgstr "Firmware-Familien"
+
+#: ui/tabs/overview_tab.py:164
+msgid "Generic/Unknown"
+msgstr "Generisch/Unbekannt"
+
+#: ui/tabs/overview_tab.py:165
+msgid "Detected Hardware"
+msgstr "Erkannte Hardware"
+
+#: ui/tabs/overview_tab.py:165
+msgid "Active Drivers"
+msgstr "Aktive Treiber"
+
+#: ui/tabs/overview_tab.py:171
+msgid "Languages & Docs"
+msgstr "Sprachen & Dokumentation"
+
+#: ui/tabs/overview_tab.py:175
+msgid "Total Reclaimable Space"
+msgstr "Gesamter rückgewinnbarer Speicher"
+
+#: ui/tabs/overview_tab.py:175
+msgid "Ready to clean"
+msgstr "Bereit zum Bereinigen"
+
+#: ui/tabs/overview_tab.py:178
+msgid "System Usage"
+msgstr "Systemauslastung"
+
+#: ui/tabs/temp_tab.py:35
+msgid "Keep files from the last:"
+msgstr "Dateien der letzten behalten:"
+
+#: ui/tabs/temp_tab.py:39
+msgid "1 day"
+msgstr "1 Tag"
+
+#: ui/tabs/temp_tab.py:39
+msgid "7 days"
+msgstr "7 Tage"
+
+#: ui/tabs/temp_tab.py:39
+msgid "30 days"
+msgstr "30 Tage"
+
+#: ui/tabs/temp_tab.py:39
+msgid "DO NOT KEEP (Delete all)"
+msgstr "NICHT BEHALTEN (Alles löschen)"
+
+#: ui/tabs/temp_tab.py:108
+msgid "{} item(s) — {}"
+msgstr "{} Element(e) — {}"
+
+#: ui/tabs/temp_tab.py:113
+msgid "No temporary files matching this filter"
+msgstr "Keine temporären Dateien für diesen Filter"
+
+#: ui/tabs/temp_tab.py:175
+msgid "Remove selected temporary files?"
+msgstr "Ausgewählte temporäre Dateien entfernen?"
+
+#: ui/tabs/temp_tab.py:177
+msgid "{} item(s) to remove."
+msgstr "{} Element(e) zu entfernen."
+
+#: ui/tabs/temp_tab.py:187
+msgid "Removing temporary files..."
+msgstr "Temporäre Dateien werden entfernt..."
+
+msgid "{} item(s)"
+msgstr "{} Element(e)"
+
+msgid "{} family(s)"
+msgstr "{} Familie(n)"
+
+msgid "{} removable"
+msgstr "{} entfernbar"

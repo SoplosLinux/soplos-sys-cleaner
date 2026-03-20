@@ -1,0 +1,55 @@
+.TH "SOPLOS-SYS-CLEANER" "1" "2026-03-19" "Soplos Linux" "User Commands"
+.SH NAME
+soplos-sys-cleaner \- the advanced system cleaner and optimizer for Soplos Linux
+.SH SYNOPSIS
+.B soplos-sys-cleaner
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B soplos-sys-cleaner
+is a system maintenance tool designed specifically for Soplos Linux distributions
+like Boro, Tyron, and Tyson. It helps users free up disk space and optimize
+their systems by safely removing unnecessary files.
+.P
+It provides a comprehensive interface for:
+.IP \[bu] 2
+Cleaning APT cache and orphaned packages.
+.IP \[bu]
+Removing Flatpak unused runtimes and cache.
+.IP \[bu]
+Clearing system logs and crash reports.
+.IP \[bu]
+Uninstalling old kernels safely, with initramfs cleanup using soplos dracut hooks.
+.IP \[bu]
+Visualizing system resources (Disk, CPU, RAM, GPU, and Temp).
+.P
+Designed with modern Soplos environments in mind, matching natively with GNOME, KDE, and XFCE.
+.SH OPTIONS
+Application Options:
+.TP
+.B \-h, \-\-help
+Show help options.
+.TP
+.B \-\-help-all
+Show all help options.
+.TP
+.B \-\-help-gtk
+Show GTK+ Options.
+.P
+GTK+ Options:
+.TP
+.B \-\-display=\fIDISPLAY\fR
+X display to use.
+.SH FILES
+.TP
+.I /usr/share/soplos-sys-cleaner/
+Application resources directory containing UI files, themes, and translations.
+.SH AUTHOR
+Written by Sergi Perich <info@soploslinux.com> for the Soplos Linux project.
+.SH COPYRIGHT
+Copyright \(co 2026 Sergi Perich.
+License: GPL-3.0-or-later <https://www.gnu.org/licenses/gpl-3.0.html>.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH SEE ALSO
+.BR soplos-welcome (1)
