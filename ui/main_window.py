@@ -258,7 +258,64 @@ class MainWindow(Gtk.ApplicationWindow):
         dialog.set_license_type(Gtk.License.GPL_3_0)
         icon_path = Path(__file__).parent.parent / 'assets' / 'icons' / '64x64' / 'org.soplos.sys-cleaner.png'
         if icon_path.exists():
-            dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file(str(icon_path)))
+            dialog.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(str(icon_path), 48, 48, True))
+        _about_css = Gtk.CssProvider()
+        _about_css.load_from_data(b"""
+            dialog, messagedialog {
+                background-color: #2b2b2b;
+                color: #ffffff;
+            }
+            dialog .background, messagedialog .background {
+                background-color: #2b2b2b;
+                color: #ffffff;
+            }
+            dialog > box, messagedialog > box {
+                background-color: #2b2b2b;
+            }
+            dialog label, messagedialog label {
+                color: #ffffff;
+            }
+            dialog button, messagedialog button {
+                background-image: none;
+                background-color: #333333;
+                color: #ffffff;
+                border: 1px solid #3c3c3c;
+                border-radius: 4px;
+                padding: 6px 14px;
+                box-shadow: none;
+            }
+            dialog button:hover, messagedialog button:hover {
+                background-color: #444444;
+                border-color: #ff8800;
+            }
+            dialog stackswitcher button {
+                border-radius: 100px;
+                background-color: #2b2b2b;
+                background-image: none;
+                border: 1px solid #3c3c3c;
+                font-weight: normal;
+                padding: 4px 16px;
+                box-shadow: none;
+                color: #ffffff;
+            }
+            dialog stackswitcher button:hover {
+                background-color: #444444;
+                border-color: #ff8800;
+            }
+            dialog stackswitcher button:checked {
+                background-color: #444444;
+                color: #ffffff;
+            }
+            dialog scrolledwindow,
+            dialog scrolledwindow viewport {
+                background-color: #2b2b2b;
+                border-radius: 0;
+            }
+        """)
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(), _about_css,
+            Gtk.STYLE_PROVIDER_PRIORITY_USER
+        )
         dialog.run()
         dialog.destroy()
 

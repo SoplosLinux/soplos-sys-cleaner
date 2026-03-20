@@ -17,7 +17,9 @@
 
 window { background-color: @soplos_dark_bg; color: @soplos_light_text; }
 
-
+dialog, messagedialog { background-color: @soplos_dark_bg; color: @soplos_light_text; }
+dialog .background, messagedialog .background { background-color: @soplos_dark_bg; color: @soplos_light_text; }
+dialog > box, messagedialog > box { background-color: @soplos_dark_bg; }
 
 notebook { background-color: @soplos_darker_bg; border: 1px solid @soplos_border; }
 notebook > header { background-color: @soplos_darker_bg; }
@@ -54,6 +56,10 @@ headerbar button.titlebutton.close:hover {
 
 button { background-color: #333; color: @soplos_light_text; border: 1px solid @soplos_border; border-radius: 4px; }
 button:hover { background-color: #444; border-color: @soplos_orange; }
+
+stackswitcher button { border-radius: 100px; background-color: @soplos_dark_bg; background-image: none; border: 1px solid @soplos_border; font-weight: normal; padding: 4px 16px; box-shadow: none; color: @soplos_light_text; }
+stackswitcher button:hover { background-color: #444444; border-color: @soplos_orange; }
+stackswitcher button:checked { background-color: #444444; }
 button.suggested-action { background-color: @soplos_orange; color: #000; border-color: @soplos_orange_hover; font-weight: bold; }
 button.suggested-action:hover { background-color: @soplos_orange_hover; }
 button.destructive-action { background-color: @soplos_error; color: #fff; border-color: #c0392b; }

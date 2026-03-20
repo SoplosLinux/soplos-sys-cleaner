@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.0--1-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.0--2-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -94,6 +94,10 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.0-2 (20/03/2026)
+- Fixed: About dialog credits panel on KDE now displays with an opaque dark background and square corners instead of transparent or rounded-corner artifacts.
+- About dialog app icon standardized to 48×48 pixels.
 
 ### v1.0.0-1 (20/03/2026)
 - Added keyboard shortcuts Ctrl+Tab / Ctrl+Shift+Tab to cycle between tabs.
