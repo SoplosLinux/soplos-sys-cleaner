@@ -4,6 +4,10 @@ Follows Soplos v2.0 standard: HeaderBar + Notebook(6 tabs) + ProgressRevealer + 
 Compatible with X11, Wayland, GNOME, KDE, XFCE.
 """
 
+import os
+import sys
+import shutil
+import subprocess
 import threading
 from pathlib import Path
 
@@ -25,6 +29,10 @@ from ui.tabs.kernels_tab import KernelsTab
 from ui.tabs.cache_tab import CacheTab
 from ui.tabs.temp_tab import TempTab
 from ui.tabs.locales_tab import LocalesTab
+from ui.tabs.user_cache_tab import UserCacheTab
+from ui.tabs.trash_tab import TrashTab
+from ui.tabs.flatpak_tab import FlatpakTab
+from ui.tabs.logs_tab import LogsTab
 
 
 class MainWindow(Gtk.ApplicationWindow):
@@ -52,6 +60,11 @@ class MainWindow(Gtk.ApplicationWindow):
         self._setup_shortcuts()
         self.show_all()
         self.progress_revealer.set_reveal_child(False)
+        self.connect('destroy', self._on_self_destroy)
+
+    def _on_self_destroy(self, *args):
+        """Pre-destruction cleanup."""
+        self._stop_root_session()
 
     # ─────────────────────────── HeaderBar ───────────────────────────
 
@@ -104,31 +117,41 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # Instantiate tabs
         self.overview_tab = OverviewTab(self)
+        self.user_cache_tab = UserCacheTab(self)
+        self.trash_tab = TrashTab(self)
+        self.flatpak_tab = FlatpakTab(self)
+        # Root-only tabs
         self.drivers_tab = DriversTab(self)
         self.firmware_tab = FirmwareTab(self)
         self.kernels_tab = KernelsTab(self)
         self.cache_tab = CacheTab(self)
         self.temp_tab = TempTab(self)
         self.locales_tab = LocalesTab(self)
+        self.logs_tab = LogsTab(self)
 
-        tab_definitions = [
-            (self.overview_tab,  _("Overview"),      'preferences-system'),
+        # User tabs always visible
+        user_tabs = [
+            (self.overview_tab,    _("Overview"),      'preferences-system'),
+            (self.user_cache_tab,  _("User Cache"),    'folder'),
+            (self.trash_tab,       _("Trash"),         'user-trash-full'),
+            (self.flatpak_tab,     _("Flatpak"),       'package-x-generic'),
+        ]
+
+        # Root tabs — added dynamically after root scan if running as user
+        self._root_tab_definitions = [
             (self.drivers_tab,   _("GPU Drivers"),   'video-display'),
             (self.firmware_tab,  _("Firmwares"),     'drive-harddisk'),
             (self.kernels_tab,   _("Kernels"),       'media-flash'),
             (self.locales_tab,   _("Languages"),     'locale'),
             (self.cache_tab,     _("APT Cache"),     'system-software-install'),
             (self.temp_tab,      _("Temp Files"),    'user-trash-full'),
+            (self.logs_tab,      _("System Logs"),   'text-x-script'),
         ]
 
+        tab_definitions = user_tabs + (self._root_tab_definitions if os.geteuid() == 0 else [])
+
         for widget, label_text, icon_name in tab_definitions:
-            tab_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-            icon = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU)
-            lbl = Gtk.Label(label=label_text)
-            tab_box.pack_start(icon, False, False, 0)
-            tab_box.pack_start(lbl, False, False, 0)
-            tab_box.show_all()
-            self.notebook.append_page(widget, tab_box)
+            self._append_tab(widget, label_text, icon_name)
 
         # Progress Revealer (Soplos standard)
         self.progress_revealer = Gtk.Revealer()
@@ -178,7 +201,28 @@ class MainWindow(Gtk.ApplicationWindow):
             info = self.env_detector.get_environment_info()
             desktop = info.get('desktop', 'unknown').upper()
             protocol = info.get('protocol', 'unknown').upper()
-            self.status_label.set_text(_("Running on {} ({})").format(desktop, protocol))
+            base = _("Running on {} ({})").format(desktop, protocol)
+            if os.geteuid() == 0:
+                base += _(" — Administrator mode")
+            self.status_label.set_text(base)
+
+    def _relaunch_as_root(self):
+        """Relaunch the application with pkexec, propagating the user environment."""
+        important_vars = [
+            'DISPLAY', 'XAUTHORITY', 'XDG_RUNTIME_DIR', 'DBUS_SESSION_BUS_ADDRESS',
+            'WAYLAND_DISPLAY', 'XDG_CURRENT_DESKTOP', 'XDG_SESSION_TYPE',
+            'HOME', 'LANG', 'GDK_BACKEND', 'GTK_THEME',
+        ]
+        env_vars = [f"{v}={os.environ[v]}" for v in important_vars if v in os.environ]
+        env_vars += ['NO_AT_BRIDGE=1', 'GSETTINGS_BACKEND=memory', 'GIO_USE_VFS=local']
+
+        script_path = str(Path(__file__).resolve().parent.parent / 'main.py')
+        pkexec_path = shutil.which('pkexec') or 'pkexec'
+        cmd = [pkexec_path, 'env'] + env_vars + [sys.executable, script_path]
+        try:
+            subprocess.Popen(cmd)
+        except Exception as e:
+            logger.error(f"Failed to relaunch as root: {e}")
 
     def _apply_notebook_custom_css(self):
         """Apply Soplos Standard slim tab styling (matching Welcome)."""
@@ -207,6 +251,7 @@ class MainWindow(Gtk.ApplicationWindow):
             padding: 4px 6px;
             min-height: 0;
         }
+
         """
         try:
             css_provider.load_from_data(css_data.encode('utf-8'))
@@ -236,6 +281,13 @@ class MainWindow(Gtk.ApplicationWindow):
         bind('w', 'CONTROL', lambda: self.application.quit())
         bind('r', 'CONTROL', self._on_scan_clicked)
         bind('F5', None, self._on_scan_clicked)
+        # Ctrl+Shift+R — root scan (only meaningful when not already root)
+        accel.connect(
+            Gdk.keyval_from_name('r'),
+            Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK,
+            Gtk.AccelFlags.VISIBLE,
+            lambda *a: self.start_root_scan()
+        )
         bind('F1', None, self._show_about)
         # Tab navigation: Ctrl+1..7
         for i in range(7):
@@ -345,76 +397,207 @@ class MainWindow(Gtk.ApplicationWindow):
             self.progress_revealer.set_reveal_child(visible)
         GLib.idle_add(_update)
 
+    def _append_tab(self, widget, label_text, icon_name):
+        tab_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        tab_box.pack_start(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU), False, False, 0)
+        tab_box.pack_start(Gtk.Label(label=label_text), False, False, 0)
+        tab_box.show_all()
+        self.notebook.append_page(widget, tab_box)
+        widget.show()
+
+    def _ensure_root_tabs_visible(self):
+        """Add root tabs to the notebook if not already present."""
+        existing = [self.notebook.get_nth_page(i) for i in range(self.notebook.get_n_pages())]
+        for widget, label_text, icon_name in self._root_tab_definitions:
+            if widget not in existing:
+                self._append_tab(widget, label_text, icon_name)
+
     def _on_scan_clicked(self, *args):
         self.start_scan()
 
     def start_scan(self):
-        """Launch full system scan in background thread."""
+        """Launch the appropriate scan based on privilege level."""
+        if os.geteuid() == 0:
+            self.start_root_scan()
+        else:
+            self.start_user_scan()
+
+    def start_user_scan(self):
+        """Scan user-accessible data: ~/.cache, trash, flatpak."""
         if hasattr(self, 'scan_btn_header'):
             self.scan_btn_header.set_sensitive(False)
-        self.set_ui_state(_("Scanning system..."), pulse=True, visible=True)
+        self.set_ui_state(_("Scanning user data..."), pulse=True, visible=True)
 
         def do_scan():
             results = {}
             try:
-                from scanner.hardware import get_gpu_vendors, get_all_firmware_families, is_firmware_protected
-                from scanner.packages import get_unnecessary_gpu_packages
-                from scanner.kernels import get_installed_kernels
-                from scanner.cache import get_apt_cache_info, get_autoremove_packages
-                from scanner.temp_files import get_temp_entries
+                GLib.idle_add(self.set_ui_state, _("Scanning user cache..."), None, True, True)
+                from scanner.user_cache import get_user_cache_entries
+                results['user_cache_entries'] = get_user_cache_entries()
 
-                GLib.idle_add(self.set_ui_state, _("Detecting hardware..."), None, True, True)
-                info = self.env_detector.get_environment_info()
-                results['desktop'] = info.get('desktop', 'unknown')
-                results['gpu_vendors'] = get_gpu_vendors()
+                GLib.idle_add(self.set_ui_state, _("Scanning trash..."), None, True, True)
+                from scanner.trash import get_trash_info
+                results['trash_info'] = get_trash_info()
 
-                GLib.idle_add(self.set_ui_state, _("Scanning GPU drivers..."), None, True, True)
-                results['unnecessary_pkgs'] = get_unnecessary_gpu_packages(results['gpu_vendors'])
-
-                GLib.idle_add(self.set_ui_state, _("Scanning firmwares..."), None, True, True)
-                results['firmware_families'] = get_all_firmware_families()
-                results['is_firmware_protected'] = is_firmware_protected
-
-                GLib.idle_add(self.set_ui_state, _("Scanning kernels..."), None, True, True)
-                results['kernels'] = get_installed_kernels()
-
-                GLib.idle_add(self.set_ui_state, _("Scanning APT cache..."), None, True, True)
-                results['apt_cache'] = get_apt_cache_info()
-                results['autoremove_pkgs'] = get_autoremove_packages()
-
-                GLib.idle_add(self.set_ui_state, _("Scanning temporary files..."), None, True, True)
-                results['temp_entries'] = get_temp_entries(min_age_days=0.0)
-
-                GLib.idle_add(self.set_ui_state, _("Scanning languages and docs..."), None, True, True)
-                from scanner.locales import get_locales_info, get_docs_summary
-                results['locales'] = get_locales_info(results.get('desktop', 'unknown'))
-                results['docs_summary'] = get_docs_summary()
+                GLib.idle_add(self.set_ui_state, _("Scanning Flatpak..."), None, True, True)
+                from scanner.flatpak import get_unused_flatpak_entries
+                results['flatpak_entries'] = get_unused_flatpak_entries()
 
             except Exception as e:
-                logger.error(f"Scan error: {e}")
+                logger.error(f"User scan error: {e}")
                 results['error'] = str(e)
 
-            GLib.idle_add(self._on_scan_done, results)
+            GLib.idle_add(self._on_user_scan_done, results)
 
         threading.Thread(target=do_scan, daemon=True).start()
 
-    def _on_scan_done(self, results):
-        self._scan_results = results
+    def _on_user_scan_done(self, results):
         if hasattr(self, 'scan_btn_header'):
             self.scan_btn_header.set_sensitive(True)
-
         if 'error' in results:
-            self.set_ui_state(_("Error during scan: {}").format(results['error']), fraction=0, visible=True)
+            self.set_ui_state(_("Scan error: {}").format(results['error']), fraction=0, visible=True)
             return
+        self.set_ui_state(_("Scan completed"), fraction=1.0, visible=True)
+        GLib.timeout_add_seconds(3, lambda: self.set_ui_state("", visible=False))
+
+        self._scan_results.update(results)
+        self.overview_tab.populate(self._scan_results)
+        self.user_cache_tab.populate(results)
+        self.trash_tab.populate(results)
+        self.flatpak_tab.populate(results)
+
+    def start_root_scan(self):
+        """Launch persistent root helper via pkexec (one auth), send scan command."""
+        if hasattr(self, 'scan_btn_header'):
+            self.scan_btn_header.set_sensitive(False)
+        self.set_ui_state(_("Scanning system (administrator)..."), pulse=True, visible=True)
+
+        def do_scan():
+            import json as _json
+            try:
+                proc = getattr(self, '_root_process', None)
+                if proc is None or proc.poll() is not None:
+                    script = str(Path(__file__).resolve().parent.parent / 'scanner' / 'root_helper.py')
+                    env_vars = [f"{v}={os.environ[v]}" for v in ('SOPLOS_DESKTOP', 'LANG', 'HOME') if v in os.environ]
+                    env_vars += ['NO_AT_BRIDGE=1', 'GSETTINGS_BACKEND=memory', 'GIO_USE_VFS=local']
+                    
+                    if os.geteuid() == 0:
+                        cmd = ['env'] + env_vars + [sys.executable, script]
+                    else:
+                        cmd = ['pkexec', 'env'] + env_vars + [sys.executable, script]
+                        
+                    proc = subprocess.Popen(
+                        cmd,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True, bufsize=1
+                    )
+                    self._root_process = proc
+
+                # Send scan command and wait for result
+                proc.stdin.write(_json.dumps({'action': 'scan'}) + '\n')
+                proc.stdin.flush()
+                line = proc.stdout.readline()
+
+                if not line:
+                    GLib.idle_add(self._on_root_scan_done, {'error': _("Authentication cancelled.")})
+                    return
+
+                results = _json.loads(line)
+
+            except Exception as e:
+                logger.error(f"Root scan error: {e}")
+                GLib.idle_add(self._on_root_scan_done, {'error': str(e)})
+                return
+
+            GLib.idle_add(self._on_root_scan_done, results)
+
+        threading.Thread(target=do_scan, daemon=True).start()
+
+    def run_root_action(self, action_dict, callback):
+        """Send a command to the persistent root process. No password prompt."""
+        import json as _json
+
+        def do_action():
+            try:
+                proc = getattr(self, '_root_process', None)
+                if proc is None or proc.poll() is not None:
+                    GLib.idle_add(callback, {'success': False, 'error': _("No active root session. Scan as administrator first.")})
+                    return
+                proc.stdin.write(_json.dumps(action_dict) + '\n')
+                proc.stdin.flush()
+                line = proc.stdout.readline()
+                result = _json.loads(line) if line else {'success': False, 'error': 'No response'}
+            except Exception as e:
+                result = {'success': False, 'error': str(e)}
+            GLib.idle_add(callback, result)
+
+        threading.Thread(target=do_action, daemon=True).start()
+
+    def _stop_root_session(self):
+        import json as _json
+        proc = getattr(self, '_root_process', None)
+        if proc and proc.poll() is None:
+            try:
+                proc.stdin.write(_json.dumps({'action': 'exit'}) + '\n')
+                proc.stdin.flush()
+            except Exception:
+                pass
+        self._root_process = None
+
+    def _on_root_scan_done(self, results):
+        if hasattr(self, 'scan_btn_header'):
+            self.scan_btn_header.set_sensitive(True)
+        if 'error' in results:
+            self.set_ui_state(_("Scan error: {}").format(results['error']), fraction=0, visible=True)
+            return
+        # Add root tabs to notebook if running as user (first time)
+        self._ensure_root_tabs_visible()
 
         self.set_ui_state(_("Scan completed"), fraction=1.0, visible=True)
         GLib.timeout_add_seconds(3, lambda: self.set_ui_state("", visible=False))
 
-        # Populate all tabs
-        self.overview_tab.populate(results)
+        # Deserialize namedtuple-like objects from JSON dicts
+        from scanner.hardware import is_firmware_protected
+        results['is_firmware_protected'] = is_firmware_protected
+
+        from scanner.packages import PackageInfo
+        results['unnecessary_pkgs'] = [
+            PackageInfo(name=p['name'], installed_size=p['installed_size'], description=p['description'])
+            for p in results.get('unnecessary_pkgs', [])
+        ]
+        from scanner.kernels import KernelInfo
+        results['kernels'] = [
+            KernelInfo(version=k['version'], is_active=k['is_active'],
+                       has_headers=k['has_headers'], has_src=k['has_src'],
+                       image_pkg=k['image_pkg'], headers_pkg=k['headers_pkg'],
+                       src_pkg=k['src_pkg'], size_kb=k['size_kb'])
+            for k in results.get('kernels', [])
+        ]
+        from scanner.temp_files import TempEntry
+        results['temp_entries'] = [
+            TempEntry(path=e['path'], size_bytes=e['size_bytes'],
+                      age_days=e['age_days'], is_dir=e['is_dir'])
+            for e in results.get('temp_entries', [])
+        ]
+        from scanner.locales import LocaleEntry, DocEntry
+        results['locales'] = [
+            LocaleEntry(code=l['code'], name=l['name'], paths=tuple(l['paths']),
+                        size_kb=l['size_kb'], category=l['category'])
+            for l in results.get('locales', [])
+        ]
+        results['docs_summary'] = [
+            DocEntry(name=d['name'], path=d['path'], size_kb=d['size_kb'], type=d['type'])
+            for d in results.get('docs_summary', [])
+        ]
+
+        self._scan_results.update(results)
+        self.overview_tab.populate(self._scan_results)
         self.drivers_tab.populate(results)
         self.firmware_tab.populate(results)
         self.kernels_tab.populate(results)
         self.cache_tab.populate(results)
         self.temp_tab.populate(results)
         self.locales_tab.populate(results)
+        self.logs_tab.populate(results)

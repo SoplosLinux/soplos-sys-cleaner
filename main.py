@@ -30,6 +30,9 @@ def _clean_pycache():
         for root, dirs, files in os.walk(PROJECT_ROOT):
             if '__pycache__' in dirs:
                 shutil.rmtree(os.path.join(root, '__pycache__'), ignore_errors=True)
+                # Optimize: remove from dirs so os.walk doesn't try to enter it
+                if '__pycache__' in dirs:
+                    dirs.remove('__pycache__')
     except Exception:
         pass
 

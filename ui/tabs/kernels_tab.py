@@ -177,15 +177,15 @@ class KernelsTab(Gtk.Box):
 
         self.remove_btn.set_sensitive(False)
 
-        def do_purge():
-            from cleaner.remover import purge_packages
-            self.parent.set_ui_state(_("Removing kernel packages..."), pulse=True)
-            success, msg = purge_packages(to_remove)
-
-            GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
-            GLib.idle_add(self.remove_btn.set_sensitive, True)
+        self.parent.set_ui_state(_("Removing kernel packages..."), pulse=True)
+        
+        def _on_done(result):
+            success = result.get('success', False)
+            msg = _("Tasks completed successfully.") if success else result.get('error', _("Unknown error"))
+            self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
+            self.remove_btn.set_sensitive(True)
             if success:
-                GLib.timeout_add_seconds(2, lambda: self.parent.start_scan())
+                GLib.timeout_add_seconds(2, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
-
-        threading.Thread(target=do_purge, daemon=True).start()
+            
+        self.parent.run_root_action({'action': 'apt_purge', 'packages': to_remove, 'rebuild_initrd': False}, _on_done)

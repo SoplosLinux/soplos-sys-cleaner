@@ -49,6 +49,12 @@ class OverviewTab(Gtk.Box):
         sub.set_markup(f"<span color='gray'>{_('The scan may take a few seconds')}</span>")
         placeholder.pack_start(sub, False, False, 0)
 
+        if os.geteuid() != 0:
+            admin_label = Gtk.Label()
+            admin_label.set_markup(f'<a href="#">{_("Run as administrator")}</a>')
+            admin_label.connect('activate-link', lambda lbl, uri: self.parent.start_root_scan() or True)
+            placeholder.pack_start(admin_label, False, False, 0)
+
         self.pack_start(placeholder, True, True, 40)
         self._placeholder = placeholder
         self.show_all()
@@ -142,50 +148,7 @@ class OverviewTab(Gtk.Box):
         grid.set_halign(Gtk.Align.FILL)
         outer.pack_start(grid, False, False, 0)
 
-        # GPU Drivers
-        gpu_pkgs = results.get('unnecessary_pkgs', [])
-        gpu_size = sum(p.installed_size * 1024 for p in gpu_pkgs)
-        card_gpu = self._make_card('video-display', _("Unnecessary GPU Drivers"), _("{} item(s)").format(len(gpu_pkgs)), _fmt_size(gpu_size))
-
-        # Kernels
-        kernels = [k for k in results.get('kernels', []) if not k.is_active]
-        kernel_size = sum(k.size_kb * 1024 for k in kernels)
-        card_kernels = self._make_card('media-flash', _("Old Kernels"), _("{} item(s)").format(len(kernels)), _fmt_size(kernel_size))
-
-        # APT Cache
-        apt_info = results.get('apt_cache', {})
-        apt_size = apt_info.get('size_bytes', 0)
-        apt_count = apt_info.get('deb_count', 0)
-        apt_lists_size = apt_info.get('lists_size_bytes', 0)
-        card_apt = self._make_card('system-software-install', _("APT Cache"), f"{apt_count} .deb", _fmt_size(apt_size))
-
-        # Temp files
-        temp_entries = results.get('temp_entries', [])
-        temp_size = sum(e.size_bytes for e in temp_entries)
-        card_temp = self._make_card('user-trash', _("Temporary Files"), _("{} item(s)").format(len(temp_entries)), _fmt_size(temp_size))
-
-        # Firmwares
-        firmwares = results.get('firmware_families', [])
-        is_protected = results.get('is_firmware_protected', lambda x: False)
-        unprotected_count = sum(1 for f in firmwares if not is_protected(f))
-        card_fw = self._make_card('drive-harddisk', _("Firmware Families"), _("{} family(s)").format(len(firmwares)), _("{} removable").format(unprotected_count))
-
-        # Hardware GPU
-        vendors = results.get('gpu_vendors', [])
-        hw_str = ', '.join(vendors) if vendors else _("Generic/Unknown")
-        card_hw = self._make_card('computer', _("Detected Hardware"), _("Active Drivers"), hw_str)
-
-        # Languages & Docs
-        locales = results.get('locales', [])
-        docs = results.get('docs_summary', [])
-        lang_size = (sum(l.size_kb for l in locales) + sum(d.size_kb for d in docs)) * 1024
-        card_lang = self._make_card('locale', _("Languages & Docs"), _("{} item(s)").format(len(locales) + len(docs)), _fmt_size(lang_size))
-
-        # Total Reclaimable Space
-        total = gpu_size + kernel_size + apt_size + temp_size + lang_size
-        card_total = self._make_card('edit-clear', _("Total Reclaimable Space"), _("Ready to clean"), _fmt_size(total))
-
-        # System Usage Metrics
+        # System Usage Metrics (always shown)
         card_sys, sys_cnt, sys_sz = self._make_card('utilities-system-monitor', _("System Usage"), "CPU: --%", "RAM: --%", ret_labels=True)
         self.sys_count_label = sys_cnt
         self.sys_size_label = sys_sz
@@ -193,21 +156,78 @@ class OverviewTab(Gtk.Box):
             GLib.source_remove(self._sys_timer_id)
         self._sys_timer_id = GLib.timeout_add_seconds(1, self._update_sys_usage)
 
-        for c in [card_gpu, card_kernels, card_apt, card_temp, card_fw, card_hw, card_total, card_lang, card_sys]:
-            c.set_hexpand(True)
+        # User cards (always shown)
+        cache_entries = results.get('user_cache_entries', [])
+        cache_size = sum(e.size_bytes for e in cache_entries)
+        card_cache = self._make_card('folder', _("User Cache"), _("{} item(s)").format(len(cache_entries)), _fmt_size(cache_size))
 
-        # 3-column layout
-        grid.attach(card_gpu, 0, 0, 1, 1)
-        grid.attach(card_kernels, 1, 0, 1, 1)
-        grid.attach(card_apt, 2, 0, 1, 1)
-        
-        grid.attach(card_temp, 0, 1, 1, 1)
-        grid.attach(card_fw, 1, 1, 1, 1)
-        grid.attach(card_hw, 2, 1, 1, 1)
-        
-        grid.attach(card_total, 0, 2, 1, 1)
-        grid.attach(card_lang, 1, 2, 1, 1)
-        grid.attach(card_sys, 2, 2, 1, 1)
+        trash = results.get('trash_info')
+        trash_count = trash.files_count if trash else 0
+        trash_size = trash.size_bytes if trash else 0
+        card_trash = self._make_card('user-trash-full', _("Trash"), _("{} item(s)").format(trash_count), _fmt_size(trash_size))
+
+        flatpak_entries = results.get('flatpak_entries', [])
+        flatpak_size = sum(e.size_bytes for e in flatpak_entries)
+        card_flatpak = self._make_card('package-x-generic', _("Flatpak"), _("{} unused").format(len(flatpak_entries)), _fmt_size(flatpak_size))
+
+        has_root_data = os.geteuid() == 0 or 'kernels' in results
+
+        if has_root_data:
+            # Root cards
+            gpu_pkgs = results.get('unnecessary_pkgs', [])
+            gpu_size = sum(p.installed_size * 1024 for p in gpu_pkgs)
+            card_gpu = self._make_card('video-display', _("Unnecessary GPU Drivers"), _("{} item(s)").format(len(gpu_pkgs)), _fmt_size(gpu_size))
+
+            kernels = [k for k in results.get('kernels', []) if not k.is_active]
+            kernel_size = sum(k.size_kb * 1024 for k in kernels)
+            card_kernels = self._make_card('media-flash', _("Old Kernels"), _("{} item(s)").format(len(kernels)), _fmt_size(kernel_size))
+
+            apt_info = results.get('apt_cache', {})
+            apt_size = apt_info.get('size_bytes', 0)
+            apt_count = apt_info.get('deb_count', 0)
+            card_apt = self._make_card('system-software-install', _("APT Cache"), f"{apt_count} .deb", _fmt_size(apt_size))
+
+            temp_entries = results.get('temp_entries', [])
+            temp_size = sum(e.size_bytes for e in temp_entries)
+            card_temp = self._make_card('user-trash', _("Temporary Files"), _("{} item(s)").format(len(temp_entries)), _fmt_size(temp_size))
+
+            firmwares = results.get('firmware_families', [])
+            is_protected = results.get('is_firmware_protected', lambda x: False)
+            unprotected_count = sum(1 for f in firmwares if not is_protected(f))
+            card_fw = self._make_card('drive-harddisk', _("Firmware Families"), _("{} family(s)").format(len(firmwares)), _("{} removable").format(unprotected_count))
+
+            locales = results.get('locales', [])
+            docs = results.get('docs_summary', [])
+            lang_size = (sum(l.size_kb for l in locales) + sum(d.size_kb for d in docs)) * 1024
+            card_lang = self._make_card('locale', _("Languages & Docs"), _("{} item(s)").format(len(locales) + len(docs)), _fmt_size(lang_size))
+
+            log_entries = results.get('log_entries', [])
+            log_size = sum(e.get('size_bytes', 0) if isinstance(e, dict) else e.size_bytes for e in log_entries)
+            journald = results.get('journald', {})
+            journald_size = journald.get('size_bytes', 0) if isinstance(journald, dict) else 0
+            card_logs = self._make_card('text-x-script', _("System Logs"), _("{} item(s)").format(len(log_entries)), _fmt_size(log_size + journald_size))
+
+            total = gpu_size + kernel_size + apt_size + temp_size + lang_size + cache_size + trash_size + flatpak_size + log_size + journald_size
+            card_total = self._make_card('edit-clear', _("Total Reclaimable Space"), _("Ready to clean"), _fmt_size(total))
+
+            cards = [card_cache, card_trash, card_flatpak,
+                     card_gpu, card_kernels, card_apt,
+                     card_temp, card_fw, card_lang,
+                     card_logs, card_total, card_sys]
+        else:
+            total = cache_size + trash_size + flatpak_size
+            card_total = self._make_card('edit-clear', _("Total Reclaimable Space"), _("Ready to clean"), _fmt_size(total))
+            cards = [card_cache, card_trash, card_flatpak, card_total, card_sys]
+
+        if os.geteuid() != 0 and not has_root_data:
+            admin_label = Gtk.Label()
+            admin_label.set_markup(f'<a href="#">{_("Run as administrator")}</a>')
+            admin_label.connect('activate-link', lambda lbl, uri: self.parent.start_root_scan() or True)
+            outer.pack_start(admin_label, False, False, 0)
+
+        for i, c in enumerate(cards):
+            c.set_hexpand(True)
+            grid.attach(c, i % 3, i // 3, 1, 1)
 
         self.show_all()
 

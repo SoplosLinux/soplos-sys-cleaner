@@ -25,6 +25,7 @@ class LocalesTab(Gtk.Box):
         self._locale_checkboxes = {} # {path: check}
         self._doc_checkboxes = {}    # {path: check}
         self._pending_results = None
+        self._protected_codes = set()
         self._build_ui()
         self.connect('map', self._on_mapped)
 
@@ -110,7 +111,8 @@ class LocalesTab(Gtk.Box):
         app_lang_full = get_current_language()                          # Already a code like 'es' or 'en'
 
         # We protect exactly what is being used, plus C/POSIX defaults
-        protected_codes = {sys_lang_full, sys_lang_base, app_lang_full, 'en', 'es', 'C', 'POSIX'}
+        self._protected_codes = {sys_lang_full, sys_lang_base, app_lang_full, 'en', 'es', 'C', 'POSIX'}
+        protected_codes = self._protected_codes
 
         # 1. System Documentation Card
         if self._docs:
@@ -129,7 +131,7 @@ class LocalesTab(Gtk.Box):
                 items_to_add = []
                 for loc in sorted(cat_items, key=lambda x: x.code):
                     is_protected = loc.code in protected_codes
-                    items_to_add.append((loc.name, loc.path, loc.size_kb, icon, is_protected))
+                    items_to_add.append((loc.name, loc.paths, loc.size_kb, icon, is_protected))
                 self._add_card_section(cat_name, items_to_add, is_locale=True)
 
         self.main_container.show_all()
@@ -157,10 +159,10 @@ class LocalesTab(Gtk.Box):
         # Items List
         for item in items:
             if is_locale:
-                name, path, size_kb, icon, protected = item
+                name, paths, size_kb, icon, protected = item
             else:
-                # DocEntry
-                name, path, size_kb, icon, protected = item.name, item.path, item.size_kb, 'help-browser', False
+                # DocEntry: path es string, lo envolvemos en tupla
+                name, paths, size_kb, icon, protected = item.name, (item.path,), item.size_kb, 'help-browser', False
 
             item_box = Gtk.Box(spacing=12)
             item_box.set_margin_start(8)
@@ -175,16 +177,16 @@ class LocalesTab(Gtk.Box):
                 check.connect('toggled', self._on_check_toggled)
             
             if is_locale:
-                self._locale_checkboxes[path] = check
+                self._locale_checkboxes[paths] = check
             else:
-                self._doc_checkboxes[path] = check
+                self._doc_checkboxes[paths] = check
                 
             item_box.pack_start(check, False, False, 0)
 
             img = Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.MENU)
             item_box.pack_start(img, False, False, 0)
 
-            lbl = Gtk.Label(label=name)
+            lbl = Gtk.Label(label=name if isinstance(name, str) else paths[0])
             lbl.set_halign(Gtk.Align.START)
             if protected:
                 lbl.get_style_context().add_class('dim-label')
@@ -213,7 +215,10 @@ class LocalesTab(Gtk.Box):
 
     def _on_remove_clicked(self, btn):
         combined = {**self._locale_checkboxes, **self._doc_checkboxes}
-        selected_paths = [path for path, check in combined.items() if check.get_active()]
+        selected_paths = []
+        for paths, check in combined.items():
+            if check.get_active():
+                selected_paths.extend(paths)
         if not selected_paths:
             return
 
@@ -231,14 +236,14 @@ class LocalesTab(Gtk.Box):
 
         self.remove_btn.set_sensitive(False)
 
-        def do_remove():
-            from cleaner.remover import purge_locales_and_docs
-            self.parent.set_ui_state(_("Cleaning locales and docs..."), pulse=True)
-            success, msg = purge_locales_and_docs(selected_paths)
-            GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
-            GLib.idle_add(self.remove_btn.set_sensitive, True)
+        self.parent.set_ui_state(_("Cleaning locales and docs..."), pulse=True)
+        def _on_done(result):
+            success = result.get('success', False)
+            msg = _("Localization and documentation cleaned successfully.") if success else result.get('error', _("Unknown error"))
+            self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
+            self.remove_btn.set_sensitive(True)
             if success:
-                GLib.timeout_add_seconds(1, lambda: self.parent.start_scan())
+                GLib.timeout_add_seconds(1, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
 
-        threading.Thread(target=do_remove, daemon=True).start()
+        self.parent.run_root_action({'action': 'delete_locales', 'paths': selected_paths, 'keep_codes': list(self._protected_codes)}, _on_done)

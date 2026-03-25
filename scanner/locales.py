@@ -11,7 +11,7 @@ from typing import NamedTuple
 class LocaleEntry(NamedTuple):
     code: str
     name: str # Human readable if possible, or same as code
-    path: str
+    paths: tuple  # All filesystem paths for this locale (may be multiple for help files)
     size_kb: int
     category: str # 'system', 'gnome', 'kde'
 
@@ -51,7 +51,7 @@ def get_locales_info(desktop: str) -> list[LocaleEntry]:
                         results[entry.name] = LocaleEntry(
                             code=entry.name,
                             name=entry.name,
-                            path=entry.path,
+                            paths=(entry.path,),
                             size_kb=size,
                             category='system'
                         )
@@ -73,14 +73,17 @@ def get_locales_info(desktop: str) -> list[LocaleEntry]:
                                 if size > 0:
                                     if code in results:
                                         old = results[code]
-                                        results[code] = old._replace(size_kb=old.size_kb + size)
+                                        results[code] = old._replace(
+                                            size_kb=old.size_kb + size,
+                                            paths=old.paths + (lang_entry.path,)
+                                        )
                                     else:
                                         results[code] = LocaleEntry(
                                             code=code,
                                             name=code,
-                                            path=lang_entry.path,
+                                            paths=(lang_entry.path,),
                                             size_kb=size,
-                                            category='gnome' # Group all help here
+                                            category='gnome'
                                         )
                     except (OSError, PermissionError):
                         continue
@@ -98,12 +101,15 @@ def get_locales_info(desktop: str) -> list[LocaleEntry]:
                     if size > 0:
                         if code in results:
                             old = results[code]
-                            results[code] = old._replace(size_kb=old.size_kb + size)
+                            results[code] = old._replace(
+                                size_kb=old.size_kb + size,
+                                paths=old.paths + (entry.path,)
+                            )
                         else:
                             results[code] = LocaleEntry(
                                 code=code,
                                 name=code,
-                                path=entry.path,
+                                paths=(entry.path,),
                                 size_kb=size,
                                 category='kde'
                             )

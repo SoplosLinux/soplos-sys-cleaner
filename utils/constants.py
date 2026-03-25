@@ -13,7 +13,7 @@ def fmt_size(size_bytes: int) -> str:
 
 APPLICATION_NAME = "Soplos Sys Cleaner"
 APPLICATION_ID = "org.soplos.sys-cleaner"
-APPLICATION_VERSION = "1.0.0"
+APPLICATION_VERSION = "1.0.1"
 
 WINDOW_DEFAULT_WIDTH = 920
 WINDOW_DEFAULT_HEIGHT = 600

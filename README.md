@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.0--2-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.1-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -18,7 +18,9 @@ Soplos Sys Cleaner is an advanced system maintenance tool for Soplos Linux distr
   - System logs (`/var/log`)
   - Crash reports
   - `__pycache__` directories automatically detected and cleaned
+- **Dual-Layer Scanning**: Separate fast User-level scans and deep Root-level scans to eliminate intrusive password prompts.
 - **Disk Space Optimization**: Removes unnecessary packages (`apt autoremove --purge`) and cleans up Flatpak unused runtimes and caches.
+- **User Space Management**: Safely empty User Trash and application caches without needing administrative privileges.
 - **Old Kernel Removal**: Intelligently identifies and removes old kernels to free up boot partition space, integrating directly with Soplos's system tools.
 - **Resource Monitoring**: Tracks CPU usage, RAM utilization, Disk usage, Temperature, and GPU details intuitively.
 - **Selective Languages & Docs Cleanup**: Advanced scanner that protects your system locale while allowing removal of unused translations and help files for Gnome, KDE, and XFCE.
@@ -94,6 +96,15 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.1 (25/03/2026)
+- Major Architecture Update: Introduced Dual-Layer Scanning (User vs Root modes) to prevent unnecessary password prompts on startup.
+- Added Flatpak unused runtimes cleaning.
+- Added specific User Cache (`~/.cache`) and Trash cleanup tabs working without root privileges.
+- Dynamic UI tabs that reveal administrative features only after explicit root authorization.
+- Fixed repeated `pkexec` password prompts when refreshing UI after cleanup tasks.
+- Fixed Kernels tab appearing empty due to IPC data mapping errors.
+- Fixed redundant root authentication loops when the application is launched via `sudo`.
 
 ### v1.0.0-2 (20/03/2026)
 - Fixed: About dialog credits panel on KDE now displays with an opaque dark background and square corners instead of transparent or rounded-corner artifacts.

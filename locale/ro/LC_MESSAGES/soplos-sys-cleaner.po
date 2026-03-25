@@ -1,258 +1,386 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-03-20 04:02+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 01:02+0100\n"
 "Language: ro\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "No packages to remove."
-msgstr "Nu există pachete de eliminat."
-
-msgid "Preparing administrative tasks..."
-msgstr "Se pregătesc sarcinile administrative..."
-
-msgid "Authentication cancelled."
-msgstr "Autentificare anulată."
-
-msgid "Tasks completed successfully."
-msgstr "Sarcini finalizate cu succes."
-
-msgid "Unexpected error: {}"
-msgstr "Eroare neașteptată: {}"
-
-msgid "Cleaning APT cache..."
-msgstr "Se curăță cache-ul APT..."
-
-msgid "APT cache cleaned successfully."
-msgstr "Cache APT curățat cu succes."
-
-msgid "Error cleaning cache: {}"
-msgstr "Eroare la curățarea cache-ului: {}"
-
-msgid "Removing orphaned packages..."
-msgstr "Se elimină pachetele orfane..."
-
-msgid "Orphaned packages removed."
-msgstr "Pachete orfane eliminate."
-
-msgid "Removing {}..."
-msgstr "Se elimină {}..."
-
-msgid "Permission denied: {}"
-msgstr "Permisiune refuzată: {}"
-
-msgid "Error in {}: {}"
-msgstr "Eroare în {}: {}"
-
-msgid "{} item(s) removed."
-msgstr "{} element(e) eliminat(e)."
-
-msgid "{} error(s)."
-msgstr "{} eroare(i)."
-
-msgid "Regenerating initramfs with dracut..."
-msgstr "Se regenerează initramfs cu dracut..."
-
-msgid "dracut error: {}"
-msgstr "Eroare dracut: {}"
-
-msgid "initramfs regenerated successfully."
-msgstr "initramfs regenerat cu succes."
-
-msgid "dracut not found on the system."
-msgstr "dracut nu a fost găsit pe sistem."
-
-msgid "No firmwares to remove."
-msgstr "Nu există firmware de eliminat."
-
-msgid "Preparing firmware removal..."
-msgstr "Se pregătește eliminarea firmware-ului..."
-
-msgid "Firmware removed and initramfs regenerated."
-msgstr "Firmware eliminat și initramfs regenerat."
-
-msgid "No items selected for removal."
-msgstr "Nu sunt elemente selectate pentru eliminare."
-
-msgid "Cleaning localization and documentation files..."
-msgstr "Se curăță fișierele de localizare și documentație..."
-
-msgid "Localization and documentation cleaned successfully."
-msgstr "Localizare și documentație curățate cu succes."
-
-msgid "Scan system"
-msgstr "Scanare sistem"
-
-msgid "Overview"
-msgstr "Prezentare generală"
-
-msgid "GPU Drivers"
-msgstr "Drivere GPU"
-
-msgid "Firmwares"
-msgstr "Firmware"
-
-msgid "Kernels"
-msgstr "Kerneluri"
-
-msgid "Languages"
-msgstr "Limbi"
-
-msgid "APT Cache"
-msgstr "Cache APT"
-
-msgid "Temp Files"
-msgstr "Fișiere temporare"
-
-msgid "Ready"
-msgstr "Gata"
-
-msgid "Running on {} ({})"
-msgstr "Rulează pe {} ({})"
-
-msgid "Scanning system..."
-msgstr "Se scanează sistemul..."
-
-msgid "Detecting hardware..."
-msgstr "Se detectează hardware-ul..."
-
-msgid "Scanning GPU drivers..."
-msgstr "Se scanează driverele GPU..."
-
-msgid "Scanning firmwares..."
-msgstr "Se scanează firmware-ul..."
-
-msgid "Scanning kernels..."
-msgstr "Se scanează kernelurile..."
-
-msgid "Scanning APT cache..."
-msgstr "Se scanează cache-ul APT..."
-
-msgid "Scanning temporary files..."
-msgstr "Se scanează fișierele temporare..."
-
-msgid "Scanning languages and docs..."
-msgstr "Se scanează limbile și documentația..."
-
-msgid "Error during scan: {}"
-msgstr "Eroare în timpul scanării: {}"
-
-msgid "Scan completed"
-msgstr "Scanare finalizată"
-
+#: ui/tabs/cache_tab.py:31
 msgid "APT Package Cache"
 msgstr "Cache de pachete APT"
 
+#: ui/tabs/cache_tab.py:35
 msgid "Click «Scan» to view cache status"
 msgstr "Faceți clic pe «Scanare» pentru a vedea starea cache-ului"
 
+#: ui/tabs/cache_tab.py:42
 msgid "Clean APT Cache"
 msgstr "Curățare cache APT"
 
+#: ui/tabs/cache_tab.py:53
 msgid "Orphaned Packages"
 msgstr "Pachete orfane"
 
+#: ui/tabs/cache_tab.py:57
 msgid "Click «Scan» to view orphaned packages"
 msgstr "Faceți clic pe «Scanare» pentru a vedea pachetele orfane"
 
+#: ui/tabs/cache_tab.py:73
 msgid "Remove Orphaned Packages"
 msgstr "Eliminare pachete orfane"
 
+#: ui/tabs/cache_tab.py:91
 msgid "{} cached .deb files — {} | Package lists: {}"
 msgstr "{} fișiere .deb în cache — {} | Liste de pachete: {}"
 
+#: ui/tabs/cache_tab.py:95
 msgid "No cached .deb files | Package lists: {}"
 msgstr "Niciun fișier .deb în cache | Liste de pachete: {}"
 
+#: ui/tabs/cache_tab.py:104
 msgid "No orphaned packages"
 msgstr "Nu există pachete orfane"
 
+#: ui/tabs/cache_tab.py:119
 msgid "{} orphaned package(s) detected"
 msgstr "{} pachet(e) orfan(e) detectat(e)"
 
+#: ui/tabs/cache_tab.py:128 cleaner/remover.py:64
+msgid "Cleaning APT cache..."
+msgstr "Se curăță cache-ul APT..."
+
+#: ui/tabs/cache_tab.py:132 cleaner/remover.py:67
+msgid "APT cache cleaned successfully."
+msgstr "Cache APT curățat cu succes."
+
+#: ui/tabs/cache_tab.py:146
 msgid "Remove orphaned packages?"
 msgstr "Eliminați pachetele orfane?"
 
-msgid "Detected GPU: —"
-msgstr "GPU detectat: —"
+#: ui/tabs/cache_tab.py:154 cleaner/remover.py:75
+msgid "Removing orphaned packages..."
+msgstr "Se elimină pachetele orfane..."
 
+#: ui/tabs/cache_tab.py:158 cleaner/remover.py:83
+msgid "Orphaned packages removed."
+msgstr "Pachete orfane eliminate."
+
+#: ui/tabs/flatpak_tab.py:34 ui/tabs/drivers_tab.py:36 ui/tabs/logs_tab.py:35
+#: ui/tabs/user_cache_tab.py:35 ui/tabs/firmware_tab.py:50
+#: ui/tabs/temp_tab.py:45
 msgid "Select all"
 msgstr "Selectare tot"
 
+#: ui/tabs/flatpak_tab.py:61 ui/tabs/drivers_tab.py:65
+#: ui/tabs/locales_tab.py:74 ui/tabs/logs_tab.py:97
+#: ui/tabs/user_cache_tab.py:62 ui/tabs/kernels_tab.py:106
+#: ui/tabs/temp_tab.py:74
 msgid "Remove Selected"
 msgstr "Eliminare selecție"
 
+#: ui/tabs/flatpak_tab.py:82
+msgid "Flatpak is not installed on this system"
+msgstr "Flatpak nu este instalat pe acest sistem"
+
+#: ui/tabs/flatpak_tab.py:84
+msgid "No unused Flatpak runtimes found"
+msgstr "Nu s-au găsit pachete Flatpak neutilizate"
+
+#: ui/tabs/flatpak_tab.py:95
+msgid "{} unused runtime(s) — {}"
+msgstr "{} pachet(e) neutilizat(e) — {}"
+
+#: ui/tabs/flatpak_tab.py:144
+msgid "Remove selected Flatpak runtimes?"
+msgstr "Eliminați pachetele Flatpak selectate?"
+
+#: ui/tabs/flatpak_tab.py:146
+msgid "{} runtime(s) will be uninstalled."
+msgstr "{} pachet(e) vor fi dezinstalate."
+
+#: ui/tabs/flatpak_tab.py:156
+msgid "Removing Flatpak runtimes..."
+msgstr "Se elimină pachetele Flatpak..."
+
+#: ui/tabs/flatpak_tab.py:163
+msgid "Flatpak runtimes removed."
+msgstr "Pachete Flatpak eliminate."
+
+#: ui/tabs/drivers_tab.py:32
+msgid "Detected GPU: —"
+msgstr "GPU detectat: —"
+
+#: ui/tabs/drivers_tab.py:82
 msgid "Detected GPU: {}"
 msgstr "GPU detectat: {}"
 
+#: ui/tabs/drivers_tab.py:82
 msgid "Generic"
 msgstr "Generic"
 
+#: ui/tabs/drivers_tab.py:89
 msgid "No unnecessary drivers found"
 msgstr "Nu s-au găsit drivere inutile"
 
+#: ui/tabs/drivers_tab.py:146
 msgid "Remove selected packages?"
 msgstr "Eliminați pachetele selectate?"
 
+#: ui/tabs/drivers_tab.py:149
 msgid "{} package(s) will be removed and the initramfs will be regenerated."
 msgstr "{} pachet(e) vor fi eliminate și initramfs-ul va fi regenerat."
 
+#: ui/tabs/drivers_tab.py:158
 msgid "Removing drivers and regenerating initramfs..."
 msgstr "Se elimină driverele și se regenerează initramfs..."
 
-msgid ""
-"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
-"the initrd"
-msgstr "Firmware-urile de rețea/Wi-Fi sunt blocate — soplos.conf le injectează întotdeauna în initrd"
+#: ui/tabs/drivers_tab.py:162 ui/tabs/kernels_tab.py:184
+#: ui/tabs/temp_tab.py:190 cleaner/remover.py:55
+msgid "Tasks completed successfully."
+msgstr "Sarcini finalizate cu succes."
 
-msgid "Remove selected firmwares"
-msgstr "Eliminare firmware selectat"
+#: ui/tabs/locales_tab.py:40
+msgid "Select items to remove"
+msgstr "Selectați elementele de eliminat"
 
-msgid "{} firmware families detected"
-msgstr "{} familii de firmware detectate"
+#: ui/tabs/locales_tab.py:45
+msgid "Keep only my languages"
+msgstr "Păstrați doar limbile mele"
 
-msgid ""
-"Protected: soplos.conf includes this firmware in the initrd to ensure "
-"connectivity"
-msgstr "Protejat: soplos.conf include acest firmware în initrd pentru a asigura conectivitatea"
+#: ui/tabs/locales_tab.py:46
+msgid "Unselect current language and English, select everything else"
+msgstr "Deselectați limba curentă și engleza, selectați tot restul"
 
-msgid "Protected network firmware"
-msgstr "Firmware de rețea protejat"
+#: ui/tabs/locales_tab.py:119
+msgid "System Documentation"
+msgstr "Documentație sistem"
 
-msgid "Remove selected firmwares?"
-msgstr "Eliminați firmware-urile selectate?"
+#: ui/tabs/locales_tab.py:123
+msgid "Standard Locales"
+msgstr "Locale standard"
 
-msgid ""
-"{} firmware family(s) will be removed from /lib/firmware/\n"
-"The initramfs will be regenerated automatically."
-msgstr ""
-"{} familie(ii) de firmware vor fi eliminate din /lib/firmware/\n"
-"Initramfs-ul va fi regenerat automat."
+#: ui/tabs/locales_tab.py:124
+msgid "Gnome Help files"
+msgstr "Fișiere de ajutor Gnome"
 
-msgid "Removing firmwares and regenerating initramfs..."
-msgstr "Se elimină firmware-urile și se regenerează initramfs..."
+#: ui/tabs/locales_tab.py:125
+msgid "KDE Documentation"
+msgstr "Documentație KDE"
 
+#: ui/tabs/locales_tab.py:175
+msgid "Protected: current language or system default"
+msgstr "Protejat: limba curentă sau implicită a sistemului"
+
+#: ui/tabs/locales_tab.py:229
+msgid "Remove selected localization and documentation?"
+msgstr "Eliminați localizarea și documentația selectate?"
+
+#: ui/tabs/locales_tab.py:231
+msgid "{} items will be permanently deleted from the system."
+msgstr "{} elemente vor fi șterse permanent din sistem."
+
+#: ui/tabs/locales_tab.py:239
+msgid "Cleaning locales and docs..."
+msgstr "Se curăță localizarea și documentația..."
+
+#: ui/tabs/locales_tab.py:242 cleaner/remover.py:210
+msgid "Localization and documentation cleaned successfully."
+msgstr "Localizare și documentație curățate cu succes."
+
+#: ui/tabs/locales_tab.py:242 ui/tabs/logs_tab.py:182 ui/tabs/logs_tab.py:212
+#: ui/tabs/kernels_tab.py:184 ui/tabs/firmware_tab.py:176
+msgid "Unknown error"
+msgstr "Eroare necunoscută"
+
+#: ui/tabs/logs_tab.py:48
+msgid "Systemd Journal"
+msgstr "Jurnal Systemd"
+
+#: ui/tabs/logs_tab.py:52 ui/tabs/trash_tab.py:33
+msgid "Scanning..."
+msgstr "Se scanează..."
+
+#: ui/tabs/logs_tab.py:57
+msgid "Keep last 100 MB"
+msgstr "Păstrează ultimii 100 MB"
+
+#: ui/tabs/logs_tab.py:59
+msgid "Keep last 2 weeks"
+msgstr "Păstrează ultimele 2 săptămâni"
+
+#: ui/tabs/logs_tab.py:74
+msgid "/var/log entries"
+msgstr "Intrări /var/log"
+
+#: ui/tabs/logs_tab.py:117
+msgid "{} used by journal"
+msgstr "{} utilizat de journal"
+
+#: ui/tabs/logs_tab.py:127 ui/tabs/user_cache_tab.py:82 ui/tabs/temp_tab.py:110
+msgid "{} item(s) — {}"
+msgstr "{} element(e) — {}"
+
+#: ui/tabs/logs_tab.py:132
+msgid "No log files found"
+msgstr "Nu s-au găsit fișiere jurnal"
+
+#: ui/tabs/logs_tab.py:179
+msgid "Cleaning journal..."
+msgstr "Se curăță jurnalul..."
+
+#: ui/tabs/logs_tab.py:182
+msgid "Journal cleaned."
+msgstr "Jurnal curățat."
+
+#: ui/tabs/logs_tab.py:199
+msgid "Remove selected log entries?"
+msgstr "Eliminați intrările de jurnal selectate?"
+
+#: ui/tabs/logs_tab.py:201 ui/tabs/user_cache_tab.py:143
+msgid "{} item(s) will be permanently deleted."
+msgstr "{} element(e) vor fi șterse definitiv."
+
+#: ui/tabs/logs_tab.py:209
+msgid "Removing log files..."
+msgstr "Se elimină fișierele jurnal..."
+
+#: ui/tabs/logs_tab.py:212 cleaner/remover.py:109
+msgid "{} item(s) removed."
+msgstr "{} element(e) eliminat(e)."
+
+#: ui/tabs/user_cache_tab.py:87
+msgid "User cache is empty"
+msgstr "Cache-ul utilizatorului este gol"
+
+#: ui/tabs/user_cache_tab.py:141
+msgid "Remove selected cache entries?"
+msgstr "Eliminați intrările de cache selectate?"
+
+#: ui/tabs/user_cache_tab.py:153
+msgid "Clearing user cache..."
+msgstr "Se curăță cache-ul utilizatorului..."
+
+#: ui/tabs/overview_tab.py:40 ui/main_window.py:92
+msgid "Scan system"
+msgstr "Scanare sistem"
+
+#: ui/tabs/overview_tab.py:44
+msgid "Click the icon to analyze the system"
+msgstr "Faceți clic pe pictogramă pentru a analiza sistemul"
+
+#: ui/tabs/overview_tab.py:49
+msgid "The scan may take a few seconds"
+msgstr "Analiza poate dura câteva secunde"
+
+#: ui/tabs/overview_tab.py:54 ui/tabs/overview_tab.py:224
+msgid "Run as administrator"
+msgstr "Executare ca administrator"
+
+#: ui/tabs/overview_tab.py:142
+msgid "Scan Summary"
+msgstr "Rezumat scanare"
+
+#: ui/tabs/overview_tab.py:152
+msgid "System Usage"
+msgstr "Utilizare sistem"
+
+#: ui/tabs/overview_tab.py:162 ui/main_window.py:130
+msgid "User Cache"
+msgstr "Cache utilizator"
+
+#: ui/tabs/overview_tab.py:162 ui/tabs/overview_tab.py:167
+#: ui/tabs/overview_tab.py:179 ui/tabs/overview_tab.py:183
+#: ui/tabs/overview_tab.py:192 ui/tabs/overview_tab.py:202
+#: ui/tabs/overview_tab.py:208
+msgid "{} item(s)"
+msgstr "{} element(e)"
+
+#: ui/tabs/overview_tab.py:167 ui/main_window.py:131
+msgid "Trash"
+msgstr "Coș de gunoi"
+
+#: ui/tabs/overview_tab.py:171 ui/main_window.py:132
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: ui/tabs/overview_tab.py:171
+msgid "{} unused"
+msgstr "{} neutilizat(e)"
+
+#: ui/tabs/overview_tab.py:179
+msgid "Unnecessary GPU Drivers"
+msgstr "Drivere GPU inutile"
+
+#: ui/tabs/overview_tab.py:183
+msgid "Old Kernels"
+msgstr "Kerneluri vechi"
+
+#: ui/tabs/overview_tab.py:188 ui/main_window.py:141
+msgid "APT Cache"
+msgstr "Cache APT"
+
+#: ui/tabs/overview_tab.py:192
+msgid "Temporary Files"
+msgstr "Fișiere temporare"
+
+#: ui/tabs/overview_tab.py:197
+msgid "Firmware Families"
+msgstr "Familii de firmware"
+
+#: ui/tabs/overview_tab.py:197
+msgid "{} family(s)"
+msgstr "{} familie(i)"
+
+#: ui/tabs/overview_tab.py:197
+msgid "{} removable"
+msgstr "{} detașabil(e)"
+
+#: ui/tabs/overview_tab.py:202
+msgid "Languages & Docs"
+msgstr "Limbi și documentație"
+
+#: ui/tabs/overview_tab.py:208 ui/main_window.py:143
+msgid "System Logs"
+msgstr "Jurnale de sistem"
+
+#: ui/tabs/overview_tab.py:211 ui/tabs/overview_tab.py:219
+msgid "Total Reclaimable Space"
+msgstr "Spațiu total recuperabil"
+
+#: ui/tabs/overview_tab.py:211 ui/tabs/overview_tab.py:219
+msgid "Ready to clean"
+msgstr "Gata de curățare"
+
+#: ui/tabs/kernels_tab.py:61
 msgid "Version"
 msgstr "Versiune"
 
+#: ui/tabs/kernels_tab.py:68
 msgid "Image"
 msgstr "Imagine"
 
+#: ui/tabs/kernels_tab.py:76
 msgid "Headers"
 msgstr "Antete"
 
+#: ui/tabs/kernels_tab.py:84
 msgid "Sources"
 msgstr "Surse"
 
+#: ui/tabs/kernels_tab.py:92
 msgid "Size"
 msgstr "Dimensiune"
 
+#: ui/tabs/kernels_tab.py:122
 msgid "{} kernel(s) installed, {} removable"
 msgstr "{} kernel(uri) instalat(e), {} de eliminat"
 
+#: ui/tabs/kernels_tab.py:168
 msgid "Remove selected kernel packages?"
 msgstr "Eliminați pachetele de kernel selectate?"
 
+#: ui/tabs/kernels_tab.py:170
 msgid ""
 "{} package(s) to remove:\n"
 "{}"
@@ -260,122 +388,286 @@ msgstr ""
 "{} pachet(e) de eliminat:\n"
 "{}"
 
+#: ui/tabs/kernels_tab.py:180
 msgid "Removing kernel packages..."
 msgstr "Se elimină pachetele de kernel..."
 
-msgid "Select items to remove"
-msgstr "Selectați elementele de eliminat"
+#: ui/tabs/firmware_tab.py:32
+msgid ""
+"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
+"the initrd"
+msgstr ""
+"Firmware-urile de rețea/Wi-Fi sunt blocate — soplos.conf le injectează "
+"întotdeauna în initrd"
 
-msgid "Keep only my languages"
-msgstr "Păstrați doar limbile mele"
+#: ui/tabs/firmware_tab.py:79
+msgid "Remove selected firmwares"
+msgstr "Eliminare firmware selectat"
 
-msgid "Unselect current language and English, select everything else"
-msgstr "Deselectați limba curentă și engleza, selectați tot restul"
+#: ui/tabs/firmware_tab.py:98
+msgid "{} firmware families detected"
+msgstr "{} familii de firmware detectate"
 
-msgid "System Documentation"
-msgstr "Documentație sistem"
+#: ui/tabs/firmware_tab.py:116
+msgid ""
+"Protected: soplos.conf includes this firmware in the initrd to ensure "
+"connectivity"
+msgstr ""
+"Protejat: soplos.conf include acest firmware în initrd pentru a asigura "
+"conectivitatea"
 
-msgid "Standard Locales"
-msgstr "Locale standard"
+#: ui/tabs/firmware_tab.py:133
+msgid "Protected network firmware"
+msgstr "Firmware de rețea protejat"
 
-msgid "Gnome Help files"
-msgstr "Fișiere de ajutor Gnome"
+#: ui/tabs/firmware_tab.py:159
+msgid "Remove selected firmwares?"
+msgstr "Eliminați firmware-urile selectate?"
 
-msgid "KDE Documentation"
-msgstr "Documentație KDE"
+#: ui/tabs/firmware_tab.py:162
+msgid ""
+"{} firmware family(s) will be removed from /lib/firmware/\n"
+"The initramfs will be regenerated automatically."
+msgstr ""
+"{} familie(ii) de firmware vor fi eliminate din /lib/firmware/\n"
+"Initramfs-ul va fi regenerat automat."
 
-msgid "Protected: current language or system default"
-msgstr "Protejat: limba curentă sau implicită a sistemului"
+#: ui/tabs/firmware_tab.py:172
+msgid "Removing firmwares and regenerating initramfs..."
+msgstr "Se elimină firmware-urile și se regenerează initramfs..."
 
-msgid "Remove selected localization and documentation?"
-msgstr "Eliminați localizarea și documentația selectate?"
+#: ui/tabs/firmware_tab.py:176 cleaner/remover.py:161
+msgid "Firmware removed and initramfs regenerated."
+msgstr "Firmware eliminat și initramfs regenerat."
 
-msgid "{} items will be permanently deleted from the system."
-msgstr "{} elemente vor fi șterse permanent din sistem."
-
-msgid "Cleaning locales and docs..."
-msgstr "Se curăță localizarea și documentația..."
-
-msgid "Click the icon to analyze the system"
-msgstr "Faceți clic pe pictogramă pentru a analiza sistemul"
-
-msgid "The scan may take a few seconds"
-msgstr "Analiza poate dura câteva secunde"
-
-msgid "Scan Summary"
-msgstr "Rezumat scanare"
-
-msgid "Unnecessary GPU Drivers"
-msgstr "Drivere GPU inutile"
-
-msgid "Old Kernels"
-msgstr "Kerneluri vechi"
-
-msgid "Temporary Files"
-msgstr "Fișiere temporare"
-
-msgid "Firmware Families"
-msgstr "Familii de firmware"
-
-msgid "Generic/Unknown"
-msgstr "Generic/Necunoscut"
-
-msgid "Detected Hardware"
-msgstr "Hardware detectat"
-
-msgid "Active Drivers"
-msgstr "Drivere active"
-
-msgid "Languages & Docs"
-msgstr "Limbi și documentație"
-
-msgid "Total Reclaimable Space"
-msgstr "Spațiu total recuperabil"
-
-msgid "Ready to clean"
-msgstr "Gata de curățare"
-
-msgid "System Usage"
-msgstr "Utilizare sistem"
-
+#: ui/tabs/temp_tab.py:35
 msgid "Keep files from the last:"
 msgstr "Păstrați fișierele din ultimele:"
 
+#: ui/tabs/temp_tab.py:39
 msgid "1 day"
 msgstr "1 zi"
 
+#: ui/tabs/temp_tab.py:39
 msgid "7 days"
 msgstr "7 zile"
 
+#: ui/tabs/temp_tab.py:39
 msgid "30 days"
 msgstr "30 de zile"
 
+#: ui/tabs/temp_tab.py:39
 msgid "DO NOT KEEP (Delete all)"
 msgstr "NU PĂSTRA (Șterge tot)"
 
-msgid "{} item(s) — {}"
-msgstr "{} element(e) — {}"
-
+#: ui/tabs/temp_tab.py:115
 msgid "No temporary files matching this filter"
 msgstr "Nu există fișiere temporare pentru acest filtru"
 
+#: ui/tabs/temp_tab.py:177
 msgid "Remove selected temporary files?"
 msgstr "Eliminați fișierele temporare selectate?"
 
+#: ui/tabs/temp_tab.py:179
 msgid "{} item(s) to remove."
 msgstr "{} element(e) de eliminat."
 
+#: ui/tabs/temp_tab.py:186
 msgid "Removing temporary files..."
 msgstr "Se elimină fișierele temporare..."
 
-msgid "{} item(s)"
-msgstr "{} element(e)"
+#: ui/tabs/trash_tab.py:40
+msgid "Empty Trash"
+msgstr "Golește coșul de gunoi"
 
-msgid "{} family(s)"
-msgstr "{} familie(i)"
+#: ui/tabs/trash_tab.py:57
+msgid "item(s) in trash"
+msgstr "element(e) în coș"
 
-msgid "{} removable"
-msgstr "{} detașabil(e)"
+#: ui/tabs/trash_tab.py:62
+msgid "Trash is empty"
+msgstr "Coșul de gunoi este gol"
 
+#: ui/tabs/trash_tab.py:71
+msgid "Empty the trash?"
+msgstr "Goliți coșul de gunoi?"
+
+#: ui/tabs/trash_tab.py:73
+msgid "This will permanently delete all items in the trash."
+msgstr "Această acțiune va șterge definitiv toate elementele din coș."
+
+#: ui/tabs/trash_tab.py:84
+msgid "Emptying trash..."
+msgstr "Se golește coșul de gunoi..."
+
+#: ui/tabs/trash_tab.py:94
+msgid "Trash already empty."
+msgstr "Coșul de gunoi este deja gol."
+
+#: ui/main_window.py:129
+msgid "Overview"
+msgstr "Prezentare generală"
+
+#: ui/main_window.py:137
+msgid "GPU Drivers"
+msgstr "Drivere GPU"
+
+#: ui/main_window.py:138
+msgid "Firmwares"
+msgstr "Firmware"
+
+#: ui/main_window.py:139
+msgid "Kernels"
+msgstr "Kerneluri"
+
+#: ui/main_window.py:140
+msgid "Languages"
+msgstr "Limbi"
+
+#: ui/main_window.py:142
+msgid "Temp Files"
+msgstr "Fișiere temporare"
+
+#: ui/main_window.py:164
+msgid "Ready"
+msgstr "Gata"
+
+#: ui/main_window.py:199
+msgid "Running on {} ({})"
+msgstr "Rulează pe {} ({})"
+
+#: ui/main_window.py:201
+msgid " — Administrator mode"
+msgstr " — Mod administrator"
+
+#: ui/main_window.py:301
 msgid "Advanced system cleaner and optimizer for Soplos Linux."
 msgstr "Curățător și optimizator avansat de sistem pentru Soplos Linux."
+
+#: ui/main_window.py:424
+msgid "Scanning user data..."
+msgstr "Se scanează datele utilizatorului..."
+
+#: ui/main_window.py:429
+msgid "Scanning user cache..."
+msgstr "Se scanează cache-ul utilizatorului..."
+
+#: ui/main_window.py:433
+msgid "Scanning trash..."
+msgstr "Se scanează coșul de gunoi..."
+
+#: ui/main_window.py:437
+msgid "Scanning Flatpak..."
+msgstr "Se scanează Flatpak..."
+
+#: ui/main_window.py:453 ui/main_window.py:548
+msgid "Scan error: {}"
+msgstr "Eroare de scanare: {}"
+
+#: ui/main_window.py:455 ui/main_window.py:553
+msgid "Scan completed"
+msgstr "Scanare finalizată"
+
+#: ui/main_window.py:468
+msgid "Scanning system (administrator)..."
+msgstr "Se scanează sistemul (administrator)..."
+
+#: ui/main_window.py:499 cleaner/remover.py:52 cleaner/remover.py:126
+#: cleaner/remover.py:158 cleaner/remover.py:207
+msgid "Authentication cancelled."
+msgstr "Autentificare anulată."
+
+#: ui/main_window.py:521
+msgid "No active root session. Scan as administrator first."
+msgstr "Nicio sesiune root activă. Scanați mai întâi ca administrator."
+
+#: cleaner/remover.py:25
+msgid "No packages to remove."
+msgstr "Nu există pachete de eliminat."
+
+#: cleaner/remover.py:28
+msgid "Preparing administrative tasks..."
+msgstr "Se pregătesc sarcinile administrative..."
+
+#: cleaner/remover.py:58 cleaner/remover.py:132 cleaner/remover.py:164
+#: cleaner/remover.py:213
+msgid "Unexpected error: {}"
+msgstr "Eroare neașteptată: {}"
+
+#: cleaner/remover.py:69
+msgid "Error cleaning cache: {}"
+msgstr "Eroare la curățarea cache-ului: {}"
+
+#: cleaner/remover.py:96
+msgid "Removing {}..."
+msgstr "Se elimină {}..."
+
+#: cleaner/remover.py:107
+msgid "Error in {}: {}"
+msgstr "Eroare în {}: {}"
+
+#: cleaner/remover.py:111
+msgid "{} error(s)."
+msgstr "{} eroare(i)."
+
+#: cleaner/remover.py:118
+msgid "Regenerating initramfs with dracut..."
+msgstr "Se regenerează initramfs cu dracut..."
+
+#: cleaner/remover.py:127
+msgid "dracut error: {}"
+msgstr "Eroare dracut: {}"
+
+#: cleaner/remover.py:128
+msgid "initramfs regenerated successfully."
+msgstr "initramfs regenerat cu succes."
+
+#: cleaner/remover.py:130
+msgid "dracut not found on the system."
+msgstr "dracut nu a fost găsit pe sistem."
+
+#: cleaner/remover.py:140
+msgid "No firmwares to remove."
+msgstr "Nu există firmware de eliminat."
+
+#: cleaner/remover.py:143
+msgid "Preparing firmware removal..."
+msgstr "Se pregătește eliminarea firmware-ului..."
+
+#: cleaner/remover.py:173
+msgid "No items selected for removal."
+msgstr "Nu sunt elemente selectate pentru eliminare."
+
+#: cleaner/remover.py:176
+msgid "Cleaning localization and documentation files..."
+msgstr "Se curăță fișierele de localizare și documentație..."
+
+#~ msgid "Permission denied: {}"
+#~ msgstr "Permisiune refuzată: {}"
+
+#~ msgid "Detecting hardware..."
+#~ msgstr "Se detectează hardware-ul..."
+
+#~ msgid "Scanning GPU drivers..."
+#~ msgstr "Se scanează driverele GPU..."
+
+#~ msgid "Scanning kernels..."
+#~ msgstr "Se scanează kernelurile..."
+
+#~ msgid "Scanning temporary files..."
+#~ msgstr "Se scanează fișierele temporare..."
+
+#~ msgid "Scanning languages and docs..."
+#~ msgstr "Se scanează limbile și documentația..."
+
+#~ msgid "Error during scan: {}"
+#~ msgstr "Eroare în timpul scanării: {}"
+
+#~ msgid "Generic/Unknown"
+#~ msgstr "Generic/Necunoscut"
+
+#~ msgid "Detected Hardware"
+#~ msgstr "Hardware detectat"
+
+#~ msgid "Active Drivers"
+#~ msgstr "Drivere active"

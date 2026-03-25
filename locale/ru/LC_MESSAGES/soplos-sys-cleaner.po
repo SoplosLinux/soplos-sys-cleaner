@@ -1,258 +1,386 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-03-20 04:02+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25 01:02+0100\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "No packages to remove."
-msgstr "Нет пакетов для удаления."
-
-msgid "Preparing administrative tasks..."
-msgstr "Подготовка административных задач..."
-
-msgid "Authentication cancelled."
-msgstr "Аутентификация отменена."
-
-msgid "Tasks completed successfully."
-msgstr "Задачи выполнены успешно."
-
-msgid "Unexpected error: {}"
-msgstr "Неожиданная ошибка: {}"
-
-msgid "Cleaning APT cache..."
-msgstr "Очистка кэша APT..."
-
-msgid "APT cache cleaned successfully."
-msgstr "Кэш APT успешно очищен."
-
-msgid "Error cleaning cache: {}"
-msgstr "Ошибка при очистке кэша: {}"
-
-msgid "Removing orphaned packages..."
-msgstr "Удаление осиротевших пакетов..."
-
-msgid "Orphaned packages removed."
-msgstr "Осиротевшие пакеты удалены."
-
-msgid "Removing {}..."
-msgstr "Удаление {}..."
-
-msgid "Permission denied: {}"
-msgstr "Доступ запрещён: {}"
-
-msgid "Error in {}: {}"
-msgstr "Ошибка в {}: {}"
-
-msgid "{} item(s) removed."
-msgstr "{} элемент(ов) удалено."
-
-msgid "{} error(s)."
-msgstr "{} ошибка(ок)."
-
-msgid "Regenerating initramfs with dracut..."
-msgstr "Восстановление initramfs с помощью dracut..."
-
-msgid "dracut error: {}"
-msgstr "Ошибка dracut: {}"
-
-msgid "initramfs regenerated successfully."
-msgstr "initramfs успешно восстановлен."
-
-msgid "dracut not found on the system."
-msgstr "dracut не найден в системе."
-
-msgid "No firmwares to remove."
-msgstr "Нет прошивок для удаления."
-
-msgid "Preparing firmware removal..."
-msgstr "Подготовка удаления прошивки..."
-
-msgid "Firmware removed and initramfs regenerated."
-msgstr "Прошивка удалена и initramfs восстановлен."
-
-msgid "No items selected for removal."
-msgstr "Не выбрано элементов для удаления."
-
-msgid "Cleaning localization and documentation files..."
-msgstr "Очистка файлов локализации и документации..."
-
-msgid "Localization and documentation cleaned successfully."
-msgstr "Локализация и документация успешно очищены."
-
-msgid "Scan system"
-msgstr "Сканировать систему"
-
-msgid "Overview"
-msgstr "Обзор"
-
-msgid "GPU Drivers"
-msgstr "Драйверы GPU"
-
-msgid "Firmwares"
-msgstr "Прошивки"
-
-msgid "Kernels"
-msgstr "Ядра"
-
-msgid "Languages"
-msgstr "Языки"
-
-msgid "APT Cache"
-msgstr "Кэш APT"
-
-msgid "Temp Files"
-msgstr "Временные файлы"
-
-msgid "Ready"
-msgstr "Готово"
-
-msgid "Running on {} ({})"
-msgstr "Запущено на {} ({})"
-
-msgid "Scanning system..."
-msgstr "Сканирование системы..."
-
-msgid "Detecting hardware..."
-msgstr "Определение оборудования..."
-
-msgid "Scanning GPU drivers..."
-msgstr "Сканирование драйверов GPU..."
-
-msgid "Scanning firmwares..."
-msgstr "Сканирование прошивок..."
-
-msgid "Scanning kernels..."
-msgstr "Сканирование ядер..."
-
-msgid "Scanning APT cache..."
-msgstr "Сканирование кэша APT..."
-
-msgid "Scanning temporary files..."
-msgstr "Сканирование временных файлов..."
-
-msgid "Scanning languages and docs..."
-msgstr "Сканирование языков и документации..."
-
-msgid "Error during scan: {}"
-msgstr "Ошибка при сканировании: {}"
-
-msgid "Scan completed"
-msgstr "Сканирование завершено"
-
+#: ui/tabs/cache_tab.py:31
 msgid "APT Package Cache"
 msgstr "Кэш пакетов APT"
 
+#: ui/tabs/cache_tab.py:35
 msgid "Click «Scan» to view cache status"
 msgstr "Нажмите «Сканировать», чтобы увидеть состояние кэша"
 
+#: ui/tabs/cache_tab.py:42
 msgid "Clean APT Cache"
 msgstr "Очистить кэш APT"
 
+#: ui/tabs/cache_tab.py:53
 msgid "Orphaned Packages"
 msgstr "Осиротевшие пакеты"
 
+#: ui/tabs/cache_tab.py:57
 msgid "Click «Scan» to view orphaned packages"
 msgstr "Нажмите «Сканировать», чтобы увидеть осиротевшие пакеты"
 
+#: ui/tabs/cache_tab.py:73
 msgid "Remove Orphaned Packages"
 msgstr "Удалить осиротевшие пакеты"
 
+#: ui/tabs/cache_tab.py:91
 msgid "{} cached .deb files — {} | Package lists: {}"
 msgstr "{} файлов .deb в кэше — {} | Списки пакетов: {}"
 
+#: ui/tabs/cache_tab.py:95
 msgid "No cached .deb files | Package lists: {}"
 msgstr "Нет .deb-файлов в кэше | Списки пакетов: {}"
 
+#: ui/tabs/cache_tab.py:104
 msgid "No orphaned packages"
 msgstr "Нет осиротевших пакетов"
 
+#: ui/tabs/cache_tab.py:119
 msgid "{} orphaned package(s) detected"
 msgstr "Обнаружено {} осиротевших пакетов"
 
+#: ui/tabs/cache_tab.py:128 cleaner/remover.py:64
+msgid "Cleaning APT cache..."
+msgstr "Очистка кэша APT..."
+
+#: ui/tabs/cache_tab.py:132 cleaner/remover.py:67
+msgid "APT cache cleaned successfully."
+msgstr "Кэш APT успешно очищен."
+
+#: ui/tabs/cache_tab.py:146
 msgid "Remove orphaned packages?"
 msgstr "Удалить осиротевшие пакеты?"
 
-msgid "Detected GPU: —"
-msgstr "Обнаружен GPU: —"
+#: ui/tabs/cache_tab.py:154 cleaner/remover.py:75
+msgid "Removing orphaned packages..."
+msgstr "Удаление осиротевших пакетов..."
 
+#: ui/tabs/cache_tab.py:158 cleaner/remover.py:83
+msgid "Orphaned packages removed."
+msgstr "Осиротевшие пакеты удалены."
+
+#: ui/tabs/flatpak_tab.py:34 ui/tabs/drivers_tab.py:36 ui/tabs/logs_tab.py:35
+#: ui/tabs/user_cache_tab.py:35 ui/tabs/firmware_tab.py:50
+#: ui/tabs/temp_tab.py:45
 msgid "Select all"
 msgstr "Выбрать всё"
 
+#: ui/tabs/flatpak_tab.py:61 ui/tabs/drivers_tab.py:65
+#: ui/tabs/locales_tab.py:74 ui/tabs/logs_tab.py:97
+#: ui/tabs/user_cache_tab.py:62 ui/tabs/kernels_tab.py:106
+#: ui/tabs/temp_tab.py:74
 msgid "Remove Selected"
 msgstr "Удалить выбранное"
 
+#: ui/tabs/flatpak_tab.py:82
+msgid "Flatpak is not installed on this system"
+msgstr "Flatpak не установлен в этой системе"
+
+#: ui/tabs/flatpak_tab.py:84
+msgid "No unused Flatpak runtimes found"
+msgstr "Неиспользуемые среды выполнения Flatpak не найдены"
+
+#: ui/tabs/flatpak_tab.py:95
+msgid "{} unused runtime(s) — {}"
+msgstr "{} неиспользуемых сред(ы) выполнения — {}"
+
+#: ui/tabs/flatpak_tab.py:144
+msgid "Remove selected Flatpak runtimes?"
+msgstr "Удалить выбранные среды выполнения Flatpak?"
+
+#: ui/tabs/flatpak_tab.py:146
+msgid "{} runtime(s) will be uninstalled."
+msgstr "{} сред(ы) выполнения будут удалены."
+
+#: ui/tabs/flatpak_tab.py:156
+msgid "Removing Flatpak runtimes..."
+msgstr "Удаление сред выполнения Flatpak..."
+
+#: ui/tabs/flatpak_tab.py:163
+msgid "Flatpak runtimes removed."
+msgstr "Среды выполнения Flatpak удалены."
+
+#: ui/tabs/drivers_tab.py:32
+msgid "Detected GPU: —"
+msgstr "Обнаружен GPU: —"
+
+#: ui/tabs/drivers_tab.py:82
 msgid "Detected GPU: {}"
 msgstr "Обнаружен GPU: {}"
 
+#: ui/tabs/drivers_tab.py:82
 msgid "Generic"
 msgstr "Общий"
 
+#: ui/tabs/drivers_tab.py:89
 msgid "No unnecessary drivers found"
 msgstr "Ненужные драйверы не найдены"
 
+#: ui/tabs/drivers_tab.py:146
 msgid "Remove selected packages?"
 msgstr "Удалить выбранные пакеты?"
 
+#: ui/tabs/drivers_tab.py:149
 msgid "{} package(s) will be removed and the initramfs will be regenerated."
 msgstr "{} пакет(ов) будет удалено и initramfs будет восстановлен."
 
+#: ui/tabs/drivers_tab.py:158
 msgid "Removing drivers and regenerating initramfs..."
 msgstr "Удаление драйверов и восстановление initramfs..."
 
-msgid ""
-"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
-"the initrd"
-msgstr "Прошивки сети/Wi-Fi заблокированы — soplos.conf всегда включает их в initrd"
+#: ui/tabs/drivers_tab.py:162 ui/tabs/kernels_tab.py:184
+#: ui/tabs/temp_tab.py:190 cleaner/remover.py:55
+msgid "Tasks completed successfully."
+msgstr "Задачи выполнены успешно."
 
-msgid "Remove selected firmwares"
-msgstr "Удалить выбранные прошивки"
+#: ui/tabs/locales_tab.py:40
+msgid "Select items to remove"
+msgstr "Выберите элементы для удаления"
 
-msgid "{} firmware families detected"
-msgstr "Обнаружено {} семейств прошивок"
+#: ui/tabs/locales_tab.py:45
+msgid "Keep only my languages"
+msgstr "Сохранить только мои языки"
 
-msgid ""
-"Protected: soplos.conf includes this firmware in the initrd to ensure "
-"connectivity"
-msgstr "Защищено: soplos.conf включает эту прошивку в initrd для обеспечения подключения"
+#: ui/tabs/locales_tab.py:46
+msgid "Unselect current language and English, select everything else"
+msgstr "Снять выбор с текущего языка и английского, выбрать всё остальное"
 
-msgid "Protected network firmware"
-msgstr "Защищённая сетевая прошивка"
+#: ui/tabs/locales_tab.py:119
+msgid "System Documentation"
+msgstr "Системная документация"
 
-msgid "Remove selected firmwares?"
-msgstr "Удалить выбранные прошивки?"
+#: ui/tabs/locales_tab.py:123
+msgid "Standard Locales"
+msgstr "Стандартные локали"
 
-msgid ""
-"{} firmware family(s) will be removed from /lib/firmware/\n"
-"The initramfs will be regenerated automatically."
-msgstr ""
-"{} семейств(о) прошивок будет удалено из /lib/firmware/\n"
-"Initramfs будет восстановлен автоматически."
+#: ui/tabs/locales_tab.py:124
+msgid "Gnome Help files"
+msgstr "Файлы справки Gnome"
 
-msgid "Removing firmwares and regenerating initramfs..."
-msgstr "Удаление прошивок и восстановление initramfs..."
+#: ui/tabs/locales_tab.py:125
+msgid "KDE Documentation"
+msgstr "Документация KDE"
 
+#: ui/tabs/locales_tab.py:175
+msgid "Protected: current language or system default"
+msgstr "Защищено: текущий язык или системный по умолчанию"
+
+#: ui/tabs/locales_tab.py:229
+msgid "Remove selected localization and documentation?"
+msgstr "Удалить выбранную локализацию и документацию?"
+
+#: ui/tabs/locales_tab.py:231
+msgid "{} items will be permanently deleted from the system."
+msgstr "{} элементов будет навсегда удалено из системы."
+
+#: ui/tabs/locales_tab.py:239
+msgid "Cleaning locales and docs..."
+msgstr "Очистка локалей и документации..."
+
+#: ui/tabs/locales_tab.py:242 cleaner/remover.py:210
+msgid "Localization and documentation cleaned successfully."
+msgstr "Локализация и документация успешно очищены."
+
+#: ui/tabs/locales_tab.py:242 ui/tabs/logs_tab.py:182 ui/tabs/logs_tab.py:212
+#: ui/tabs/kernels_tab.py:184 ui/tabs/firmware_tab.py:176
+msgid "Unknown error"
+msgstr "Неизвестная ошибка"
+
+#: ui/tabs/logs_tab.py:48
+msgid "Systemd Journal"
+msgstr "Журнал Systemd"
+
+#: ui/tabs/logs_tab.py:52 ui/tabs/trash_tab.py:33
+msgid "Scanning..."
+msgstr "Сканирование..."
+
+#: ui/tabs/logs_tab.py:57
+msgid "Keep last 100 MB"
+msgstr "Оставить последние 100 МБ"
+
+#: ui/tabs/logs_tab.py:59
+msgid "Keep last 2 weeks"
+msgstr "Оставить за последние 2 недели"
+
+#: ui/tabs/logs_tab.py:74
+msgid "/var/log entries"
+msgstr "Записи /var/log"
+
+#: ui/tabs/logs_tab.py:117
+msgid "{} used by journal"
+msgstr "{} используется журналом"
+
+#: ui/tabs/logs_tab.py:127 ui/tabs/user_cache_tab.py:82 ui/tabs/temp_tab.py:110
+msgid "{} item(s) — {}"
+msgstr "{} элемент(ов) — {}"
+
+#: ui/tabs/logs_tab.py:132
+msgid "No log files found"
+msgstr "Файлы журналов не найдены"
+
+#: ui/tabs/logs_tab.py:179
+msgid "Cleaning journal..."
+msgstr "Очистка журнала..."
+
+#: ui/tabs/logs_tab.py:182
+msgid "Journal cleaned."
+msgstr "Журнал очищен."
+
+#: ui/tabs/logs_tab.py:199
+msgid "Remove selected log entries?"
+msgstr "Удалить выбранные записи журнала?"
+
+#: ui/tabs/logs_tab.py:201 ui/tabs/user_cache_tab.py:143
+msgid "{} item(s) will be permanently deleted."
+msgstr "{} элемент(ов) будут безвозвратно удалены."
+
+#: ui/tabs/logs_tab.py:209
+msgid "Removing log files..."
+msgstr "Удаление файлов журналов..."
+
+#: ui/tabs/logs_tab.py:212 cleaner/remover.py:109
+msgid "{} item(s) removed."
+msgstr "{} элемент(ов) удалено."
+
+#: ui/tabs/user_cache_tab.py:87
+msgid "User cache is empty"
+msgstr "Пользовательский кэш пуст"
+
+#: ui/tabs/user_cache_tab.py:141
+msgid "Remove selected cache entries?"
+msgstr "Удалить выбранные записи кэша?"
+
+#: ui/tabs/user_cache_tab.py:153
+msgid "Clearing user cache..."
+msgstr "Очистка пользовательского кэша..."
+
+#: ui/tabs/overview_tab.py:40 ui/main_window.py:92
+msgid "Scan system"
+msgstr "Сканировать систему"
+
+#: ui/tabs/overview_tab.py:44
+msgid "Click the icon to analyze the system"
+msgstr "Нажмите на иконку для анализа системы"
+
+#: ui/tabs/overview_tab.py:49
+msgid "The scan may take a few seconds"
+msgstr "Анализ может занять несколько секунд"
+
+#: ui/tabs/overview_tab.py:54 ui/tabs/overview_tab.py:224
+msgid "Run as administrator"
+msgstr "Запустить от имени администратора"
+
+#: ui/tabs/overview_tab.py:142
+msgid "Scan Summary"
+msgstr "Сводка сканирования"
+
+#: ui/tabs/overview_tab.py:152
+msgid "System Usage"
+msgstr "Использование системы"
+
+#: ui/tabs/overview_tab.py:162 ui/main_window.py:130
+msgid "User Cache"
+msgstr "Кэш пользователя"
+
+#: ui/tabs/overview_tab.py:162 ui/tabs/overview_tab.py:167
+#: ui/tabs/overview_tab.py:179 ui/tabs/overview_tab.py:183
+#: ui/tabs/overview_tab.py:192 ui/tabs/overview_tab.py:202
+#: ui/tabs/overview_tab.py:208
+msgid "{} item(s)"
+msgstr "{} элемент(ов)"
+
+#: ui/tabs/overview_tab.py:167 ui/main_window.py:131
+msgid "Trash"
+msgstr "Корзина"
+
+#: ui/tabs/overview_tab.py:171 ui/main_window.py:132
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: ui/tabs/overview_tab.py:171
+msgid "{} unused"
+msgstr "{} не используется"
+
+#: ui/tabs/overview_tab.py:179
+msgid "Unnecessary GPU Drivers"
+msgstr "Ненужные драйверы GPU"
+
+#: ui/tabs/overview_tab.py:183
+msgid "Old Kernels"
+msgstr "Старые ядра"
+
+#: ui/tabs/overview_tab.py:188 ui/main_window.py:141
+msgid "APT Cache"
+msgstr "Кэш APT"
+
+#: ui/tabs/overview_tab.py:192
+msgid "Temporary Files"
+msgstr "Временные файлы"
+
+#: ui/tabs/overview_tab.py:197
+msgid "Firmware Families"
+msgstr "Семейства прошивок"
+
+#: ui/tabs/overview_tab.py:197
+msgid "{} family(s)"
+msgstr "{} семейство(в)"
+
+#: ui/tabs/overview_tab.py:197
+msgid "{} removable"
+msgstr "{} можно удалить"
+
+#: ui/tabs/overview_tab.py:202
+msgid "Languages & Docs"
+msgstr "Языки и документация"
+
+#: ui/tabs/overview_tab.py:208 ui/main_window.py:143
+msgid "System Logs"
+msgstr "Системные журналы"
+
+#: ui/tabs/overview_tab.py:211 ui/tabs/overview_tab.py:219
+msgid "Total Reclaimable Space"
+msgstr "Всего освобождаемое место"
+
+#: ui/tabs/overview_tab.py:211 ui/tabs/overview_tab.py:219
+msgid "Ready to clean"
+msgstr "Готово к очистке"
+
+#: ui/tabs/kernels_tab.py:61
 msgid "Version"
 msgstr "Версия"
 
+#: ui/tabs/kernels_tab.py:68
 msgid "Image"
 msgstr "Образ"
 
+#: ui/tabs/kernels_tab.py:76
 msgid "Headers"
 msgstr "Заголовки"
 
+#: ui/tabs/kernels_tab.py:84
 msgid "Sources"
 msgstr "Исходники"
 
+#: ui/tabs/kernels_tab.py:92
 msgid "Size"
 msgstr "Размер"
 
+#: ui/tabs/kernels_tab.py:122
 msgid "{} kernel(s) installed, {} removable"
 msgstr "Установлено {} ядер, {} можно удалить"
 
+#: ui/tabs/kernels_tab.py:168
 msgid "Remove selected kernel packages?"
 msgstr "Удалить выбранные пакеты ядра?"
 
+#: ui/tabs/kernels_tab.py:170
 msgid ""
 "{} package(s) to remove:\n"
 "{}"
@@ -260,122 +388,285 @@ msgstr ""
 "{} пакет(ов) для удаления:\n"
 "{}"
 
+#: ui/tabs/kernels_tab.py:180
 msgid "Removing kernel packages..."
 msgstr "Удаление пакетов ядра..."
 
-msgid "Select items to remove"
-msgstr "Выберите элементы для удаления"
+#: ui/tabs/firmware_tab.py:32
+msgid ""
+"Network/Wi-Fi firmwares are locked — soplos.conf always injects them into "
+"the initrd"
+msgstr ""
+"Прошивки сети/Wi-Fi заблокированы — soplos.conf всегда включает их в initrd"
 
-msgid "Keep only my languages"
-msgstr "Сохранить только мои языки"
+#: ui/tabs/firmware_tab.py:79
+msgid "Remove selected firmwares"
+msgstr "Удалить выбранные прошивки"
 
-msgid "Unselect current language and English, select everything else"
-msgstr "Снять выбор с текущего языка и английского, выбрать всё остальное"
+#: ui/tabs/firmware_tab.py:98
+msgid "{} firmware families detected"
+msgstr "Обнаружено {} семейств прошивок"
 
-msgid "System Documentation"
-msgstr "Системная документация"
+#: ui/tabs/firmware_tab.py:116
+msgid ""
+"Protected: soplos.conf includes this firmware in the initrd to ensure "
+"connectivity"
+msgstr ""
+"Защищено: soplos.conf включает эту прошивку в initrd для обеспечения "
+"подключения"
 
-msgid "Standard Locales"
-msgstr "Стандартные локали"
+#: ui/tabs/firmware_tab.py:133
+msgid "Protected network firmware"
+msgstr "Защищённая сетевая прошивка"
 
-msgid "Gnome Help files"
-msgstr "Файлы справки Gnome"
+#: ui/tabs/firmware_tab.py:159
+msgid "Remove selected firmwares?"
+msgstr "Удалить выбранные прошивки?"
 
-msgid "KDE Documentation"
-msgstr "Документация KDE"
+#: ui/tabs/firmware_tab.py:162
+msgid ""
+"{} firmware family(s) will be removed from /lib/firmware/\n"
+"The initramfs will be regenerated automatically."
+msgstr ""
+"{} семейств(о) прошивок будет удалено из /lib/firmware/\n"
+"Initramfs будет восстановлен автоматически."
 
-msgid "Protected: current language or system default"
-msgstr "Защищено: текущий язык или системный по умолчанию"
+#: ui/tabs/firmware_tab.py:172
+msgid "Removing firmwares and regenerating initramfs..."
+msgstr "Удаление прошивок и восстановление initramfs..."
 
-msgid "Remove selected localization and documentation?"
-msgstr "Удалить выбранную локализацию и документацию?"
+#: ui/tabs/firmware_tab.py:176 cleaner/remover.py:161
+msgid "Firmware removed and initramfs regenerated."
+msgstr "Прошивка удалена и initramfs восстановлен."
 
-msgid "{} items will be permanently deleted from the system."
-msgstr "{} элементов будет навсегда удалено из системы."
-
-msgid "Cleaning locales and docs..."
-msgstr "Очистка локалей и документации..."
-
-msgid "Click the icon to analyze the system"
-msgstr "Нажмите на иконку для анализа системы"
-
-msgid "The scan may take a few seconds"
-msgstr "Анализ может занять несколько секунд"
-
-msgid "Scan Summary"
-msgstr "Сводка сканирования"
-
-msgid "Unnecessary GPU Drivers"
-msgstr "Ненужные драйверы GPU"
-
-msgid "Old Kernels"
-msgstr "Старые ядра"
-
-msgid "Temporary Files"
-msgstr "Временные файлы"
-
-msgid "Firmware Families"
-msgstr "Семейства прошивок"
-
-msgid "Generic/Unknown"
-msgstr "Общий/Неизвестный"
-
-msgid "Detected Hardware"
-msgstr "Обнаруженное оборудование"
-
-msgid "Active Drivers"
-msgstr "Активные драйверы"
-
-msgid "Languages & Docs"
-msgstr "Языки и документация"
-
-msgid "Total Reclaimable Space"
-msgstr "Всего освобождаемое место"
-
-msgid "Ready to clean"
-msgstr "Готово к очистке"
-
-msgid "System Usage"
-msgstr "Использование системы"
-
+#: ui/tabs/temp_tab.py:35
 msgid "Keep files from the last:"
 msgstr "Хранить файлы за последние:"
 
+#: ui/tabs/temp_tab.py:39
 msgid "1 day"
 msgstr "1 день"
 
+#: ui/tabs/temp_tab.py:39
 msgid "7 days"
 msgstr "7 дней"
 
+#: ui/tabs/temp_tab.py:39
 msgid "30 days"
 msgstr "30 дней"
 
+#: ui/tabs/temp_tab.py:39
 msgid "DO NOT KEEP (Delete all)"
 msgstr "НЕ ХРАНИТЬ (Удалить всё)"
 
-msgid "{} item(s) — {}"
-msgstr "{} элемент(ов) — {}"
-
+#: ui/tabs/temp_tab.py:115
 msgid "No temporary files matching this filter"
 msgstr "Нет временных файлов для этого фильтра"
 
+#: ui/tabs/temp_tab.py:177
 msgid "Remove selected temporary files?"
 msgstr "Удалить выбранные временные файлы?"
 
+#: ui/tabs/temp_tab.py:179
 msgid "{} item(s) to remove."
 msgstr "{} элемент(ов) для удаления."
 
+#: ui/tabs/temp_tab.py:186
 msgid "Removing temporary files..."
 msgstr "Удаление временных файлов..."
 
-msgid "{} item(s)"
-msgstr "{} элемент(ов)"
+#: ui/tabs/trash_tab.py:40
+msgid "Empty Trash"
+msgstr "Очистить корзину"
 
-msgid "{} family(s)"
-msgstr "{} семейство(в)"
+#: ui/tabs/trash_tab.py:57
+msgid "item(s) in trash"
+msgstr "объект(ов) в корзине"
 
-msgid "{} removable"
-msgstr "{} можно удалить"
+#: ui/tabs/trash_tab.py:62
+msgid "Trash is empty"
+msgstr "Корзина пуста"
 
+#: ui/tabs/trash_tab.py:71
+msgid "Empty the trash?"
+msgstr "Очистить корзину?"
+
+#: ui/tabs/trash_tab.py:73
+msgid "This will permanently delete all items in the trash."
+msgstr "Это безвозвратно удалит все объекты из корзины."
+
+#: ui/tabs/trash_tab.py:84
+msgid "Emptying trash..."
+msgstr "Очистка корзины..."
+
+#: ui/tabs/trash_tab.py:94
+msgid "Trash already empty."
+msgstr "Корзина уже пуста."
+
+#: ui/main_window.py:129
+msgid "Overview"
+msgstr "Обзор"
+
+#: ui/main_window.py:137
+msgid "GPU Drivers"
+msgstr "Драйверы GPU"
+
+#: ui/main_window.py:138
+msgid "Firmwares"
+msgstr "Прошивки"
+
+#: ui/main_window.py:139
+msgid "Kernels"
+msgstr "Ядра"
+
+#: ui/main_window.py:140
+msgid "Languages"
+msgstr "Языки"
+
+#: ui/main_window.py:142
+msgid "Temp Files"
+msgstr "Временные файлы"
+
+#: ui/main_window.py:164
+msgid "Ready"
+msgstr "Готово"
+
+#: ui/main_window.py:199
+msgid "Running on {} ({})"
+msgstr "Запущено на {} ({})"
+
+#: ui/main_window.py:201
+msgid " — Administrator mode"
+msgstr " — Режим администратора"
+
+#: ui/main_window.py:301
 msgid "Advanced system cleaner and optimizer for Soplos Linux."
 msgstr "Расширенный очиститель и оптимизатор системы для Soplos Linux."
+
+#: ui/main_window.py:424
+msgid "Scanning user data..."
+msgstr "Сканирование данных пользователя..."
+
+#: ui/main_window.py:429
+msgid "Scanning user cache..."
+msgstr "Сканирование кэша пользователя..."
+
+#: ui/main_window.py:433
+msgid "Scanning trash..."
+msgstr "Сканирование корзины..."
+
+#: ui/main_window.py:437
+msgid "Scanning Flatpak..."
+msgstr "Сканирование Flatpak..."
+
+#: ui/main_window.py:453 ui/main_window.py:548
+msgid "Scan error: {}"
+msgstr "Ошибка сканирования: {}"
+
+#: ui/main_window.py:455 ui/main_window.py:553
+msgid "Scan completed"
+msgstr "Сканирование завершено"
+
+#: ui/main_window.py:468
+msgid "Scanning system (administrator)..."
+msgstr "Сканирование системы (администратор)..."
+
+#: ui/main_window.py:499 cleaner/remover.py:52 cleaner/remover.py:126
+#: cleaner/remover.py:158 cleaner/remover.py:207
+msgid "Authentication cancelled."
+msgstr "Аутентификация отменена."
+
+#: ui/main_window.py:521
+msgid "No active root session. Scan as administrator first."
+msgstr "Нет активного сеанса root. Сначала выполните сканирование от имени администратора."
+
+#: cleaner/remover.py:25
+msgid "No packages to remove."
+msgstr "Нет пакетов для удаления."
+
+#: cleaner/remover.py:28
+msgid "Preparing administrative tasks..."
+msgstr "Подготовка административных задач..."
+
+#: cleaner/remover.py:58 cleaner/remover.py:132 cleaner/remover.py:164
+#: cleaner/remover.py:213
+msgid "Unexpected error: {}"
+msgstr "Неожиданная ошибка: {}"
+
+#: cleaner/remover.py:69
+msgid "Error cleaning cache: {}"
+msgstr "Ошибка при очистке кэша: {}"
+
+#: cleaner/remover.py:96
+msgid "Removing {}..."
+msgstr "Удаление {}..."
+
+#: cleaner/remover.py:107
+msgid "Error in {}: {}"
+msgstr "Ошибка в {}: {}"
+
+#: cleaner/remover.py:111
+msgid "{} error(s)."
+msgstr "{} ошибка(ок)."
+
+#: cleaner/remover.py:118
+msgid "Regenerating initramfs with dracut..."
+msgstr "Восстановление initramfs с помощью dracut..."
+
+#: cleaner/remover.py:127
+msgid "dracut error: {}"
+msgstr "Ошибка dracut: {}"
+
+#: cleaner/remover.py:128
+msgid "initramfs regenerated successfully."
+msgstr "initramfs успешно восстановлен."
+
+#: cleaner/remover.py:130
+msgid "dracut not found on the system."
+msgstr "dracut не найден в системе."
+
+#: cleaner/remover.py:140
+msgid "No firmwares to remove."
+msgstr "Нет прошивок для удаления."
+
+#: cleaner/remover.py:143
+msgid "Preparing firmware removal..."
+msgstr "Подготовка удаления прошивки..."
+
+#: cleaner/remover.py:173
+msgid "No items selected for removal."
+msgstr "Не выбрано элементов для удаления."
+
+#: cleaner/remover.py:176
+msgid "Cleaning localization and documentation files..."
+msgstr "Очистка файлов локализации и документации..."
+
+#~ msgid "Permission denied: {}"
+#~ msgstr "Доступ запрещён: {}"
+
+#~ msgid "Detecting hardware..."
+#~ msgstr "Определение оборудования..."
+
+#~ msgid "Scanning GPU drivers..."
+#~ msgstr "Сканирование драйверов GPU..."
+
+#~ msgid "Scanning kernels..."
+#~ msgstr "Сканирование ядер..."
+
+#~ msgid "Scanning temporary files..."
+#~ msgstr "Сканирование временных файлов..."
+
+#~ msgid "Scanning languages and docs..."
+#~ msgstr "Сканирование языков и документации..."
+
+#~ msgid "Error during scan: {}"
+#~ msgstr "Ошибка при сканировании: {}"
+
+#~ msgid "Generic/Unknown"
+#~ msgstr "Общий/Неизвестный"
+
+#~ msgid "Detected Hardware"
+#~ msgstr "Обнаруженное оборудование"
+
+#~ msgid "Active Drivers"
+#~ msgstr "Активные драйверы"

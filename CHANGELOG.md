@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.1] - 2026-03-25
+
+### ✨ Added
+- **Dual-Layer Scanning**: Separates User and Administrator scans. Starts with a fast user-level scan, only requesting administrative privileges when explicitly requested via the top header button.
+- **Flatpak Cleaning**: New dedicated tab to detect and safely uninstall unused Flatpak runtimes (`flatpak uninstall --unused`).
+- **User Cache Cleaning**: New scanner specifically targeting `~/.cache`, grouped by application folders.
+- **Trash Management**: New dedicated tab to easily empty the user's local trash (`~/.local/share/Trash`).
+- **Dynamic Tabs**: System-critical tabs (GPU Drivers, Firmwares, Kernels, APT, Logs, Languages) now logically remain hidden until an administrative scan is authorized.
+- **Unified Overview**: The overview tab now perfectly aggregates sizes and elements from both the user-level and root-level scans dynamically.
+
+### 🐛 Fixed
+- **Root Session Refreshing**: Resolved a major architectural frustration where the administrative session was hard-killed (triggering repeated `pkexec` password prompts) just to refresh the UI after a cleanup. The persistent IPC helper is now gracefully reused for subsequent rescans.
+- **Silent User Cleanup**: Removed intrusive `pkexec` fallbacks from user-level tasks. Clearing user cache or trash now silently skips unprivileged files instead of throwing root password prompts.
+- **Kernel Tab Display**: Fixed a `TypeError` in IPC data deserialization that caused the Kernels tab to crash silently and display completely empty.
+- **Root Launch Optimization**: The administrative scan now correctly detects if the application is already running under `sudo` / `root`, bypassing redundant Polkit authentication prompts.
+
+---
+
 ## [1.0.0-2] - 2026-03-20
 
 ### 🐛 Fixed

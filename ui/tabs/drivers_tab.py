@@ -155,15 +155,15 @@ class DriversTab(Gtk.Box):
             return
 
         self.remove_btn.set_sensitive(False)
+        self.parent.set_ui_state(_("Removing drivers and regenerating initramfs..."), pulse=True)
 
-        def do_remove():
-            from cleaner.remover import purge_and_rebuild
-            self.parent.set_ui_state(_("Removing drivers and regenerating initramfs..."), pulse=True)
-            success, msg = purge_and_rebuild(selected, rebuild_initrd=True)
-            GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
-            GLib.idle_add(self.remove_btn.set_sensitive, True)
+        def on_done(result):
+            success = result.get('success', False)
+            msg = _("Tasks completed successfully.") if success else f"Error: {result.get('stderr', '')}"
+            self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
+            self.remove_btn.set_sensitive(True)
             if success:
-                GLib.timeout_add_seconds(2, lambda: self.parent.start_scan())
+                GLib.timeout_add_seconds(2, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
 
-        threading.Thread(target=do_remove, daemon=True).start()
+        self.parent.run_root_action({'action': 'apt_purge', 'packages': selected, 'rebuild_initrd': True}, on_done)

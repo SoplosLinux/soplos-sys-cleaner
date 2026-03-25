@@ -125,16 +125,18 @@ class CacheTab(Gtk.Box):
 
     def _on_clean_cache(self, btn):
         btn.set_sensitive(False)
-        def do_clean():
-            from cleaner.remover import clean_apt_cache
-            self.parent.set_ui_state(_("Cleaning APT cache..."), pulse=True)
-            success, msg = clean_apt_cache()
-            GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
-            GLib.idle_add(btn.set_sensitive, True)
+        self.parent.set_ui_state(_("Cleaning APT cache..."), pulse=True)
+
+        def on_done(result):
+            success = result.get('success', False)
+            msg = _("APT cache cleaned successfully.") if success else f"Error: {result.get('stderr', '')}"
+            self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
+            btn.set_sensitive(True)
             if success:
-                GLib.timeout_add_seconds(1, lambda: self.parent.start_scan())
+                GLib.timeout_add_seconds(1, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
-        threading.Thread(target=do_clean, daemon=True).start()
+
+        self.parent.run_root_action({'action': 'apt_clean'}, on_done)
 
     def _on_autoremove(self, btn):
         dialog = Gtk.MessageDialog(
@@ -149,13 +151,15 @@ class CacheTab(Gtk.Box):
             return
 
         btn.set_sensitive(False)
-        def do_autoremove():
-            from cleaner.remover import autoremove_packages
-            self.parent.set_ui_state(_("Removing orphaned packages..."), pulse=True)
-            success, msg = autoremove_packages()
-            GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
-            GLib.idle_add(btn.set_sensitive, True)
+        self.parent.set_ui_state(_("Removing orphaned packages..."), pulse=True)
+
+        def on_done(result):
+            success = result.get('success', False)
+            msg = _("Orphaned packages removed.") if success else f"Error: {result.get('stderr', '')}"
+            self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
+            btn.set_sensitive(True)
             if success:
-                GLib.timeout_add_seconds(1, lambda: self.parent.start_scan())
+                GLib.timeout_add_seconds(1, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
-        threading.Thread(target=do_autoremove, daemon=True).start()
+
+        self.parent.run_root_action({'action': 'apt_autoremove'}, on_done)
