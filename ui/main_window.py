@@ -206,16 +206,20 @@ class MainWindow(Gtk.ApplicationWindow):
                 base += _(" — Administrator mode")
             self.status_label.set_text(base)
 
-    def _relaunch_as_root(self):
-        """Relaunch the application with pkexec, propagating the user environment."""
+    def _get_pkexec_env(self):
+        """Returns list of "VAR=VALUE" for essential environment variables."""
         important_vars = [
             'DISPLAY', 'XAUTHORITY', 'XDG_RUNTIME_DIR', 'DBUS_SESSION_BUS_ADDRESS',
             'WAYLAND_DISPLAY', 'XDG_CURRENT_DESKTOP', 'XDG_SESSION_TYPE',
-            'HOME', 'LANG', 'GDK_BACKEND', 'GTK_THEME',
+            'SOPLOS_DESKTOP', 'LANG', 'HOME', 'PATH', 'GDK_BACKEND', 'GTK_THEME',
         ]
-        env_vars = [f"{v}={os.environ[v]}" for v in important_vars if v in os.environ]
-        env_vars += ['NO_AT_BRIDGE=1', 'GSETTINGS_BACKEND=memory', 'GIO_USE_VFS=local']
+        ev = [f"{v}={os.environ[v]}" for v in important_vars if v in os.environ]
+        ev += ['NO_AT_BRIDGE=1', 'GSETTINGS_BACKEND=memory', 'GIO_USE_VFS=local']
+        return ev
 
+    def _relaunch_as_root(self):
+        """Relaunch the application with pkexec, propagating the user environment."""
+        env_vars = self._get_pkexec_env()
         script_path = str(Path(__file__).resolve().parent.parent / 'main.py')
         pkexec_path = shutil.which('pkexec') or 'pkexec'
         cmd = [pkexec_path, 'env'] + env_vars + [sys.executable, script_path]
@@ -478,9 +482,8 @@ class MainWindow(Gtk.ApplicationWindow):
                 proc = getattr(self, '_root_process', None)
                 if proc is None or proc.poll() is not None:
                     script = str(Path(__file__).resolve().parent.parent / 'scanner' / 'root_helper.py')
-                    env_vars = [f"{v}={os.environ[v]}" for v in ('SOPLOS_DESKTOP', 'LANG', 'HOME') if v in os.environ]
-                    env_vars += ['NO_AT_BRIDGE=1', 'GSETTINGS_BACKEND=memory', 'GIO_USE_VFS=local']
-                    
+                    env_vars = self._get_pkexec_env()
+
                     if os.geteuid() == 0:
                         cmd = ['env'] + env_vars + [sys.executable, script]
                     else:
@@ -559,38 +562,41 @@ class MainWindow(Gtk.ApplicationWindow):
         GLib.timeout_add_seconds(3, lambda: self.set_ui_state("", visible=False))
 
         # Deserialize namedtuple-like objects from JSON dicts
-        from scanner.hardware import is_firmware_protected
-        results['is_firmware_protected'] = is_firmware_protected
+        try:
+            from scanner.hardware import is_firmware_protected
+            results['is_firmware_protected'] = is_firmware_protected
 
-        from scanner.packages import PackageInfo
-        results['unnecessary_pkgs'] = [
-            PackageInfo(name=p['name'], installed_size=p['installed_size'], description=p['description'])
-            for p in results.get('unnecessary_pkgs', [])
-        ]
-        from scanner.kernels import KernelInfo
-        results['kernels'] = [
-            KernelInfo(version=k['version'], is_active=k['is_active'],
-                       has_headers=k['has_headers'], has_src=k['has_src'],
-                       image_pkg=k['image_pkg'], headers_pkg=k['headers_pkg'],
-                       src_pkg=k['src_pkg'], size_kb=k['size_kb'])
-            for k in results.get('kernels', [])
-        ]
-        from scanner.temp_files import TempEntry
-        results['temp_entries'] = [
-            TempEntry(path=e['path'], size_bytes=e['size_bytes'],
-                      age_days=e['age_days'], is_dir=e['is_dir'])
-            for e in results.get('temp_entries', [])
-        ]
-        from scanner.locales import LocaleEntry, DocEntry
-        results['locales'] = [
-            LocaleEntry(code=l['code'], name=l['name'], paths=tuple(l['paths']),
-                        size_kb=l['size_kb'], category=l['category'])
-            for l in results.get('locales', [])
-        ]
-        results['docs_summary'] = [
-            DocEntry(name=d['name'], path=d['path'], size_kb=d['size_kb'], type=d['type'])
-            for d in results.get('docs_summary', [])
-        ]
+            from scanner.packages import PackageInfo
+            results['unnecessary_pkgs'] = [
+                PackageInfo(name=p['name'], installed_size=p['installed_size'], description=p['description'], vendor=p['vendor'])
+                for p in results.get('unnecessary_pkgs', [])
+            ]
+            from scanner.kernels import KernelInfo
+            results['kernels'] = [
+                KernelInfo(version=k['version'], is_active=k['is_active'],
+                           has_headers=k['has_headers'], has_src=k['has_src'],
+                           image_pkg=k['image_pkg'], headers_pkg=k['headers_pkg'],
+                           src_pkg=k['src_pkg'], size_kb=k['size_kb'])
+                for k in results.get('kernels', [])
+            ]
+            from scanner.temp_files import TempEntry
+            results['temp_entries'] = [
+                TempEntry(path=e['path'], size_bytes=e['size_bytes'],
+                          age_days=e['age_days'], is_dir=e['is_dir'])
+                for e in results.get('temp_entries', [])
+            ]
+            from scanner.locales import LocaleEntry, DocEntry
+            results['locales'] = [
+                LocaleEntry(code=l['code'], name=l['name'], paths=tuple(l['paths']),
+                            size_kb=l['size_kb'], category=l['category'])
+                for l in results.get('locales', [])
+            ]
+            results['docs_summary'] = [
+                DocEntry(name=d['name'], path=d['path'], size_kb=d['size_kb'], type=d['type'])
+                for d in results.get('docs_summary', [])
+            ]
+        except Exception as e:
+            logger.error(f"Error deserializing root scan results: {e}")
 
         self._scan_results.update(results)
         self.overview_tab.populate(self._scan_results)

@@ -47,6 +47,7 @@ class SoplosCleanerApplication(Gtk.Application):
         self.environment_detector = get_environment_detector()
         self.environment_detector.configure_environment_variables()
         env_info = self.environment_detector.get_environment_info()
+        os.environ['SOPLOS_DESKTOP'] = env_info['desktop']
         logger.info(f"Desktop: {env_info['desktop']}, Protocol: {env_info['protocol']}")
 
         initialize_i18n(str(self.locale_path))

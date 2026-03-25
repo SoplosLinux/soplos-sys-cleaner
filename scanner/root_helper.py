@@ -35,7 +35,7 @@ def do_scan(params):
         from scanner.packages import get_unnecessary_gpu_packages
         pkgs = get_unnecessary_gpu_packages(results.get('gpu_vendors', []))
         results['unnecessary_pkgs'] = [
-            {'name': p.name, 'installed_size': p.installed_size, 'description': p.description}
+            {'name': p.name, 'installed_size': p.installed_size, 'description': p.description, 'vendor': p.vendor}
             for p in pkgs
         ]
     except Exception:
