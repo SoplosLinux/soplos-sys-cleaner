@@ -642,6 +642,58 @@ msgstr "Nu sunt elemente selectate pentru eliminare."
 msgid "Cleaning localization and documentation files..."
 msgstr "Se curăță fișierele de localizare și documentație..."
 
+#: scanner/locales.py:127
+msgid "Manual Pages"
+msgstr "Pagini de manual"
+
+#: scanner/locales.py:128
+msgid "Info Pages"
+msgstr "Pagini de info"
+
+#: scanner/locales.py:129
+msgid "Help Files"
+msgstr "Fișiere de ajutor"
+
+#: scanner/locales.py:130
+msgid "Application Icons"
+msgstr "Pictograme aplicație"
+
+#: scanner/locales.py:131
+msgid "Development Files"
+msgstr "Fișiere de dezvoltare"
+
+#: scanner/locales.py:132
+msgid "Documentation Files"
+msgstr "Fișiere de documentație"
+
+#: scanner/locales.py:133
+msgid "Locale Data"
+msgstr "Date de localizare"
+
+#: ui/tabs/logs_tab.py:120
+msgid "Keep last 500 MB"
+msgstr "Păstrează ultimii 500 MB"
+
+#: ui/tabs/logs_tab.py:121
+msgid "Keep last 1 GB"
+msgstr "Păstrează ultimul 1 GB"
+
+#: ui/tabs/logs_tab.py:122
+msgid "Keep last 2 GB"
+msgstr "Păstrează ultimii 2 GB"
+
+#: ui/tabs/logs_tab.py:123
+msgid "Keep last 7 days"
+msgstr "Păstrează ultimele 7 zile"
+
+#: ui/tabs/logs_tab.py:124
+msgid "Keep last 30 days"
+msgstr "Păstrează ultimele 30 de zile"
+
+#: ui/tabs/logs_tab.py:125
+msgid "Clear all"
+msgstr "Șterge tot"
+
 #~ msgid "Permission denied: {}"
 #~ msgstr "Permisiune refuzată: {}"
 

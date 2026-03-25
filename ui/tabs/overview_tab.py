@@ -173,13 +173,12 @@ class OverviewTab(Gtk.Box):
         has_root_data = os.geteuid() == 0 or 'kernels' in results
 
         if has_root_data:
-            # Root cards
             gpu_pkgs = results.get('unnecessary_pkgs', [])
-            gpu_size = sum(p.installed_size * 1024 for p in gpu_pkgs)
+            gpu_size = sum((p.installed_size if not isinstance(p, dict) else p.get('installed_size', 0)) * 1024 for p in gpu_pkgs)
             card_gpu = self._make_card('video-display', _("Unnecessary GPU Drivers"), _("{} item(s)").format(len(gpu_pkgs)), _fmt_size(gpu_size))
 
-            kernels = [k for k in results.get('kernels', []) if not k.is_active]
-            kernel_size = sum(k.size_kb * 1024 for k in kernels)
+            kernels = [k for k in results.get('kernels', []) if (not k.is_active if not isinstance(k, dict) else not k.get('is_active', False))]
+            kernel_size = sum((k.size_kb if not isinstance(k, dict) else k.get('size_kb', 0)) * 1024 for k in kernels)
             card_kernels = self._make_card('media-flash', _("Old Kernels"), _("{} item(s)").format(len(kernels)), _fmt_size(kernel_size))
 
             apt_info = results.get('apt_cache', {})
@@ -188,7 +187,7 @@ class OverviewTab(Gtk.Box):
             card_apt = self._make_card('system-software-install', _("APT Cache"), f"{apt_count} .deb", _fmt_size(apt_size))
 
             temp_entries = results.get('temp_entries', [])
-            temp_size = sum(e.size_bytes for e in temp_entries)
+            temp_size = sum((e.size_bytes if not isinstance(e, dict) else e.get('size_bytes', 0)) for e in temp_entries)
             card_temp = self._make_card('user-trash', _("Temporary Files"), _("{} item(s)").format(len(temp_entries)), _fmt_size(temp_size))
 
             firmwares = results.get('firmware_families', [])
@@ -198,7 +197,8 @@ class OverviewTab(Gtk.Box):
 
             locales = results.get('locales', [])
             docs = results.get('docs_summary', [])
-            lang_size = (sum(l.size_kb for l in locales) + sum(d.size_kb for d in docs)) * 1024
+            lang_size = (sum(l.size_kb if not isinstance(l, dict) else l.get('size_kb', 0) for l in locales) + 
+                         sum(d.size_kb if not isinstance(d, dict) else d.get('size_kb', 0) for d in docs)) * 1024
             card_lang = self._make_card('locale', _("Languages & Docs"), _("{} item(s)").format(len(locales) + len(docs)), _fmt_size(lang_size))
 
             log_entries = results.get('log_entries', [])
@@ -207,11 +207,10 @@ class OverviewTab(Gtk.Box):
             journald_size = journald.get('size_bytes', 0) if isinstance(journald, dict) else 0
             card_logs = self._make_card('text-x-script', _("System Logs"), _("{} item(s)").format(len(log_entries)), _fmt_size(log_size + journald_size))
 
-            total = gpu_size + kernel_size + apt_size + temp_size + lang_size + cache_size + trash_size + flatpak_size + log_size + journald_size
+            total = gpu_size + kernel_size + apt_size + temp_size + lang_size + log_size + journald_size
             card_total = self._make_card('edit-clear', _("Total Reclaimable Space"), _("Ready to clean"), _fmt_size(total))
 
-            cards = [card_cache, card_trash, card_flatpak,
-                     card_gpu, card_kernels, card_apt,
+            cards = [card_gpu, card_kernels, card_apt,
                      card_temp, card_fw, card_lang,
                      card_logs, card_total, card_sys]
         else:

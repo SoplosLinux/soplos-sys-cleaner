@@ -199,30 +199,28 @@ msgid "Unknown error"
 msgstr ""
 
 #: ui/tabs/logs_tab.py:48
-#, fuzzy
 msgid "Systemd Journal"
-msgstr "Documentación del sistema"
+msgstr "Journal de Systemd"
 
 #: ui/tabs/logs_tab.py:52 ui/tabs/trash_tab.py:33
-#, fuzzy
 msgid "Scanning..."
-msgstr "Escaneando sistema..."
+msgstr "Escaneando..."
 
 #: ui/tabs/logs_tab.py:57
 msgid "Keep last 100 MB"
-msgstr ""
+msgstr "Mantener últimos 100 MB"
 
 #: ui/tabs/logs_tab.py:59
 msgid "Keep last 2 weeks"
-msgstr ""
+msgstr "Mantener últimas 2 semanas"
 
 #: ui/tabs/logs_tab.py:74
 msgid "/var/log entries"
-msgstr ""
+msgstr "Entradas en /var/log"
 
 #: ui/tabs/logs_tab.py:117
 msgid "{} used by journal"
-msgstr ""
+msgstr "{} usados por el journal"
 
 #: ui/tabs/logs_tab.py:127 ui/tabs/user_cache_tab.py:82 ui/tabs/temp_tab.py:110
 msgid "{} item(s) — {}"
@@ -230,21 +228,19 @@ msgstr "{} elemento(s) — {}"
 
 #: ui/tabs/logs_tab.py:132
 msgid "No log files found"
-msgstr ""
+msgstr "No se han encontrado registros"
 
 #: ui/tabs/logs_tab.py:179
-#, fuzzy
 msgid "Cleaning journal..."
-msgstr "Limpiando caché APT..."
+msgstr "Limpiando el journal..."
 
 #: ui/tabs/logs_tab.py:182
 msgid "Journal cleaned."
-msgstr ""
+msgstr "Journal limpiado."
 
 #: ui/tabs/logs_tab.py:199
-#, fuzzy
 msgid "Remove selected log entries?"
-msgstr "¿Eliminar paquetes seleccionados?"
+msgstr "¿Eliminar registros seleccionados?"
 
 #: ui/tabs/logs_tab.py:201 ui/tabs/user_cache_tab.py:143
 #, fuzzy
@@ -655,6 +651,58 @@ msgstr "No hay elementos seleccionados para eliminar."
 msgid "Cleaning localization and documentation files..."
 msgstr "Limpiando archivos de localización y documentación..."
 
+#: scanner/locales.py:127
+msgid "Manual Pages"
+msgstr "Páginas de manual"
+
+#: scanner/locales.py:128
+msgid "Info Pages"
+msgstr "Páginas info"
+
+#: scanner/locales.py:129
+msgid "Help Files"
+msgstr "Archivos de ayuda"
+
+#: scanner/locales.py:130
+msgid "Application Icons"
+msgstr "Iconos de aplicación"
+
+#: scanner/locales.py:131
+msgid "Development Files"
+msgstr "Archivos de desarrollo"
+
+#: scanner/locales.py:132
+msgid "Documentation Files"
+msgstr "Archivos de documentación"
+
+#: scanner/locales.py:133
+msgid "Locale Data"
+msgstr "Datos de idiomas"
+
+#: ui/tabs/logs_tab.py:120
+msgid "Keep last 500 MB"
+msgstr "Mantener últimos 500 MB"
+
+#: ui/tabs/logs_tab.py:121
+msgid "Keep last 1 GB"
+msgstr "Mantener último 1 GB"
+
+#: ui/tabs/logs_tab.py:122
+msgid "Keep last 2 GB"
+msgstr "Mantener últimos 2 GB"
+
+#: ui/tabs/logs_tab.py:123
+msgid "Keep last 7 days"
+msgstr "Mantener últimos 7 días"
+
+#: ui/tabs/logs_tab.py:124
+msgid "Keep last 30 days"
+msgstr "Mantener últimos 30 días"
+
+#: ui/tabs/logs_tab.py:125
+msgid "Clear all"
+msgstr "Borrar todo"
+
 #~ msgid "Permission denied: {}"
 #~ msgstr "Permiso denegado: {}"
 
@@ -684,3 +732,33 @@ msgstr "Limpiando archivos de localización y documentación..."
 
 #~ msgid "Active Drivers"
 #~ msgstr "Controladores activos"
+
+#~ msgid "Package Documentation"
+#~ msgstr "Documentación de paquetes"
+
+#~ msgid "Qt5 Documentation"
+#~ msgstr "Documentación Qt5"
+
+#~ msgid "Qt6 Documentation"
+#~ msgstr "Documentación Qt6"
+
+#~ msgid "GTK Documentation"
+#~ msgstr "Documentación GTK"
+
+#~ msgid "CUPS Documentation"
+#~ msgstr "Documentación CUPS"
+
+#~ msgid "DocBook XML"
+#~ msgstr "DocBook XML"
+
+#~ msgid "Doc-Base"
+#~ msgstr "Doc-Base"
+
+#~ msgid "XFCE Helpers"
+#~ msgstr "Ayudantes XFCE"
+
+#~ msgid "KF6 DocTools"
+#~ msgstr "Herramientas de doc. KF6"
+
+#~ msgid "Soplos App Docs"
+#~ msgstr "Documentos de Apps Soplos"

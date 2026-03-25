@@ -642,6 +642,58 @@ msgstr "Keine Elemente zur Entfernung ausgewählt."
 msgid "Cleaning localization and documentation files..."
 msgstr "Lokalisierungs- und Dokumentationsdateien werden geleert..."
 
+#: scanner/locales.py:127
+msgid "Manual Pages"
+msgstr "Handbuchseiten"
+
+#: scanner/locales.py:128
+msgid "Info Pages"
+msgstr "Info-Seiten"
+
+#: scanner/locales.py:129
+msgid "Help Files"
+msgstr "Hilfedateien"
+
+#: scanner/locales.py:130
+msgid "Application Icons"
+msgstr "Anwendungssymbole"
+
+#: scanner/locales.py:131
+msgid "Development Files"
+msgstr "Entwicklungsdateien"
+
+#: scanner/locales.py:132
+msgid "Documentation Files"
+msgstr "Dokumentationsdateien"
+
+#: scanner/locales.py:133
+msgid "Locale Data"
+msgstr "Sprachdaten"
+
+#: ui/tabs/logs_tab.py:120
+msgid "Keep last 500 MB"
+msgstr "Die letzten 500 MB behalten"
+
+#: ui/tabs/logs_tab.py:121
+msgid "Keep last 1 GB"
+msgstr "Das letzte 1 GB behalten"
+
+#: ui/tabs/logs_tab.py:122
+msgid "Keep last 2 GB"
+msgstr "Die letzten 2 GB behalten"
+
+#: ui/tabs/logs_tab.py:123
+msgid "Keep last 7 days"
+msgstr "Die letzten 7 Tage behalten"
+
+#: ui/tabs/logs_tab.py:124
+msgid "Keep last 30 days"
+msgstr "Die letzten 30 Tage behalten"
+
+#: ui/tabs/logs_tab.py:125
+msgid "Clear all"
+msgstr "Alles löschen"
+
 #~ msgid "Permission denied: {}"
 #~ msgstr "Zugriff verweigert: {}"
 

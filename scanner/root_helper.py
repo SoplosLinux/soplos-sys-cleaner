@@ -123,7 +123,7 @@ def do_delete_paths(params):
                 os.remove(path)
         except Exception as e:
             errors.append(str(e))
-    return {'success': len(errors) == 0, 'errors': errors}
+    return {'success': len(errors) == 0, 'error': " | ".join(errors) if errors else None}
 
 
 def do_apt_clean(params):
@@ -181,11 +181,14 @@ def do_delete_locales(params):
         try:
             with open('/etc/locale.nopurge', 'w') as f:
                 f.write(nopurge)
-            subprocess.run(['localepurge'], capture_output=True, text=True)
+            
+            localepurge_bin = '/usr/sbin/localepurge' if os.path.exists('/usr/sbin/localepurge') else shutil.which('localepurge')
+            if localepurge_bin:
+                subprocess.run([localepurge_bin], capture_output=True, text=True)
         except Exception as e:
             errors.append(str(e))
 
-    return {'success': len(errors) == 0, 'errors': errors}
+    return {'success': len(errors) == 0, 'error': " | ".join(errors) if errors else None}
 
 
 def do_remove_firmware(params):
@@ -201,7 +204,7 @@ def do_remove_firmware(params):
     result = subprocess.run(['dracut', '-f'], capture_output=True, text=True)
     if result.returncode != 0:
         errors.append(result.stderr.strip())
-    return {'success': len(errors) == 0, 'errors': errors}
+    return {'success': len(errors) == 0, 'error': " | ".join(errors) if errors else None}
 
 
 # ─── Dispatch ─────────────────────────────────────────────────────────────────

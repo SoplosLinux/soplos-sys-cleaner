@@ -113,8 +113,7 @@ class LogsTab(Gtk.Box):
         ]
         journald = results.get('journald', {})
         self._journald_size = journald.get('size_bytes', 0) if isinstance(journald, dict) else journald.size_bytes
-        disk_str = journald.get('disk_usage_str', '') if isinstance(journald, dict) else journald.disk_usage_str
-        self.journald_label.set_text(disk_str or _("{} used by journal").format(_fmt_size(self._journald_size)))
+        self.journald_label.set_text(_("{} used by journal").format(_fmt_size(self._journald_size)))
         self._fill_list()
 
     def _fill_list(self):

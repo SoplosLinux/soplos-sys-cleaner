@@ -132,10 +132,13 @@ class MainWindow(Gtk.ApplicationWindow):
         # User tabs always visible
         user_tabs = [
             (self.overview_tab,    _("Overview"),      'preferences-system'),
-            (self.user_cache_tab,  _("User Cache"),    'folder'),
-            (self.trash_tab,       _("Trash"),         'user-trash-full'),
-            (self.flatpak_tab,     _("Flatpak"),       'package-x-generic'),
         ]
+        if os.geteuid() != 0:
+            user_tabs.extend([
+                (self.user_cache_tab,  _("User Cache"),    'folder'),
+                (self.trash_tab,       _("Trash"),         'user-trash-full'),
+                (self.flatpak_tab,     _("Flatpak"),       'package-x-generic'),
+            ])
 
         # Root tabs — added dynamically after root scan if running as user
         self._root_tab_definitions = [
@@ -393,7 +396,11 @@ class MainWindow(Gtk.ApplicationWindow):
     def set_ui_state(self, message: str, fraction: float = None, pulse: bool = False, visible: bool = True):
         """Update progress bar and label. Thread-safe via GLib.idle_add."""
         def _update():
-            self.progress_label.set_text(message)
+            if not isinstance(message, str):
+                import traceback
+                print(f"CRITICAL: message is {type(message)}: {message}, Traceback:")
+                traceback.print_stack()
+            self.progress_label.set_text(str(message))
             if pulse:
                 self.progress_bar.pulse()
             elif fraction is not None:
@@ -415,6 +422,13 @@ class MainWindow(Gtk.ApplicationWindow):
         for widget, label_text, icon_name in self._root_tab_definitions:
             if widget not in existing:
                 self._append_tab(widget, label_text, icon_name)
+
+    def _hide_user_tabs(self):
+        """Remove user-specific tabs when switching to root mode."""
+        widgets_to_hide = [self.user_cache_tab, self.trash_tab, self.flatpak_tab]
+        for i in range(self.notebook.get_n_pages() - 1, -1, -1):
+            if self.notebook.get_nth_page(i) in widgets_to_hide:
+                self.notebook.remove_page(i)
 
     def _on_scan_clicked(self, *args):
         self.start_scan()
@@ -557,6 +571,7 @@ class MainWindow(Gtk.ApplicationWindow):
             return
         # Add root tabs to notebook if running as user (first time)
         self._ensure_root_tabs_visible()
+        self._hide_user_tabs()
 
         self.set_ui_state(_("Scan completed"), fraction=1.0, visible=True)
         GLib.timeout_add_seconds(3, lambda: self.set_ui_state("", visible=False))
@@ -565,12 +580,19 @@ class MainWindow(Gtk.ApplicationWindow):
         try:
             from scanner.hardware import is_firmware_protected
             results['is_firmware_protected'] = is_firmware_protected
+        except Exception as e:
+            logger.error(f"Error importing is_firmware_protected: {e}")
 
+        try:
             from scanner.packages import PackageInfo
             results['unnecessary_pkgs'] = [
                 PackageInfo(name=p['name'], installed_size=p['installed_size'], description=p['description'], vendor=p['vendor'])
                 for p in results.get('unnecessary_pkgs', [])
             ]
+        except Exception as e:
+            logger.error(f"Error deserializing GPU packages: {e}")
+
+        try:
             from scanner.kernels import KernelInfo
             results['kernels'] = [
                 KernelInfo(version=k['version'], is_active=k['is_active'],
@@ -579,12 +601,20 @@ class MainWindow(Gtk.ApplicationWindow):
                            src_pkg=k['src_pkg'], size_kb=k['size_kb'])
                 for k in results.get('kernels', [])
             ]
+        except Exception as e:
+            logger.error(f"Error deserializing Kernels: {e}")
+
+        try:
             from scanner.temp_files import TempEntry
             results['temp_entries'] = [
                 TempEntry(path=e['path'], size_bytes=e['size_bytes'],
                           age_days=e['age_days'], is_dir=e['is_dir'])
                 for e in results.get('temp_entries', [])
             ]
+        except Exception as e:
+            logger.error(f"Error deserializing Temp entries: {e}")
+
+        try:
             from scanner.locales import LocaleEntry, DocEntry
             results['locales'] = [
                 LocaleEntry(code=l['code'], name=l['name'], paths=tuple(l['paths']),
@@ -596,7 +626,7 @@ class MainWindow(Gtk.ApplicationWindow):
                 for d in results.get('docs_summary', [])
             ]
         except Exception as e:
-            logger.error(f"Error deserializing root scan results: {e}")
+            logger.error(f"Error deserializing Locales/Docs: {e}")
 
         self._scan_results.update(results)
         self.overview_tab.populate(self._scan_results)

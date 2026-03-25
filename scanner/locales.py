@@ -6,6 +6,7 @@ Supports standard locales and DE-specific paths (Gnome Help, KDE HTML).
 import os
 import subprocess
 from typing import NamedTuple
+from core.i18n_manager import _
 
 
 class LocaleEntry(NamedTuple):
@@ -123,19 +124,19 @@ def get_docs_summary() -> list[DocEntry]:
     """Retrieve summary of extended system documentation sizes."""
     # Comprehensive list of documentation roots discovered across Boro, Tyron, Tyson
     doc_roots = [
-        ('Manual Pages', '/usr/share/man', 'man'),
-        ('Info Pages', '/usr/share/info', 'info'),
-        ('Package Documentation', '/usr/share/doc', 'doc'),
-        ('Qt5 Documentation', '/usr/share/qt5/doc', 'doc'),
-        ('Qt6 Documentation', '/usr/share/qt6/doc', 'doc'),
-        ('GTK Documentation', '/usr/share/gtk-doc', 'doc'),
-        ('CUPS Documentation', '/usr/share/cups/doc-root', 'doc'),
-        ('DocBook XML', '/usr/share/xml/docbook', 'doc'),
-        ('Doc-Base', '/usr/share/doc-base', 'doc'),
-        ('XFCE Helpers', '/usr/share/xfce4/helpers', 'doc'),
-        ('KF6 DocTools', '/usr/share/kf6/kdoctools', 'doc'),
-        ('Developer Help', '/usr/share/devhelp', 'doc'),
-        ('Soplos App Docs', '/usr/share/soplos-welcome/docs', 'doc'),
+        (_('Manual Pages'), '/usr/share/man', 'man'),
+        (_('Info Pages'), '/usr/share/info', 'info'),
+        (_('Package Documentation'), '/usr/share/doc', 'doc'),
+        (_('Qt5 Documentation'), '/usr/share/qt5/doc', 'doc'),
+        (_('Qt6 Documentation'), '/usr/share/qt6/doc', 'doc'),
+        (_('GTK Documentation'), '/usr/share/gtk-doc', 'doc'),
+        (_('CUPS Documentation'), '/usr/share/cups/doc-root', 'doc'),
+        (_('DocBook XML'), '/usr/share/xml/docbook', 'doc'),
+        (_('Doc-Base'), '/usr/share/doc-base', 'doc'),
+        (_('XFCE Helpers'), '/usr/share/xfce4/helpers', 'doc'),
+        (_('KF6 DocTools'), '/usr/share/kf6/kdoctools', 'doc'),
+        (_('Developer Help'), '/usr/share/devhelp', 'doc'),
+        (_('Soplos App Docs'), '/usr/share/soplos-welcome/docs', 'doc'),
     ]
     
     results = []

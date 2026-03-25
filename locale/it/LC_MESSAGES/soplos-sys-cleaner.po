@@ -580,7 +580,8 @@ msgstr "Autenticazione annullata."
 
 #: ui/main_window.py:521
 msgid "No active root session. Scan as administrator first."
-msgstr "Nessuna sessione root attiva. Esegui prima la scansione come amministratore."
+msgstr ""
+"Nessuna sessione root attiva. Esegui prima la scansione come amministratore."
 
 #: cleaner/remover.py:25
 msgid "No packages to remove."
@@ -642,6 +643,58 @@ msgstr "Nessun elemento selezionato per la rimozione."
 #: cleaner/remover.py:176
 msgid "Cleaning localization and documentation files..."
 msgstr "Pulizia file di localizzazione e documentazione..."
+
+#: scanner/locales.py:127
+msgid "Manual Pages"
+msgstr "Pagine di manuale"
+
+#: scanner/locales.py:128
+msgid "Info Pages"
+msgstr "Pagine di info"
+
+#: scanner/locales.py:129
+msgid "Help Files"
+msgstr "File di aiuto"
+
+#: scanner/locales.py:130
+msgid "Application Icons"
+msgstr "Icone applicazione"
+
+#: scanner/locales.py:131
+msgid "Development Files"
+msgstr "File di sviluppo"
+
+#: scanner/locales.py:132
+msgid "Documentation Files"
+msgstr "File di documentazione"
+
+#: scanner/locales.py:133
+msgid "Locale Data"
+msgstr "Dati di localizzazione"
+
+#: ui/tabs/logs_tab.py:120
+msgid "Keep last 500 MB"
+msgstr "Mantieni ultimi 500 MB"
+
+#: ui/tabs/logs_tab.py:121
+msgid "Keep last 1 GB"
+msgstr "Mantieni ultimo 1 GB"
+
+#: ui/tabs/logs_tab.py:122
+msgid "Keep last 2 GB"
+msgstr "Mantieni ultimi 2 GB"
+
+#: ui/tabs/logs_tab.py:123
+msgid "Keep last 7 days"
+msgstr "Mantieni ultimi 7 giorni"
+
+#: ui/tabs/logs_tab.py:124
+msgid "Keep last 30 days"
+msgstr "Mantieni ultimi 30 giorni"
+
+#: ui/tabs/logs_tab.py:125
+msgid "Clear all"
+msgstr "Cancella tutto"
 
 #~ msgid "Permission denied: {}"
 #~ msgstr "Permesso negato: {}"

@@ -27,7 +27,8 @@ def get_gpu_vendors() -> list[str]:
     try:
         output = subprocess.check_output(['lspci', '-nn'], text=True, timeout=5)
         for line in output.splitlines():
-            if 'VGA compatible controller' in line or '3D controller' in line:
+            line_upper = line.upper()
+            if any(x in line_upper for x in ['VGA COMPATIBLE CONTROLLER', '3D CONTROLLER', 'DISPLAY CONTROLLER']):
                 match = re.search(r'\[([0-9a-fA-F]{4}):([0-9a-fA-F]{4})\]', line)
                 if match:
                     vendor_id = match.group(1).lower()

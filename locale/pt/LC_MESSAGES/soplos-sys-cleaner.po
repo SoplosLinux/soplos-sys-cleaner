@@ -641,6 +641,58 @@ msgstr "Nenhum elemento selecionado para remoção."
 msgid "Cleaning localization and documentation files..."
 msgstr "A limpar ficheiros de localização e documentação..."
 
+#: scanner/locales.py:127
+msgid "Manual Pages"
+msgstr "Páginas de manual"
+
+#: scanner/locales.py:128
+msgid "Info Pages"
+msgstr "Páginas de informação"
+
+#: scanner/locales.py:129
+msgid "Help Files"
+msgstr "Arquivos de ajuda"
+
+#: scanner/locales.py:130
+msgid "Application Icons"
+msgstr "Ícones de aplicativo"
+
+#: scanner/locales.py:131
+msgid "Development Files"
+msgstr "Arquivos de desenvolvimento"
+
+#: scanner/locales.py:132
+msgid "Documentation Files"
+msgstr "Arquivos de documentação"
+
+#: scanner/locales.py:133
+msgid "Locale Data"
+msgstr "Dados de localização"
+
+#: ui/tabs/logs_tab.py:120
+msgid "Keep last 500 MB"
+msgstr "Manter últimos 500 MB"
+
+#: ui/tabs/logs_tab.py:121
+msgid "Keep last 1 GB"
+msgstr "Manter último 1 GB"
+
+#: ui/tabs/logs_tab.py:122
+msgid "Keep last 2 GB"
+msgstr "Manter últimos 2 GB"
+
+#: ui/tabs/logs_tab.py:123
+msgid "Keep last 7 days"
+msgstr "Manter últimos 7 dias"
+
+#: ui/tabs/logs_tab.py:124
+msgid "Keep last 30 days"
+msgstr "Manter últimos 30 dias"
+
+#: ui/tabs/logs_tab.py:125
+msgid "Clear all"
+msgstr "Limpar tudo"
+
 #~ msgid "Permission denied: {}"
 #~ msgstr "Permissão negada: {}"
 
