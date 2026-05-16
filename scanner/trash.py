@@ -36,5 +36,5 @@ def get_trash_info() -> TrashInfo:
         except PermissionError:
             pass
 
-    size = _dir_size_bytes(trash_dir)
+    size = _dir_size_bytes(files_dir) if (os.path.isdir(files_dir) and count > 0) else 0
     return TrashInfo(files_count=count, size_bytes=size, path=trash_dir)

@@ -33,6 +33,8 @@ from ui.tabs.user_cache_tab import UserCacheTab
 from ui.tabs.trash_tab import TrashTab
 from ui.tabs.flatpak_tab import FlatpakTab
 from ui.tabs.logs_tab import LogsTab
+from ui.tabs.snap_tab import SnapTab
+from ui.tabs.installed_apps_tab import InstalledAppsTab
 
 
 class MainWindow(Gtk.ApplicationWindow):
@@ -48,6 +50,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.theme_manager = theme_manager
 
         self._scan_results = {}
+        self._pulse_timer_id = None
 
         self.set_title(_(APPLICATION_NAME))
         self.set_default_size(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT)
@@ -61,6 +64,9 @@ class MainWindow(Gtk.ApplicationWindow):
         self.show_all()
         self.progress_revealer.set_reveal_child(False)
         self.connect('destroy', self._on_self_destroy)
+
+        if os.geteuid() != 0:
+            GLib.idle_add(self.start_user_scan)
 
     def _on_self_destroy(self, *args):
         """Pre-destruction cleanup."""
@@ -120,6 +126,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.user_cache_tab = UserCacheTab(self)
         self.trash_tab = TrashTab(self)
         self.flatpak_tab = FlatpakTab(self)
+        self.snap_tab = SnapTab(self)
+        self.installed_apps_tab = InstalledAppsTab(self)
         # Root-only tabs
         self.drivers_tab = DriversTab(self)
         self.firmware_tab = FirmwareTab(self)
@@ -135,14 +143,16 @@ class MainWindow(Gtk.ApplicationWindow):
         ]
         if os.geteuid() != 0:
             user_tabs.extend([
-                (self.user_cache_tab,  _("User Cache"),    'folder'),
-                (self.trash_tab,       _("Trash"),         'user-trash-full'),
-                (self.flatpak_tab,     _("Flatpak"),       'package-x-generic'),
+                (self.installed_apps_tab, _("Apps"),          'application-x-executable'),
+                (self.flatpak_tab,        _("Flatpak"),       'package-x-generic'),
+                (self.snap_tab,           _("Snap"),          'package-x-generic'),
+                (self.user_cache_tab,     _("User Cache"),    'folder'),
+                (self.trash_tab,          _("Trash"),         'user-trash-full'),
             ])
 
         # Root tabs — added dynamically after root scan if running as user
         self._root_tab_definitions = [
-            (self.drivers_tab,   _("GPU Drivers"),   'video-display'),
+            (self.drivers_tab,   _("Drivers"),       'video-display'),
             (self.firmware_tab,  _("Firmwares"),     'drive-harddisk'),
             (self.kernels_tab,   _("Kernels"),       'media-flash'),
             (self.locales_tab,   _("Languages"),     'locale'),
@@ -204,7 +214,7 @@ class MainWindow(Gtk.ApplicationWindow):
             info = self.env_detector.get_environment_info()
             desktop = info.get('desktop', 'unknown').upper()
             protocol = info.get('protocol', 'unknown').upper()
-            base = _("Running on {} ({})").format(desktop, protocol)
+            base = f"{desktop}  ·  {protocol}"
             if os.geteuid() == 0:
                 base += _(" — Administrator mode")
             self.status_label.set_text(base)
@@ -425,7 +435,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def _hide_user_tabs(self):
         """Remove user-specific tabs when switching to root mode."""
-        widgets_to_hide = [self.user_cache_tab, self.trash_tab, self.flatpak_tab]
+        widgets_to_hide = [self.installed_apps_tab, self.user_cache_tab, self.trash_tab, self.flatpak_tab, self.snap_tab]
         for i in range(self.notebook.get_n_pages() - 1, -1, -1):
             if self.notebook.get_nth_page(i) in widgets_to_hide:
                 self.notebook.remove_page(i)
@@ -440,26 +450,65 @@ class MainWindow(Gtk.ApplicationWindow):
         else:
             self.start_user_scan()
 
+    def _start_pulse_timer(self):
+        self._stop_pulse_timer()
+        def _pulse():
+            self.progress_bar.pulse()
+            return True
+        self._pulse_timer_id = GLib.timeout_add(120, _pulse)
+
+    def _stop_pulse_timer(self):
+        if self._pulse_timer_id is not None:
+            GLib.source_remove(self._pulse_timer_id)
+            self._pulse_timer_id = None
+
     def start_user_scan(self):
         """Scan user-accessible data: ~/.cache, trash, flatpak."""
         if hasattr(self, 'scan_btn_header'):
             self.scan_btn_header.set_sensitive(False)
-        self.set_ui_state(_("Scanning user data..."), pulse=True, visible=True)
+        self.set_ui_state(_("Scanning user data..."), 0, False, True)
 
         def do_scan():
             results = {}
             try:
-                GLib.idle_add(self.set_ui_state, _("Scanning user cache..."), None, True, True)
+                GLib.idle_add(self.set_ui_state, _("Scanning installed apps..."), 0.15, False, True)
+                from scanner.installed_apps import get_installed_apps
+                apps = get_installed_apps()
+                results['installed_apps'] = [
+                    {'name': a.name, 'summary': a.summary, 'section': a.section,
+                     'size_kb': a.size_kb, 'has_desktop': a.has_desktop}
+                    for a in apps
+                ]
+
+                GLib.idle_add(self.set_ui_state, _("Scanning user cache..."), 0.35, False, True)
                 from scanner.user_cache import get_user_cache_entries
                 results['user_cache_entries'] = get_user_cache_entries()
 
-                GLib.idle_add(self.set_ui_state, _("Scanning trash..."), None, True, True)
+                GLib.idle_add(self.set_ui_state, _("Scanning trash..."), 0.55, False, True)
                 from scanner.trash import get_trash_info
                 results['trash_info'] = get_trash_info()
 
-                GLib.idle_add(self.set_ui_state, _("Scanning Flatpak..."), None, True, True)
-                from scanner.flatpak import get_unused_flatpak_entries
+                GLib.idle_add(self.set_ui_state, _("Scanning Flatpak..."), 0.70, False, True)
+                from scanner.flatpak import get_unused_flatpak_entries, get_installed_flatpak_apps
                 results['flatpak_entries'] = get_unused_flatpak_entries()
+                flatpak_apps = get_installed_flatpak_apps()
+                results['flatpak_apps'] = [
+                    {'app_id': a.app_id, 'name': a.name, 'version': a.version, 'size_bytes': a.size_bytes}
+                    for a in flatpak_apps
+                ]
+
+                GLib.idle_add(self.set_ui_state, _("Scanning Snap..."), 0.85, False, True)
+                from scanner.snap import get_installed_snaps, get_snap_old_revisions
+                snap_apps = get_installed_snaps()
+                results['snap_apps'] = [
+                    {'name': a.name, 'version': a.version, 'channel': a.channel, 'size_bytes': a.size_bytes}
+                    for a in snap_apps
+                ]
+                revisions = get_snap_old_revisions()
+                results['snap_revisions'] = [
+                    {'name': r.name, 'revision': r.revision, 'size_bytes': r.size_bytes}
+                    for r in revisions
+                ]
 
             except Exception as e:
                 logger.error(f"User scan error: {e}")
@@ -470,6 +519,7 @@ class MainWindow(Gtk.ApplicationWindow):
         threading.Thread(target=do_scan, daemon=True).start()
 
     def _on_user_scan_done(self, results):
+        self._stop_pulse_timer()
         if hasattr(self, 'scan_btn_header'):
             self.scan_btn_header.set_sensitive(True)
         if 'error' in results:
@@ -478,17 +528,39 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_ui_state(_("Scan completed"), fraction=1.0, visible=True)
         GLib.timeout_add_seconds(3, lambda: self.set_ui_state("", visible=False))
 
+        try:
+            from scanner.installed_apps import AppInfo
+            results['installed_apps'] = [
+                AppInfo(name=a['name'], summary=a['summary'], section=a['section'],
+                        size_kb=a['size_kb'], has_desktop=a['has_desktop'])
+                for a in results.get('installed_apps', [])
+            ]
+        except Exception:
+            pass
+
+        try:
+            from scanner.flatpak import FlatpakApp
+            results['flatpak_apps'] = [
+                FlatpakApp(app_id=a['app_id'], name=a['name'], version=a['version'], size_bytes=a['size_bytes'])
+                for a in results.get('flatpak_apps', [])
+            ]
+        except Exception:
+            pass
+
         self._scan_results.update(results)
         self.overview_tab.populate(self._scan_results)
+        self.installed_apps_tab.populate(results)
         self.user_cache_tab.populate(results)
         self.trash_tab.populate(results)
         self.flatpak_tab.populate(results)
+        self.snap_tab.populate(results)
 
     def start_root_scan(self):
         """Launch persistent root helper via pkexec (one auth), send scan command."""
         if hasattr(self, 'scan_btn_header'):
             self.scan_btn_header.set_sensitive(False)
-        self.set_ui_state(_("Scanning system (administrator)..."), pulse=True, visible=True)
+        self.set_ui_state(_("Scanning system (administrator)..."), 0, False, True)
+        self._start_pulse_timer()
 
         def do_scan():
             import json as _json
@@ -564,6 +636,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self._root_process = None
 
     def _on_root_scan_done(self, results):
+        self._stop_pulse_timer()
         if hasattr(self, 'scan_btn_header'):
             self.scan_btn_header.set_sensitive(True)
         if 'error' in results:
@@ -578,27 +651,41 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # Deserialize namedtuple-like objects from JSON dicts
         try:
-            from scanner.hardware import is_firmware_protected
-            results['is_firmware_protected'] = is_firmware_protected
+            from scanner.hardware import is_firmware_dir_protected, get_firmware_protection_set
+            # Rebuild protection_set client-side from all available data
+            # (root_helper already computed it, but we rebuild to be safe and include dracut layer)
+            hw_snapshot = {
+                'dracut_fw_dirs': set(results.get('dracut_fw_dirs', [])),
+                'pci_vendors':    results.get('pci_vendors', []),
+                'usb_vendors':    results.get('usb_vendors', []),
+                'kvm_present':    results.get('kvm_present', False),
+                'active_fw_files': set(results.get('active_fw_files', [])),
+            }
+            protection_set = frozenset(get_firmware_protection_set(hw_snapshot))
+            results['is_firmware_protected'] = lambda f, _ps=protection_set: is_firmware_dir_protected(f, _ps)
         except Exception as e:
-            logger.error(f"Error importing is_firmware_protected: {e}")
+            logger.error(f"Error building firmware protection: {e}")
+            results['is_firmware_protected'] = lambda f: False
 
         try:
-            from scanner.packages import PackageInfo
-            results['unnecessary_pkgs'] = [
-                PackageInfo(name=p['name'], installed_size=p['installed_size'], description=p['description'], vendor=p['vendor'])
-                for p in results.get('unnecessary_pkgs', [])
-            ]
+            results['unnecessary_pkgs'] = results.get('unnecessary_pkgs', [])
         except Exception as e:
-            logger.error(f"Error deserializing GPU packages: {e}")
+            logger.error(f"Error deserializing hardware packages: {e}")
 
         try:
             from scanner.kernels import KernelInfo
             results['kernels'] = [
-                KernelInfo(version=k['version'], is_active=k['is_active'],
-                           has_headers=k['has_headers'], has_src=k['has_src'],
-                           image_pkg=k['image_pkg'], headers_pkg=k['headers_pkg'],
-                           src_pkg=k['src_pkg'], size_kb=k['size_kb'])
+                KernelInfo(
+                    version=k['version'], is_active=k['is_active'],
+                    has_headers=k['has_headers'], has_src=k['has_src'],
+                    has_kbuild=k.get('has_kbuild', False),
+                    image_pkg=k['image_pkg'], headers_pkg=k['headers_pkg'],
+                    src_pkg=k['src_pkg'], kbuild_pkg=k.get('kbuild_pkg', ''),
+                    metapackage=k.get('metapackage', ''),
+                    size_kb=k['size_kb'],
+                    orphan_src_dirs=k.get('orphan_src_dirs', []),
+                    orphan_modules_dirs=k.get('orphan_modules_dirs', []),
+                )
                 for k in results.get('kernels', [])
             ]
         except Exception as e:
@@ -628,11 +715,18 @@ class MainWindow(Gtk.ApplicationWindow):
         except Exception as e:
             logger.error(f"Error deserializing Locales/Docs: {e}")
 
+        # Expose hardware summary for the Drivers tab label
+        results['hardware_summary'] = (
+            results.get('gpu_vendors_named', []) +
+            (['KVM'] if results.get('kvm_present') else [])
+        )
+
         self._scan_results.update(results)
         self.overview_tab.populate(self._scan_results)
         self.drivers_tab.populate(results)
         self.firmware_tab.populate(results)
         self.kernels_tab.populate(results)
+        self.snap_tab.populate(results)
         self.cache_tab.populate(results)
         self.temp_tab.populate(results)
         self.locales_tab.populate(results)

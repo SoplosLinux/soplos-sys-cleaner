@@ -9,6 +9,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 
 from core.i18n_manager import _
+from utils.constants import fmt_size as _fmt_size
 
 
 class FirmwareTab(Gtk.Box):
@@ -29,7 +30,7 @@ class FirmwareTab(Gtk.Box):
         warning_box.pack_start(warning_icon, False, False, 0)
         warning_label = Gtk.Label()
         warning_label.set_markup(
-            f"<small><i>{_('Network/Wi-Fi firmwares are locked — soplos.conf always injects them into the initrd')}</i></small>"
+            f"<small><i>{_('Firmwares required by detected hardware are locked automatically — only unrecognised firmwares can be removed')}</i></small>"
         )
         warning_label.set_halign(Gtk.Align.START)
         warning_label.set_line_wrap(True)
@@ -93,6 +94,7 @@ class FirmwareTab(Gtk.Box):
 
         families = results.get('firmware_families', [])
         is_protected = results.get('is_firmware_protected', lambda x: False)
+        sizes = results.get('firmware_sizes', {})
 
         self.count_label.set_text(
             _("{} firmware families detected").format(len(families))
@@ -100,6 +102,7 @@ class FirmwareTab(Gtk.Box):
 
         for family in families:
             protected = is_protected(family)
+            size_kb = sizes.get(family, 0)
 
             row = Gtk.ListBoxRow()
             row_box = Gtk.Box(spacing=12)
@@ -113,7 +116,7 @@ class FirmwareTab(Gtk.Box):
                 check.set_active(False)
                 check.set_sensitive(False)
                 check.set_tooltip_text(
-                    _("Protected: soplos.conf includes this firmware in the initrd to ensure connectivity")
+                    _("Protected: required by hardware detected on this system")
                 )
             else:
                 check = Gtk.CheckButton()
@@ -130,8 +133,14 @@ class FirmwareTab(Gtk.Box):
 
             if protected:
                 lock_icon = Gtk.Image.new_from_icon_name('changes-prevent', Gtk.IconSize.MENU)
-                lock_icon.set_tooltip_text(_("Protected network firmware"))
+                lock_icon.set_tooltip_text(_("Protected: hardware present in this system"))
                 row_box.pack_end(lock_icon, False, False, 0)
+
+            size_label = Gtk.Label(label=_fmt_size(size_kb * 1024))
+            size_label.get_style_context().add_class('dim-label')
+            size_label.set_width_chars(8)
+            size_label.set_halign(Gtk.Align.END)
+            row_box.pack_end(size_label, False, False, 0)
 
             row.add(row_box)
             self.list_box.add(row)

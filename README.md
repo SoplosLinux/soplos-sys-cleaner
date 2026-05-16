@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.1-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2--1-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -27,7 +27,11 @@ Soplos Sys Cleaner is an advanced system maintenance tool for Soplos Linux distr
 - **Smart Selection**: Quickly keep only your active languages and English, marking everything else for deletion.
 - **Consolidated Security**: Single password prompt (`pkexec`) for complex cleaning tasks.
 - **Slim Modern UI**: Implements Soplos Standard v2.0 with slim tabs and Gtk.HeaderBar matching WebApp Manager.
-- **Hardware Protection**: Prevents removal of critical network firmwares and active kernels.
+- **Installed Apps Manager**: Browse all manually installed packages with search, size info and selective uninstall.
+- **Snap Support**: Detect and remove old/disabled Snap revisions, consistent with Flatpak cleanup.
+- **Firmware Sizes**: Each firmware family shows its disk usage to help decide what to remove.
+- **Selective APT Cache**: List and selectively delete individual cached `.deb` files instead of clearing everything at once.
+- **Hardware Protection**: Prevents removal of critical network firmwares, GPU firmwares (AMD, Intel, NVIDIA) and active kernels.
 - **Automatic Refresh**: Instant UI updates after cleaning operations.
 - **Universal Scanning**: Deep scan of over 15 critical system paths tailored for Boro, Tyron, and Tyson.
 - **One-Click Maintenance**: Cleans everything or just specific sections.
@@ -35,21 +39,37 @@ Soplos Sys Cleaner is an advanced system maintenance tool for Soplos Linux distr
 
 ## 📸 Screenshots
 
-| Welcome Screen | Scan Summary |
-| :---: | :---: |
-| ![Welcome](assets/screenshots/screenshot1.png) | ![Summary](assets/screenshots/screenshot2.png) |
+### User Mode
 
-| GPU Drivers | Firmwares |
+| Overview | Installed Apps |
 | :---: | :---: |
-| ![GPU Drivers](assets/screenshots/screenshot3.png) | ![Firmwares](assets/screenshots/screenshot4.png) |
+| ![Overview](assets/screenshots/screenshot01.png) | ![Apps](assets/screenshots/screenshot02.png) |
 
-| Kernels | Languages & Docs |
+| Flatpak | Snap |
 | :---: | :---: |
-| ![Kernels](assets/screenshots/screenshot5.png) | ![Languages](assets/screenshots/screenshot6.png) |
+| ![Flatpak](assets/screenshots/screenshot03.png) | ![Snap](assets/screenshots/screenshot04.png) |
 
-| APT Cache | Temp Files |
+| User Cache | Trash |
 | :---: | :---: |
-| ![APT Cache](assets/screenshots/screenshot7.png) | ![Temp Files](assets/screenshots/screenshot8.png) |
+| ![User Cache](assets/screenshots/screenshot05.png) | ![Trash](assets/screenshots/screenshot06.png) |
+
+### Administrator Mode
+
+| Overview | GPU Drivers |
+| :---: | :---: |
+| ![Overview Root](assets/screenshots/screenshot07.png) | ![GPU Drivers](assets/screenshots/screenshot08.png) |
+
+| Firmwares | Kernels |
+| :---: | :---: |
+| ![Firmwares](assets/screenshots/screenshot09.png) | ![Kernels](assets/screenshots/screenshot10.png) |
+
+| Languages & Docs | APT Cache |
+| :---: | :---: |
+| ![Languages](assets/screenshots/screenshot11.png) | ![APT Cache](assets/screenshots/screenshot12.png) |
+
+| Temp Files | System Logs |
+| :---: | :---: |
+| ![Temp Files](assets/screenshots/screenshot13.png) | ![System Logs](assets/screenshots/screenshot14.png) |
 
 ## 🔧 Installation
 
@@ -96,6 +116,21 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.2 (29/03/2026)
+- Added Installed Apps tab with search and selective uninstall via pkexec.
+- Added Snap old revisions tab in user mode, consistent with Flatpak.
+- Firmware families now show disk usage in the Firmwares tab.
+- APT Cache tab now lists individual `.deb` files for selective removal.
+- User-mode scan starts automatically on launch.
+- Fixed AMD/GPU and KVM/VMware/VirtualBox firmware and driver protection.
+- Added "Select all docs" button in the Languages tab.
+- Overview cards now follow tab order in both user and root modes.
+- Fixed: Flatpak tab redesigned with two sections — installed apps (name, app ID, version, size) and unused runtimes.
+- Fixed: Flatpak sizes now read actual disk usage via `du`; `flatpak list --columns=size` always returned 0 for installed items.
+- Fixed: Flatpak unused runtime detection delegates to `flatpak uninstall --unused` to correctly handle SDK dependencies, GL extensions and transitive references.
+- Fixed: Firmware and kernel packages no longer appear in the Installed Apps tab after root-mode cleanup.
+- Fixed: Progress bar no longer stuck at 100%; user scan uses real fractions, root scan uses a continuous pulse animation.
 
 ### v1.0.1 (25/03/2026)
 - Major Architecture Update: Introduced Dual-Layer Scanning (User vs Root modes) to prevent unnecessary password prompts on startup.

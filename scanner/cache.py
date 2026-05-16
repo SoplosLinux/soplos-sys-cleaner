@@ -39,6 +39,20 @@ def get_apt_cache_info() -> dict:
     }
 
 
+def get_apt_cache_debs() -> list[dict]:
+    """Returns individual .deb files in the APT cache with name and size."""
+    cache_path = '/var/cache/apt/archives'
+    debs = []
+    if os.path.isdir(cache_path):
+        for entry in os.scandir(cache_path):
+            if entry.is_file() and entry.name.endswith('.deb'):
+                try:
+                    debs.append({'name': entry.name, 'path': entry.path, 'size_bytes': entry.stat().st_size})
+                except OSError:
+                    pass
+    return sorted(debs, key=lambda d: d['size_bytes'], reverse=True)
+
+
 def get_autoremove_packages() -> list[str]:
     """Returns list of packages flagged for autoremoval by apt."""
     packages = []

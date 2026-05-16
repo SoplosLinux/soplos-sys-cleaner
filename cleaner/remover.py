@@ -164,6 +164,35 @@ def remove_firmware_and_rebuild(families: list[str], progress_cb: Callable = Non
         return False, _("Unexpected error: {}").format(e)
 
 
+def delete_orphan_dirs(paths: list[str], progress_cb: Callable = None) -> tuple[bool, str]:
+    """
+    Remove orphaned kernel directories (/usr/src/linux-headers-*, /lib/modules/*)
+    that have no corresponding installed package.
+    Uses a single pkexec session.
+    """
+    if not paths:
+        return True, _("No orphaned directories to remove.")
+
+    if progress_cb:
+        progress_cb(0.1, _("Removing orphaned kernel directories..."))
+
+    safe_paths = [shlex.quote(p) for p in paths]
+    cmd = f"rm -rf {' '.join(safe_paths)}"
+
+    try:
+        result = subprocess.run(
+            ['pkexec', 'bash', '-c', cmd],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            if result.returncode == 127:
+                return False, _("Authentication cancelled.")
+            return False, f"Error: {result.stderr.strip() or result.stdout.strip()}"
+        return True, _("Orphaned directories removed.")
+    except Exception as e:
+        return False, _("Unexpected error: {}").format(e)
+
+
 def purge_locales_and_docs(paths: list[str], keep_codes: list[str] = None, progress_cb: Callable = None) -> tuple[bool, str]:
     """
     Remove locale/doc directories and configure localepurge in a single pkexec session.

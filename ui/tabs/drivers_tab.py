@@ -29,9 +29,9 @@ class DriversTab(Gtk.Box):
         info_box.set_margin_top(12)
         info_box.set_margin_bottom(8)
 
-        self.gpu_label = Gtk.Label(label=_("Detected GPU: —"))
-        self.gpu_label.set_halign(Gtk.Align.START)
-        info_box.pack_start(self.gpu_label, True, True, 0)
+        self.hw_label = Gtk.Label(label=_("Detected hardware: —"))
+        self.hw_label.set_halign(Gtk.Align.START)
+        info_box.pack_start(self.hw_label, True, True, 0)
 
         self.select_all_btn = Gtk.CheckButton(label=_("Select all"))
         self.select_all_btn.connect('toggled', self._on_select_all)
@@ -78,8 +78,10 @@ class DriversTab(Gtk.Box):
             self.list_box.remove(row)
         self._checkboxes.clear()
 
-        vendors = results.get('gpu_vendors', [])
-        self.gpu_label.set_text(_("Detected GPU: {}").format(', '.join(vendors) if vendors else _("Generic")))
+        hw_summary = results.get('hardware_summary', [])
+        self.hw_label.set_text(
+            _("Detected hardware: {}").format(', '.join(hw_summary) if hw_summary else _("Generic"))
+        )
 
         pkgs = results.get('unnecessary_pkgs', [])
         self._packages = pkgs
@@ -93,6 +95,16 @@ class DriversTab(Gtk.Box):
             self.list_box.add(row)
         else:
             for pkg in pkgs:
+                # pkg puede ser dict o namedtuple
+                if isinstance(pkg, dict):
+                    pkg_name    = pkg.get('name', '')
+                    pkg_vendor  = pkg.get('vendor', '')
+                    pkg_size    = pkg.get('installed_size', 0)
+                else:
+                    pkg_name   = pkg.name
+                    pkg_vendor = pkg.vendor
+                    pkg_size   = pkg.installed_size
+
                 row = Gtk.ListBoxRow()
                 row_box = Gtk.Box(spacing=12)
                 row_box.set_margin_start(12)
@@ -102,18 +114,18 @@ class DriversTab(Gtk.Box):
 
                 check = Gtk.CheckButton()
                 check.connect('toggled', self._on_check_toggled)
-                self._checkboxes[pkg.name] = check
+                self._checkboxes[pkg_name] = check
                 row_box.pack_start(check, False, False, 0)
 
-                name_label = Gtk.Label(label=pkg.name)
+                name_label = Gtk.Label(label=pkg_name)
                 name_label.set_halign(Gtk.Align.START)
                 row_box.pack_start(name_label, True, True, 0)
 
-                vendor_label = Gtk.Label(label=f"[{pkg.vendor}]")
+                vendor_label = Gtk.Label(label=f"[{pkg_vendor}]")
                 vendor_label.get_style_context().add_class('dim-label')
                 row_box.pack_start(vendor_label, False, False, 0)
 
-                size_label = Gtk.Label(label=_fmt_size(pkg.installed_size * 1024))
+                size_label = Gtk.Label(label=_fmt_size(pkg_size * 1024))
                 size_label.get_style_context().add_class('dim-label')
                 size_label.set_width_chars(8)
                 size_label.set_halign(Gtk.Align.END)

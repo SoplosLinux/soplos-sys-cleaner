@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-1] - 2026-04-17
+
+### ✨ Added
+- **Snap tab redesigned**: Now has two sections like Flatpak — installed snaps with full uninstall (`snap remove --purge`, removes snap and all its data) and old/disabled revisions.
+- **VM guest detection**: `systemd-detect-virt` now identifies the hypervisor type (KVM, QEMU, VMware, VirtualBox, Hyper-V, Xen, Parallels…) and displays it in the Drivers tab label. Fallbacks via `/sys/hypervisor/type` and DMI strings.
+- **QEMU/KVM guest support**: Added Red Hat/Virtio PCI vendor `1af4` to the hardware map so QEMU guest devices are properly recognised.
+
+### 🐛 Fixed
+- **Kernel removal**: After purging kernel packages, `dracut -f` and `update-grub` are now always executed to regenerate the initramfs and update the bootloader. Previously neither was called.
+- **`apt-get` → `apt`**: All package management commands in the root helper now use the modern `apt` frontend.
+- **Translation coverage**: 27 previously untranslated strings (Drivers tab, Firmware tab, Kernels orphan section, Locales tab) added to all 8 language dictionaries and `.mo` files recompiled.
+
+---
+
+## [1.0.2] - 2026-03-29
+
+### ✨ Added
+- **Installed Apps tab**: New user-mode tab listing all manually installed packages with search, size info and selective uninstall via pkexec.
+- **Snap tab**: New user-mode tab detecting and removing old/disabled Snap revisions (consistent with Flatpak tab).
+- **Firmware sizes**: Each firmware family in the Firmwares tab now shows its disk usage.
+- **APT Cache — individual .deb selection**: The APT Cache tab now lists every cached `.deb` file individually, allowing selective deletion instead of all-or-nothing.
+- **Auto-scan on open**: User-mode scan now starts automatically on launch without requiring a manual button press.
+- **Overview Snap card**: Old Snap revisions now appear as a card in the user-mode overview.
+- **Overview Apps card**: Manually installed packages appear as a card in the user-mode overview.
+- **"Select all docs" button**: New button in the Languages tab to select all documentation entries at once.
+
+### 🐛 Fixed
+- **AMD/GPU firmware protection**: Firmware directories belonging to the detected GPU (amdgpu, radeon, i915…) are now locked in the Firmwares tab, preventing accidental removal.
+- **KVM/QEMU/VirtualBox detection**: Virtual machine packages and firmwares are now detected and protected when the corresponding technology is active.
+- **Overview grid symmetry**: Cards in the overview now use column-homogeneous layout so incomplete rows still render all cards at equal width.
+- **Flatpak tab redesigned**: Now shows two sections — installed Flatpak apps (human-readable name, app ID, version, disk size) and unused runtimes. Previously the tab only showed runtime refs with no useful app information.
+- **Flatpak sizes**: Fixed 0 B size display by reading actual disk usage via `du` on the flatpak installation directories. The previous `flatpak list --columns=size` returns download size, always 0 for already-installed items.
+- **Flatpak unused runtime detection**: Replaced the naive runtime comparison (which incorrectly flagged the SDK and Platform GL extensions as unused) with delegation to `flatpak uninstall --unused`, which correctly handles extensions, SDK dependencies and transitive references.
+- **Apps tab — firmware and kernel filtering**: Firmware and kernel packages no longer appear in the Installed Apps tab after a root-mode cleanup. Packages are now filtered by dpkg section (`kernel`, `firmware`) and by name prefix (`firmware-`, `linux-image-`, `linux-headers-`, etc.).
+- **Progress bar stuck at 100%**: Fixed. User-mode scan now uses real progress fractions per step (0 → 0.15 → 0.35 → … → 1.0). Root-mode scan uses a continuous 120 ms pulse timer that stops when the scan completes.
+
+### 🔧 Improved
+- **Tab order (user mode)**: Overview → Apps → Flatpak → Snap → User Cache → Trash.
+- **Overview card order**: Mirrors tab order in both user and root modes.
+
+---
+
 ## [1.0.1] - 2026-03-25
 
 ### ✨ Added

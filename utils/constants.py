@@ -13,18 +13,21 @@ def fmt_size(size_bytes: int) -> str:
 
 APPLICATION_NAME = "Soplos Sys Cleaner"
 APPLICATION_ID = "org.soplos.sys-cleaner"
-APPLICATION_VERSION = "1.0.1"
+APPLICATION_VERSION = "1.0.2"
 
 WINDOW_DEFAULT_WIDTH = 920
 WINDOW_DEFAULT_HEIGHT = 600
 
-# Network firmwares — NEVER removed (protected by soplos.conf)
-PROTECTED_FIRMWARE_DIRS = [
-    'rtlwifi', 'rtw88', 'rtw89',
-    'ath10k', 'ath11k', 'ath12k',
-    'brcm', 'mediatek', 'intel',
-    'iwlwifi',
+# Firmware directories that are ALWAYS protected regardless of detected hardware.
+# This list is intentionally minimal — hardware-specific protection is handled
+# dynamically by scanner/hardware.py using lspci + lsusb + lsmod.
+# Only include dirs with no clear vendor owner or critical system blobs.
+PROTECTED_FIRMWARE_ALWAYS = [
+    'regulatory.db',  # wireless regulatory database — always needed
 ]
+
+# Legacy alias kept for any remaining references — points to the new constant
+PROTECTED_FIRMWARE_DIRS = PROTECTED_FIRMWARE_ALWAYS
 
 # System paths
 FIRMWARE_PATH = '/lib/firmware'

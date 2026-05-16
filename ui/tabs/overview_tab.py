@@ -146,6 +146,7 @@ class OverviewTab(Gtk.Box):
         # Summary cards grid
         grid = Gtk.Grid(row_spacing=10, column_spacing=10)
         grid.set_halign(Gtk.Align.FILL)
+        grid.set_column_homogeneous(True)
         outer.pack_start(grid, False, False, 0)
 
         # System Usage Metrics (always shown)
@@ -214,9 +215,18 @@ class OverviewTab(Gtk.Box):
                      card_temp, card_fw, card_lang,
                      card_logs, card_total, card_sys]
         else:
-            total = cache_size + trash_size + flatpak_size
+            apps = results.get('installed_apps', [])
+            apps_count = len(apps)
+            apps_size = sum((a['size_kb'] if isinstance(a, dict) else a.size_kb) for a in apps) * 1024
+            card_apps = self._make_card('application-x-executable', _("Installed Apps"), _("{} package(s)").format(apps_count), _fmt_size(apps_size))
+
+            snap_revisions = results.get('snap_revisions', [])
+            snap_size = sum(r['size_bytes'] if isinstance(r, dict) else r.size_bytes for r in snap_revisions)
+            card_snap = self._make_card('package-x-generic', _("Snap"), _("{} old revision(s)").format(len(snap_revisions)), _fmt_size(snap_size))
+
+            total = cache_size + trash_size + flatpak_size + snap_size
             card_total = self._make_card('edit-clear', _("Total Reclaimable Space"), _("Ready to clean"), _fmt_size(total))
-            cards = [card_cache, card_trash, card_flatpak, card_total, card_sys]
+            cards = [card_apps, card_flatpak, card_snap, card_cache, card_trash, card_total, card_sys]
 
         if os.geteuid() != 0 and not has_root_data:
             admin_label = Gtk.Label()

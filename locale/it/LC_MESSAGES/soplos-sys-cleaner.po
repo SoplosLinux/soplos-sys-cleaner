@@ -387,7 +387,9 @@ msgid ""
 "{}"
 msgstr ""
 "{} pacchetto/i da rimuovere:\n"
-"{}"
+"{}\n"
+"\n"
+"L'initramfs verrà rigenerato e GRUB aggiornato."
 
 #: ui/tabs/kernels_tab.py:180
 msgid "Removing kernel packages..."
@@ -696,6 +698,186 @@ msgstr "Mantieni ultimi 30 giorni"
 msgid "Clear all"
 msgstr "Cancella tutto"
 
+#: ui/tabs/snap_tab.py:61
+msgid "Remove Selected Revisions"
+msgstr "Rimuovi le revisioni selezionate"
+
+#: ui/tabs/snap_tab.py:79
+msgid "Snap is not installed"
+msgstr "Snap non è installato"
+
+#: ui/tabs/snap_tab.py:79
+msgid "No old Snap revisions found"
+msgstr "Nessuna vecchia revisione Snap trovata"
+
+#: ui/tabs/snap_tab.py:90
+msgid "{} old revision(s) — {}"
+msgstr "{} vecchia(e) revisione(i) — {}"
+
+#: ui/tabs/snap_tab.py:145
+msgid "Remove selected Snap revisions?"
+msgstr "Rimuovere le revisioni Snap selezionate?"
+
+#: ui/tabs/snap_tab.py:148
+msgid "{} old revision(s) will be permanently removed."
+msgstr "{} vecchia(e) revisione(i) saranno rimosse definitivamente."
+
+#: ui/tabs/snap_tab.py:158
+msgid "Removing Snap revisions..."
+msgstr "Rimozione delle revisioni Snap in corso..."
+
+#: ui/tabs/snap_tab.py:169
+msgid "Snap revisions removed."
+msgstr "Revisioni Snap rimosse."
+
+#: ui/tabs/snap_tab.py
+msgid "{} snap(s) installed — {}"
+msgstr "{} snap installato/i — {}"
+
+#: ui/tabs/snap_tab.py
+msgid "No snaps installed"
+msgstr "Nessun snap installato"
+
+#: ui/tabs/snap_tab.py
+msgid "Uninstall selected snaps?"
+msgstr "Disinstallare i snap selezionati?"
+
+#: ui/tabs/snap_tab.py
+msgid "{} snap(s) will be fully removed including all their data."
+msgstr "{} snap verrà/verranno rimosso/i completamente, dati inclusi."
+
+#: ui/tabs/snap_tab.py
+msgid "Uninstalling snaps..."
+msgstr "Disinstallazione snap in corso..."
+
+#: ui/tabs/snap_tab.py
+msgid "Snaps uninstalled."
+msgstr "Snap disinstallati."
+
+#: ui/tabs/installed_apps_tab.py:41
+msgid "Search packages…"
+msgstr "Cerca pacchetti…"
+
+#: ui/tabs/installed_apps_tab.py:75
+msgid "Uninstall Selected"
+msgstr "Disinstalla selezionati"
+
+#: ui/tabs/installed_apps_tab.py:109
+msgid "{} package(s) — {}"
+msgstr "{} pacchetto(i) — {}"
+
+#: ui/tabs/installed_apps_tab.py:114
+msgid "No manually installed packages found"
+msgstr "Nessun pacchetto installato manualmente trovato"
+
+#: ui/tabs/installed_apps_tab.py:193
+msgid "Uninstall selected packages?"
+msgstr "Disinstallare i pacchetti selezionati?"
+
+#: ui/tabs/installed_apps_tab.py:195
+msgid ""
+"{} package(s) will be removed:\n"
+"{}"
+msgstr ""
+"{} pacchetto(i) saranno rimossi:\n"
+"{}"
+
+#: ui/tabs/installed_apps_tab.py:207
+msgid "Uninstalling packages..."
+msgstr "Disinstallazione dei pacchetti in corso..."
+
+#: ui/tabs/installed_apps_tab.py:215
+msgid "Packages uninstalled successfully."
+msgstr "Pacchetti disinstallati con successo."
+
+#: ui/tabs/cache_tab.py:45
+msgid "Clean all"
+msgstr "Pulisci tutto"
+
+#: ui/tabs/cache_tab.py:53
+msgid "Remove selected"
+msgstr "Rimuovi selezionati"
+
+#: ui/tabs/cache_tab.py:199
+msgid "Remove selected .deb files?"
+msgstr "Rimuovere i file .deb selezionati?"
+
+#: ui/tabs/cache_tab.py:200
+msgid "{} file(s) will be deleted from the APT cache."
+msgstr "{} file(s) verranno eliminati dalla cache APT."
+
+#: ui/tabs/cache_tab.py:207
+msgid "Removing selected .deb files..."
+msgstr "Rimozione dei file .deb selezionati in corso..."
+
+#: ui/tabs/cache_tab.py:211
+msgid "Selected .deb files removed."
+msgstr "File .deb selezionati rimossi."
+
+#: ui/tabs/locales_tab.py:51
+msgid "Select all docs"
+msgstr "Seleziona tutta la documentazione"
+
+#: ui/tabs/locales_tab.py:52
+msgid "Select all documentation entries"
+msgstr "Seleziona tutte le voci di documentazione"
+
+#: ui/tabs/overview_tab.py:221
+msgid "Installed Apps"
+msgstr "App installate"
+
+#: ui/tabs/overview_tab.py:221
+msgid "{} package(s)"
+msgstr "{} pacchetto(i)"
+
+#: ui/tabs/overview_tab.py:225 ui/main_window.py:147
+msgid "Snap"
+msgstr "Snap"
+
+#: ui/tabs/overview_tab.py:225
+msgid "{} old revision(s)"
+msgstr "{} vecchia(e) revisione(i)"
+
+#: ui/main_window.py:145
+msgid "Apps"
+msgstr "App"
+
+#: ui/main_window.py:461
+msgid "Scanning installed apps..."
+msgstr "Scansione delle app installate..."
+
+#: ui/main_window.py:482
+msgid "Scanning Snap..."
+msgstr "Scansione di Snap..."
+
+#: ui/tabs/flatpak_tab.py
+msgid "{} app(s) installed — {}"
+msgstr "{} app installata/e — {}"
+
+#: ui/tabs/flatpak_tab.py
+msgid "No Flatpak apps installed"
+msgstr "Nessuna app Flatpak installata"
+
+#: ui/tabs/flatpak_tab.py
+msgid "Unused runtimes"
+msgstr "Runtime non utilizzati"
+
+#: ui/tabs/flatpak_tab.py
+msgid "Uninstall selected Flatpak apps?"
+msgstr "Disinstallare le app Flatpak selezionate?"
+
+#: ui/tabs/flatpak_tab.py
+msgid "{} app(s) will be uninstalled."
+msgstr "{} app verranno disinstallate."
+
+#: ui/tabs/flatpak_tab.py
+msgid "Uninstalling Flatpak apps..."
+msgstr "Disinstallazione delle app Flatpak..."
+
+#: ui/tabs/flatpak_tab.py
+msgid "Flatpak apps uninstalled."
+msgstr "App Flatpak disinstallate."
+
 #~ msgid "Permission denied: {}"
 #~ msgstr "Permesso negato: {}"
 
@@ -725,3 +907,119 @@ msgstr "Cancella tutto"
 
 #~ msgid "Active Drivers"
 #~ msgstr "Driver attivi"
+
+#: generated
+msgid "Detected hardware: {}"
+msgstr "Hardware rilevato: {}"
+
+#: generated
+msgid "Detected hardware: —"
+msgstr "Hardware rilevato: —"
+
+#: generated
+msgid "Protected: hardware present in this system"
+msgstr "Protetto: hardware presente nel sistema"
+
+#: generated
+msgid "Protected: required by hardware detected on this system"
+msgstr "Protetto: richiesto dall'hardware rilevato"
+
+#: generated
+msgid "Firmwares required by detected hardware are locked automatically — only unrecognised firmwares can be removed"
+msgstr "I firmware richiesti dall'hardware rilevato sono bloccati automaticamente — solo quelli non riconosciuti possono essere rimossi"
+
+#: generated
+msgid "Kbuild"
+msgstr "Kbuild"
+
+#: generated
+msgid "Orphaned kernel directories"
+msgstr "Directory kernel orfane"
+
+#: generated
+msgid "Orphaned directories removed."
+msgstr "Directory orfane rimosse."
+
+#: generated
+msgid "Remove Orphaned Dirs"
+msgstr "Rimuovi dir. orfane"
+
+#: generated
+msgid "Remove selected orphaned directories?"
+msgstr "Rimuovere le directory orfane selezionate?"
+
+#: generated
+msgid "Removing orphaned kernel directories..."
+msgstr "Rimozione directory kernel orfane..."
+
+#: generated
+msgid "{} director(y/ies) will be permanently deleted."
+msgstr "{} directory verrà/verranno eliminate definitivamente."
+
+#: generated
+msgid "No orphaned directories to remove."
+msgstr "Nessuna directory orfana da rimuovere."
+
+#: generated
+msgid "Removing kernel packages, regenerating initramfs and updating GRUB..."
+msgstr "Rimozione pacchetti kernel, rigenerazione initramfs e aggiornamento GRUB..."
+
+#: generated
+msgid ""
+"{} package(s) to remove:\n"
+"{}\n"
+"\n"
+"The initramfs will be regenerated and GRUB updated."
+msgstr ""
+"{} pacchetto/i da rimuovere:\n"
+"{}\n"
+"\n"
+"L'initramfs verrà rigenerato e GRUB aggiornato."
+
+#: generated
+msgid "Remove selected docs"
+msgstr "Rimuovi documentazione selezionata"
+
+#: generated
+msgid "Remove selected documentation?"
+msgstr "Rimuovere la documentazione selezionata?"
+
+#: generated
+msgid "Remove selected languages"
+msgstr "Rimuovi lingue selezionate"
+
+#: generated
+msgid "Remove selected languages?"
+msgstr "Rimuovere le lingue selezionate?"
+
+#: generated
+msgid "Languages removed successfully."
+msgstr "Lingue rimosse con successo."
+
+#: generated
+msgid "Documentation removed successfully."
+msgstr "Documentazione rimossa con successo."
+
+#: generated
+msgid "Removing languages..."
+msgstr "Rimozione lingue..."
+
+#: generated
+msgid "Removing documentation..."
+msgstr "Rimozione documentazione..."
+
+#: generated
+msgid "{} language path(s) will be permanently deleted."
+msgstr "{} percorso/i lingua verrà/verranno eliminato/i definitivamente."
+
+#: generated
+msgid "{} documentation path(s) will be permanently deleted."
+msgstr "{} percorso/i documentazione verrà/verranno eliminato/i definitivamente."
+
+#: generated
+msgid "Select all languages except current language and English"
+msgstr "Seleziona tutte le lingue tranne la lingua corrente e l'inglese"
+
+#: generated
+msgid "Developer Help"
+msgstr "Guida per sviluppatori"

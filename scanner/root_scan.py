@@ -16,39 +16,78 @@ sys.path.insert(0, str(PROJECT_ROOT))
 def main():
     results = {}
 
+    # ── Hardware detection (three layers: lspci + lsusb + lsmod/modinfo) ──
     try:
-        from scanner.hardware import get_gpu_vendors, get_all_firmware_families, is_firmware_protected
-        results['gpu_vendors'] = get_gpu_vendors()
-        results['firmware_families'] = get_all_firmware_families()
-        # is_firmware_protected is a function — serialize as a set of protected names
-        families = results['firmware_families']
-        results['protected_firmware'] = [f for f in families if is_firmware_protected(f)]
-    except Exception as e:
-        results['firmware_families'] = []
-        results['gpu_vendors'] = []
-        results['protected_firmware'] = []
+        from scanner.hardware import (
+            get_all_hardware,
+            get_firmware_protection_set,
+            get_all_firmware_families,
+            get_unnecessary_hardware_packages,
+        )
+        hw = get_all_hardware()
+        results['pci_vendors'] = hw['pci_vendors']
+        results['usb_vendors'] = hw['usb_vendors']
+        results['gpu_vendors_named'] = hw['gpu_vendors_named']
+        results['kvm_present'] = hw['kvm_present']
+        # active_fw_files is a set — convert to list for JSON
+        results['active_fw_files'] = list(hw['active_fw_files'])
 
+        families = get_all_firmware_families()
+        results['firmware_families'] = families
+
+        protection_set = get_firmware_protection_set(hw)
+        results['protection_set'] = list(protection_set)
+
+    except Exception as e:
+        print(f'[root_scan] hardware error: {e}', file=sys.stderr)
+        results['pci_vendors'] = []
+        results['usb_vendors'] = []
+        results['gpu_vendors_named'] = []
+        results['kvm_present'] = False
+        results['active_fw_files'] = []
+        results['firmware_families'] = []
+        results['protection_set'] = []
+
+    # ── Unnecessary hardware packages ──
     try:
-        from scanner.packages import get_unnecessary_gpu_packages
-        pkgs = get_unnecessary_gpu_packages(results.get('gpu_vendors', []))
-        results['unnecessary_pkgs'] = [
-            {'name': p.name, 'installed_size': p.installed_size, 'description': p.description, 'vendor': p.vendor}
-            for p in pkgs
-        ]
-    except Exception:
+        from scanner.hardware import get_unnecessary_hardware_packages
+        pkgs = get_unnecessary_hardware_packages(
+            results.get('pci_vendors', []),
+            results.get('usb_vendors', []),
+            results.get('kvm_present', False),
+        )
+        results['unnecessary_pkgs'] = pkgs
+    except Exception as e:
+        print(f'[root_scan] packages error: {e}', file=sys.stderr)
         results['unnecessary_pkgs'] = []
 
+    # ── Kernels ──
     try:
         from scanner.kernels import get_installed_kernels
         kernels = get_installed_kernels()
         results['kernels'] = [
-            {'version': k.version, 'packages': list(k.packages),
-             'size_kb': k.size_kb, 'is_active': k.is_active}
+            {
+                'version': k.version,
+                'packages': list(k.packages),
+                'size_kb': k.size_kb,
+                'is_active': k.is_active,
+                'image_pkg': k.image_pkg,
+                'headers_pkg': k.headers_pkg,
+                'src_pkg': k.src_pkg,
+                'kbuild_pkg': k.kbuild_pkg,
+                'has_headers': k.has_headers,
+                'has_src': k.has_src,
+                'has_kbuild': k.has_kbuild,
+                'orphan_src_dirs': k.orphan_src_dirs,
+                'orphan_modules_dirs': k.orphan_modules_dirs,
+            }
             for k in kernels
         ]
-    except Exception:
+    except Exception as e:
+        print(f'[root_scan] kernels error: {e}', file=sys.stderr)
         results['kernels'] = []
 
+    # ── APT cache ──
     try:
         from scanner.cache import get_apt_cache_info, get_autoremove_packages
         results['apt_cache'] = get_apt_cache_info()
@@ -57,6 +96,7 @@ def main():
         results['apt_cache'] = {}
         results['autoremove_pkgs'] = []
 
+    # ── Temp files ──
     try:
         from scanner.temp_files import get_temp_entries
         entries = get_temp_entries(min_age_days=0.0)
@@ -68,6 +108,7 @@ def main():
     except Exception:
         results['temp_entries'] = []
 
+    # ── Locales & docs ──
     try:
         from scanner.locales import get_locales_info, get_docs_summary
         desktop = os.environ.get('SOPLOS_DESKTOP', 'unknown')
@@ -86,6 +127,7 @@ def main():
         results['locales'] = []
         results['docs_summary'] = []
 
+    # ── System logs ──
     try:
         from scanner.logs import get_varlog_entries, get_journald_info
         log_entries = get_varlog_entries()
