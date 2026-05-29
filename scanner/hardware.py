@@ -84,6 +84,7 @@ GPU_CLASS_PREFIXES = {'0300', '0302', '0380'}  # VGA, 3D, Display
 # Packages associated with each vendor (hardware absent → package removable)
 # ---------------------------------------------------------------------------
 PCI_VENDOR_PACKAGES: dict[str, list[str]] = {
+    # ── GPU / display ──────────────────────────────────────────────────────────
     '10de': [  # NVIDIA
         'nvidia-driver', 'nvidia-driver-bin', 'nvidia-driver-libs',
         'nvidia-kernel-dkms', 'nvidia-kernel-support',
@@ -101,20 +102,78 @@ PCI_VENDOR_PACKAGES: dict[str, list[str]] = {
         'xserver-xorg-video-radeon',
         'radeontop',
     ],
-    '8086': [  # Intel
+    '8086': [  # Intel GPU (protected only when an Intel GPU-class device is present)
         'xserver-xorg-video-intel',
         'intel-media-va-driver',
         'intel-gpu-tools',
         'intel-opencl-icd',
     ],
-    '15ad': [  # VMware
-        'xserver-xorg-video-vmware',
-        'open-vm-tools', 'open-vm-tools-desktop',
+    # ── WiFi / network ────────────────────────────────────────────────────────
+    '14e4': [  # Broadcom — proprietary DKMS WiFi driver
+        'broadcom-sta-dkms',
+        'bcmwl-kernel-source',
     ],
-    '80ee': [  # VirtualBox
+}
+
+# Packages tied to USB vendor IDs (peripheral hardware).
+# Same logic as PCI_VENDOR_PACKAGES: if vendor absent → packages are removable.
+USB_VENDOR_PACKAGES: dict[str, list[str]] = {
+    # ── Input devices ─────────────────────────────────────────────────────────
+    '056a': [  # Wacom tablets
+        'xserver-xorg-input-wacom',
+        'libwacom2', 'libwacom-bin',
+    ],
+    # ── Printers ──────────────────────────────────────────────────────────────
+    '03f0': [  # HP
+        'hplip', 'hplip-data',
+        'printer-driver-hpijs',
+    ],
+    '04b8': [  # Epson
+        'epson-inkjet-printer-escpr',
+        'epson-inkjet-printer-escpr2',
+    ],
+    '04a9': [  # Canon
+        'cnijfilter2',
+        'scangearmp2',
+    ],
+    '04f9': [  # Brother
+        'printer-driver-brlaser',
+    ],
+    '04e8': [  # Samsung (printers)
+        'printer-driver-splix',
+    ],
+    '0482': [  # Kyocera
+        'printer-driver-c2esp',
+    ],
+}
+
+# VM guest tool packages, keyed by systemd-detect-virt output.
+# Tools for the current guest type are protected; all others are removable.
+VM_GUEST_PACKAGES: dict[str, list[str]] = {
+    'oracle': [  # VirtualBox guest
         'virtualbox-guest-x11',
         'virtualbox-guest-utils',
         'virtualbox-guest-dkms',
+    ],
+    'vmware': [  # VMware guest
+        'xserver-xorg-video-vmware',
+        'open-vm-tools',
+        'open-vm-tools-desktop',
+    ],
+    'kvm': [  # KVM/QEMU guest — SPICE client tools
+        'spice-vdagent',
+        'spice-webdavd',
+    ],
+    'qemu': [  # QEMU without KVM
+        'spice-vdagent',
+        'spice-webdavd',
+    ],
+    'microsoft': [  # Hyper-V guest
+        'hyperv-daemons',
+    ],
+    'xen': [  # Xen guest
+        'xen-utils-guest',
+        'xe-guest-utilities',
     ],
 }
 
@@ -140,6 +199,7 @@ def get_all_hardware() -> dict:
     Returns a dict:
       'dracut_fw_dirs'     : set[str]  — firmware dirs declared in dracut conf (layer 0)
       'pci_vendors'        : list[str] — PCI vendor IDs detected (e.g. ['1002','8086'])
+      'gpu_pci_vendors'    : list[str] — vendor IDs of GPU-class PCI devices only (class 03xx)
       'usb_vendors'        : list[str] — USB vendor IDs detected
       'gpu_vendors_named'  : list[str] — human names of GPU vendors (for UI label)
       'active_fw_files'    : set[str]  — firmware file paths loaded by lsmod+modinfo
@@ -149,6 +209,7 @@ def get_all_hardware() -> dict:
     """
     dracut_fw_dirs    = _scan_dracut_conf()
     pci_vendors       = _scan_pci()
+    gpu_pci_vendors   = _scan_gpu_pci_vendors()
     usb_vendors       = _scan_usb()
     gpu_vendors_named = _detect_gpu_names(pci_vendors)
     active_fw_files   = _scan_active_firmware()
@@ -158,6 +219,7 @@ def get_all_hardware() -> dict:
     return {
         'dracut_fw_dirs': dracut_fw_dirs,
         'pci_vendors': list(pci_vendors),
+        'gpu_pci_vendors': list(gpu_pci_vendors),
         'usb_vendors': list(usb_vendors),
         'gpu_vendors_named': gpu_vendors_named,
         'active_fw_files': active_fw_files,
@@ -253,18 +315,34 @@ def get_unnecessary_hardware_packages(
     pci_vendors: list[str],
     usb_vendors: list[str],
     kvm_present: bool,
+    gpu_pci_vendors: list[str] | None = None,
+    vm_guest_type: str = 'none',
 ) -> list[dict]:
     """
     Returns packages installed for hardware NOT present in this system.
     Each entry: {'name', 'description', 'installed_size', 'vendor'}
+
+    gpu_pci_vendors: vendor IDs of GPU-class devices only (class 03xx).
+      Used for Intel: chipset devices expose 8086 in lspci even without an
+      Intel GPU, so Intel GPU packages are only protected when a real Intel
+      GPU is present.
+
+    vm_guest_type: output of systemd-detect-virt ('none', 'oracle', 'vmware',
+      'kvm', 'qemu', 'microsoft', 'xen', …).  VM guest tools for the current
+      guest type are protected; tools for every other guest type are removable.
     """
     from scanner.packages import is_package_installed, get_package_description, get_installed_size_kb
 
-    present = set(pci_vendors) | set(usb_vendors)
-    results = []
+    all_pci    = set(pci_vendors)
+    all_usb    = set(usb_vendors)
+    gpu_only   = set(gpu_pci_vendors) if gpu_pci_vendors else all_pci
+    results    = []
 
     for vid, packages in PCI_VENDOR_PACKAGES.items():
-        if vid in present:
+        # Intel GPU packages are protected only when an Intel GPU is present.
+        # Other vendors: protect when any PCI device with that vendor is present.
+        vendor_present = (gpu_only if vid == '8086' else all_pci)
+        if vid in vendor_present:
             continue
         for pkg in packages:
             if is_package_installed(pkg):
@@ -273,6 +351,37 @@ def get_unnecessary_hardware_packages(
                     'description': get_package_description(pkg),
                     'installed_size': get_installed_size_kb(pkg),
                     'vendor': _vendor_label(vid),
+                })
+
+    for vid, packages in USB_VENDOR_PACKAGES.items():
+        if vid in all_usb:
+            continue
+        for pkg in packages:
+            if is_package_installed(pkg):
+                results.append({
+                    'name': pkg,
+                    'description': get_package_description(pkg),
+                    'installed_size': get_installed_size_kb(pkg),
+                    'vendor': _usb_vendor_label(vid),
+                })
+
+    # VM guest tools: protect only the current guest's packages.
+    vm_vendor_labels = {
+        'oracle': 'VirtualBox', 'vmware': 'VMware',
+        'kvm': 'KVM/QEMU', 'qemu': 'KVM/QEMU',
+        'microsoft': 'Hyper-V', 'xen': 'Xen',
+    }
+    for guest_type, packages in VM_GUEST_PACKAGES.items():
+        if guest_type == vm_guest_type:
+            continue
+        label = vm_vendor_labels.get(guest_type, guest_type.upper())
+        for pkg in packages:
+            if is_package_installed(pkg):
+                results.append({
+                    'name': pkg,
+                    'description': get_package_description(pkg),
+                    'installed_size': get_installed_size_kb(pkg),
+                    'vendor': label,
                 })
 
     if not kvm_present:
@@ -376,6 +485,27 @@ def _scan_pci() -> set[str]:
                 vendors.add(match.group(1).lower())
     except Exception as e:
         print(f'[hardware] lspci error: {e}')
+    return vendors
+
+
+def _scan_gpu_pci_vendors() -> set[str]:
+    """
+    Return vendor IDs of GPU/display-class PCI devices only (class 03xx).
+
+    Uses 'lspci -n' numeric output:  addr class: vendor:device
+    This prevents Intel chipset/bridge devices (always present in VMs via
+    i440FX / ICH9 emulation) from being mistaken for Intel GPU hardware.
+    """
+    vendors: set[str] = set()
+    try:
+        output = subprocess.check_output(['lspci', '-n'], text=True, timeout=10)
+        for line in output.splitlines():
+            # e.g. "00:02.0 0300: 8086:1234 (rev 02)"
+            match = re.match(r'[\w:.]+ 03[0-9a-fA-F]{2}: ([0-9a-fA-F]{4}):', line)
+            if match:
+                vendors.add(match.group(1).lower())
+    except Exception as e:
+        print(f'[hardware] lspci -n error: {e}')
     return vendors
 
 
@@ -585,6 +715,20 @@ def _detect_vm_guest() -> str:
 def _vendor_label(vid: str) -> str:
     labels = {
         '10de': 'NVIDIA', '1002': 'AMD', '8086': 'Intel',
-        '15ad': 'VMware', '80ee': 'VirtualBox',
+        '15ad': 'VMware', '80ee': 'VirtualBox', '1af4': 'KVM/QEMU',
+        '14e4': 'Broadcom',
+    }
+    return labels.get(vid, vid.upper())
+
+
+def _usb_vendor_label(vid: str) -> str:
+    labels = {
+        '056a': 'Wacom',
+        '03f0': 'HP',
+        '04b8': 'Epson',
+        '04a9': 'Canon',
+        '04f9': 'Brother',
+        '04e8': 'Samsung',
+        '0482': 'Kyocera',
     }
     return labels.get(vid, vid.upper())

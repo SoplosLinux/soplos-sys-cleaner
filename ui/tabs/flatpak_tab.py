@@ -305,6 +305,11 @@ class FlatpakTab(Gtk.Box):
                 success, msg = False, str(e)
             GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
             GLib.idle_add(btn.set_sensitive, True)
+            def _reset_apps_select_all():
+                self.apps_select_all_btn.handler_block_by_func(self._on_apps_select_all)
+                self.apps_select_all_btn.set_active(False)
+                self.apps_select_all_btn.handler_unblock_by_func(self._on_apps_select_all)
+            GLib.idle_add(_reset_apps_select_all)
             if success:
                 GLib.timeout_add_seconds(1, lambda: self.parent.start_user_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
@@ -344,6 +349,11 @@ class FlatpakTab(Gtk.Box):
                 success, msg = False, str(e)
             GLib.idle_add(self.parent.set_ui_state, msg, 1.0 if success else 0.0, False, True)
             GLib.idle_add(btn.set_sensitive, True)
+            def _reset_runtimes_select_all():
+                self.runtimes_select_all_btn.handler_block_by_func(self._on_runtimes_select_all)
+                self.runtimes_select_all_btn.set_active(False)
+                self.runtimes_select_all_btn.handler_unblock_by_func(self._on_runtimes_select_all)
+            GLib.idle_add(_reset_runtimes_select_all)
             if success:
                 GLib.timeout_add_seconds(1, lambda: self.parent.start_user_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))

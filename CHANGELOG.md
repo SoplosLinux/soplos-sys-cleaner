@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-2] - 2026-05-29
+
+### ✨ Added
+- **Drivers tab — VM guest tools**: New `VM_GUEST_PACKAGES` dict maps `systemd-detect-virt` output to guest tool packages. Tools for the current hypervisor are protected; all others are shown as removable. Covers VirtualBox (`virtualbox-guest-x11/utils/dkms`), VMware (`xserver-xorg-video-vmware`, `open-vm-tools`, `open-vm-tools-desktop`), KVM/QEMU (`spice-vdagent`, `spice-webdavd`), Hyper-V (`hyperv-daemons`), Xen (`xen-utils-guest`, `xe-guest-utilities`).
+- **Drivers tab — printer drivers**: USB vendor detection for HP (`hplip`, `hplip-data`), Epson (`epson-inkjet-printer-escpr/2`), Canon (`cnijfilter2`, `scangearmp2`), Brother (`printer-driver-brlaser`), Samsung (`printer-driver-splix`), Kyocera (`printer-driver-c2esp`). Packages only shown as removable when the corresponding USB vendor is not detected.
+- **Drivers tab — Wacom tablets**: `xserver-xorg-input-wacom`, `libwacom2` shown as removable when USB vendor `056a` (Wacom) is absent.
+- **Drivers tab — Broadcom proprietary WiFi**: `broadcom-sta-dkms`, `bcmwl-kernel-source` shown as removable when PCI vendor `14e4` (Broadcom) is absent.
+
+### 🐛 Fixed
+- **Drivers tab — Intel GPU false positive in VMs**: VMs expose Intel chipset devices (i440FX, ICH9) with vendor `8086` in `lspci`, causing Intel GPU driver packages to be incorrectly protected. A new `_scan_gpu_pci_vendors()` function uses `lspci -n` to check PCI class `03xx` and only protects Intel GPU packages when a real Intel GPU is present.
+- **Drivers tab — VMware tools shown as removable when running in VMware**: When VirtualBox is configured with VMSVGA display, the VMware PCI vendor `15ad` appears in `lspci`, incorrectly protecting `open-vm-tools`. VM tools are now managed exclusively via `systemd-detect-virt`, not PCI vendor detection.
+- **Drivers tab — fixes not applying in production**: All hardware detection improvements were applied to `root_scan.py` but the live app uses `root_helper.py` via pkexec. `root_helper.py` was not updated with `gpu_pci_vendors` and `vm_guest_type` parameters — this is now corrected.
+- **Firmwares tab — dracut protection layer missing client-side**: `root_helper.py` was not exporting `dracut_fw_dirs` in the scan JSON. The client-side firmware protection set rebuild now correctly includes firmware directories declared in `/etc/dracut.conf.d/`.
+- **Progress bar — showing 100% during operations**: `set_ui_state(..., pulse=True)` now resets `fraction` to `0.0` before calling `pulse()`. Previously the leftover `1.0` fraction from a completed scan persisted as "100%" text during all subsequent indeterminate operations.
+- **"Select all" checkbox not resetting after cleanup**: The checkbox remained checked after a successful cleanup and re-scan. Added reset via `handler_block_by_func` + `set_active(False)` in the `on_done` callback of `drivers_tab`, `firmware_tab`, `temp_tab`, `logs_tab`, `user_cache_tab`, and `flatpak_tab`.
+
+---
+
 ## [1.0.2-1] - 2026-04-17
 
 ### ✨ Added

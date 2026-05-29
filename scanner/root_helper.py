@@ -33,6 +33,7 @@ def do_scan(params):
         hw = get_all_hardware()
         results['dracut_fw_dirs']    = list(hw['dracut_fw_dirs'])
         results['pci_vendors']       = hw['pci_vendors']
+        results['gpu_pci_vendors']   = hw['gpu_pci_vendors']
         results['usb_vendors']       = hw['usb_vendors']
         results['gpu_vendors_named'] = hw['gpu_vendors_named']
         results['kvm_present']       = hw['kvm_present']
@@ -47,7 +48,11 @@ def do_scan(params):
         results['protection_set'] = list(protection_set)
 
         pkgs = get_unnecessary_hardware_packages(
-            hw['pci_vendors'], hw['usb_vendors'], hw['kvm_present']
+            hw['pci_vendors'],
+            hw['usb_vendors'],
+            hw['kvm_present'],
+            gpu_pci_vendors=hw['gpu_pci_vendors'],
+            vm_guest_type=hw.get('vm_guest_type', 'none'),
         )
         results['unnecessary_pkgs'] = pkgs
 

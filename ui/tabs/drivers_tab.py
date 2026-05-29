@@ -174,6 +174,9 @@ class DriversTab(Gtk.Box):
             msg = _("Tasks completed successfully.") if success else f"Error: {result.get('stderr', '')}"
             self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
             self.remove_btn.set_sensitive(True)
+            self.select_all_btn.handler_block_by_func(self._on_select_all)
+            self.select_all_btn.set_active(False)
+            self.select_all_btn.handler_unblock_by_func(self._on_select_all)
             if success:
                 GLib.timeout_add_seconds(2, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))

@@ -412,6 +412,7 @@ class MainWindow(Gtk.ApplicationWindow):
                 traceback.print_stack()
             self.progress_label.set_text(str(message))
             if pulse:
+                self.progress_bar.set_fraction(0.0)
                 self.progress_bar.pulse()
             elif fraction is not None:
                 self.progress_bar.set_fraction(fraction)
@@ -452,6 +453,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def _start_pulse_timer(self):
         self._stop_pulse_timer()
+        self.progress_bar.set_fraction(0.0)
         def _pulse():
             self.progress_bar.pulse()
             return True

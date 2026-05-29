@@ -26,9 +26,12 @@ def main():
         )
         hw = get_all_hardware()
         results['pci_vendors'] = hw['pci_vendors']
+        results['gpu_pci_vendors'] = hw['gpu_pci_vendors']
         results['usb_vendors'] = hw['usb_vendors']
         results['gpu_vendors_named'] = hw['gpu_vendors_named']
         results['kvm_present'] = hw['kvm_present']
+        results['vm_guest_type'] = hw['vm_guest_type']
+        results['dracut_fw_dirs'] = list(hw['dracut_fw_dirs'])
         # active_fw_files is a set — convert to list for JSON
         results['active_fw_files'] = list(hw['active_fw_files'])
 
@@ -41,9 +44,12 @@ def main():
     except Exception as e:
         print(f'[root_scan] hardware error: {e}', file=sys.stderr)
         results['pci_vendors'] = []
+        results['gpu_pci_vendors'] = []
         results['usb_vendors'] = []
         results['gpu_vendors_named'] = []
         results['kvm_present'] = False
+        results['vm_guest_type'] = 'none'
+        results['dracut_fw_dirs'] = []
         results['active_fw_files'] = []
         results['firmware_families'] = []
         results['protection_set'] = []
@@ -55,6 +61,8 @@ def main():
             results.get('pci_vendors', []),
             results.get('usb_vendors', []),
             results.get('kvm_present', False),
+            gpu_pci_vendors=results.get('gpu_pci_vendors', []),
+            vm_guest_type=results.get('vm_guest_type', 'none'),
         )
         results['unnecessary_pkgs'] = pkgs
     except Exception as e:
