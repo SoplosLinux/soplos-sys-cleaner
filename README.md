@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.2--1-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2--3-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -32,7 +32,10 @@ Soplos Sys Cleaner is an advanced system maintenance tool for Soplos Linux distr
 - **Firmware Sizes**: Each firmware family shows its disk usage to help decide what to remove.
 - **Selective APT Cache**: List and selectively delete individual cached `.deb` files instead of clearing everything at once.
 - **Hardware Protection**: Prevents removal of critical network firmwares, GPU firmwares (AMD, Intel, NVIDIA) and active kernels.
-- **Automatic Refresh**: Instant UI updates after cleaning operations.
+- **Full Driver Cleanup**: Detects unnecessary driver packages (GPU, WiFi, VM guest tools, printers, tablets) based on hardware present. After removal, cleans leftover module references in `/etc/modules` and `/etc/modules-load.d/` before regenerating the initramfs — no boot error notifications.
+- **Orphaned DKMS Modules**: Detects compiled kernel modules in `/var/lib/dkms/` whose source package is no longer installed and offers to remove them.
+- **Orphaned Module References**: Scans `/etc/modules` and `/etc/modules-load.d/` for references to modules from uninstalled packages and shows them in the APT Cache orphaned packages section.
+- **Automatic Refresh**: Instant UI updates after cleaning operations.p
 - **Universal Scanning**: Deep scan of over 15 critical system paths tailored for Boro, Tyron, and Tyson.
 - **One-Click Maintenance**: Cleans everything or just specific sections.
 - **Desktop Environment Agnostic**: Designed to fit seamlessly into Soplos distributions running GNOME, KDE Plasma, or XFCE using native-looking GTK interfaces.
@@ -116,6 +119,34 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.2-3 (04/06/2026)
+- Added: orphaned DKMS module detection in the Drivers tab — compiled `.ko` files in `/var/lib/dkms/` with no installed source package, removed via `dkms remove` + `dracut -f`.
+- Added: orphaned reference scanner covering `/etc/modules`, `/etc/modules-load.d/`, `/etc/modprobe.d/`, systemd unit files, and X11/XDG autostart files — shown in APT Cache → Orphaned packages.
+- Added: automatic cleanup of module references in `/etc/modules` and `/etc/modules-load.d/` after driver package removal, before `dracut -f`.
+- Added: `clean_module_refs` action disables orphaned systemd services, removes orphaned modprobe.d and X11/XDG autostart files, rebuilds initramfs.
+- Fixed: `VBoxClient: the VirtualBox kernel service is not running` notifications after removing VirtualBox guest packages — caused by orphaned `/etc/X11/Xsession.d/98vboxadd-xclient` and `/etc/xdg/autostart/vboxclient.desktop`.
+- Fixed: full coverage for VMware (`vmtoolsd.service`, `vmware-vmblock-fuse.service`, `vmware-user.desktop`, `70vmware-user`), NVIDIA (`nvidia-persistenced.service`, `nvidia-hibernate/resume/suspend.service`, `/etc/modprobe.d/nvidia-blacklist-nouveau.conf`), Broadcom (`/etc/modprobe.d/blacklist-bcm43.conf`, `wl.conf`) and Hyper-V daemon services.
+- Fixed: users who removed drivers in a previous session can now clean up leftover references from APT Cache → Orphaned packages without reinstalling anything.
+
+### v1.0.2-2 (29/05/2026)
+- Added: VM guest tool packages now managed via `systemd-detect-virt` — VirtualBox, VMware, KVM/QEMU (SPICE), Hyper-V, Xen tools shown as removable when not running in that hypervisor.
+- Added: printer driver detection for HP, Epson, Canon, Brother, Samsung, Kyocera via USB vendor ID.
+- Added: Wacom tablet driver detection via USB vendor ID.
+- Added: Broadcom proprietary WiFi driver detection via PCI vendor ID.
+- Fixed: Intel GPU packages no longer falsely protected by Intel chipset devices in VMs (new PCI class `03xx` check).
+- Fixed: VMware tools shown as removable when running in VMware — was caused by VirtualBox VMSVGA exposing VMware PCI vendor in lspci.
+- Fixed: all Drivers tab fixes now apply in production — `root_helper.py` was not updated with `gpu_pci_vendors`/`vm_guest_type`.
+- Fixed: `dracut_fw_dirs` now exported from `root_helper`, firmware protection set correctly rebuilt client-side.
+- Fixed: progress bar no longer shows 100% during indeterminate operations.
+- Fixed: "Select all" checkbox now resets after cleanup in all tabs.
+
+### v1.0.2-1 (17/04/2026)
+- Snap tab redesigned with full uninstall support (`snap remove --purge`) and old revisions section, matching Flatpak tab design.
+- VM guest detection via `systemd-detect-virt`: KVM, QEMU, VMware, VirtualBox, Hyper-V, Xen, Parallels displayed in Drivers tab label.
+- Fixed: kernel removal now runs `dracut -f` and `update-grub` after `apt purge`.
+- Fixed: all `apt-get` commands replaced with `apt` throughout the root helper.
+- Fixed: 27 untranslated strings added to all 8 language dictionaries.
 
 ### v1.0.2 (29/03/2026)
 - Added Installed Apps tab with search and selective uninstall via pkexec.

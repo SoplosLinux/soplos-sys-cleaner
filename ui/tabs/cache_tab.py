@@ -157,8 +157,11 @@ class CacheTab(Gtk.Box):
         for row in self.orphan_list.get_children():
             self.orphan_list.remove(row)
 
-        orphans = results.get('autoremove_pkgs', [])
-        if not orphans:
+        orphans     = results.get('autoremove_pkgs', [])
+        mod_refs    = results.get('orphan_module_refs', [])
+        total_items = len(orphans) + len(mod_refs)
+
+        if not total_items:
             self.autoremove_label.set_text(_("No orphaned packages"))
             self.orphan_scroll.hide()
             self.autoremove_btn.hide()
@@ -173,11 +176,21 @@ class CacheTab(Gtk.Box):
                 label.set_margin_bottom(4)
                 row.add(label)
                 self.orphan_list.add(row)
+            for ref in mod_refs:
+                row = Gtk.ListBoxRow()
+                label = Gtk.Label(label=f"{ref['module']}  ({ref['source']})")
+                label.set_halign(Gtk.Align.START)
+                label.set_margin_start(12)
+                label.set_margin_top(4)
+                label.set_margin_bottom(4)
+                row.add(label)
+                self.orphan_list.add(row)
             self.autoremove_label.set_text(
-                _("{} orphaned package(s) detected").format(len(orphans))
+                _("{} orphaned package(s) detected").format(total_items)
             )
             self.autoremove_btn.set_sensitive(True)
             self.autoremove_btn.show()
+            self._orphan_module_refs = mod_refs
 
         self.orphan_list.show_all()
 
@@ -245,6 +258,9 @@ class CacheTab(Gtk.Box):
             return
 
         btn.set_sensitive(False)
+        mod_refs = getattr(self, '_orphan_module_refs', [])
+        if mod_refs:
+            self.parent.run_root_action({'action': 'clean_module_refs', 'refs': mod_refs}, lambda r: None)
         self.parent.set_ui_state(_("Removing orphaned packages..."), pulse=True)
 
         def on_done(result):

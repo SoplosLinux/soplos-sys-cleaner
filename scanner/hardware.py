@@ -397,6 +397,83 @@ def get_unnecessary_hardware_packages(
     return results
 
 
+def get_orphan_dkms_modules() -> list[dict]:
+    """
+    Finds DKMS modules compiled for the running kernel whose source package
+    is no longer installed.
+
+    Scans /var/lib/dkms/<module>/<version>/<kver>/ for compiled .ko files,
+    then checks whether the corresponding *-dkms package is still installed.
+
+    Returns list of dicts: {'name', 'version', 'kernel', 'dkms_dir', 'size_kb'}
+    """
+    dkms_base = '/var/lib/dkms'
+    if not os.path.isdir(dkms_base):
+        return []
+
+    try:
+        kver = subprocess.check_output(['uname', '-r'], text=True, timeout=5).strip()
+    except Exception:
+        return []
+
+    from scanner.packages import is_package_installed
+
+    orphans = []
+
+    for module_name in os.listdir(dkms_base):
+        module_dir = os.path.join(dkms_base, module_name)
+        if not os.path.isdir(module_dir):
+            continue
+
+        for version in os.listdir(module_dir):
+            version_dir = os.path.join(module_dir, version)
+            if not os.path.isdir(version_dir):
+                continue
+
+            # Only consider modules compiled for the running kernel
+            kernel_build_dir = os.path.join(version_dir, kver)
+            if not os.path.isdir(kernel_build_dir):
+                continue
+
+            # Check if there are actual compiled .ko files
+            has_ko = any(
+                f.endswith(('.ko', '.ko.xz', '.ko.zst'))
+                for _, _, files in os.walk(kernel_build_dir)
+                for f in files
+            )
+            if not has_ko:
+                continue
+
+            # Try common package name patterns
+            candidates = [
+                f'{module_name}-dkms',
+                module_name,
+                f'linux-{module_name}',
+            ]
+            if any(is_package_installed(pkg) for pkg in candidates):
+                continue  # package still installed, not orphaned
+
+            size_kb = 0
+            try:
+                res = subprocess.run(
+                    ['du', '-sk', version_dir],
+                    capture_output=True, text=True, timeout=5
+                )
+                size_kb = int(res.stdout.split()[0]) if res.stdout.strip() else 0
+            except Exception:
+                pass
+
+            orphans.append({
+                'name': module_name,
+                'version': version,
+                'kernel': kver,
+                'dkms_dir': version_dir,
+                'size_kb': size_kb,
+            })
+
+    return orphans
+
+
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------

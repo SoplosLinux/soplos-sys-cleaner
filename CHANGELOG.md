@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-3] - 2026-06-04
+
+### ✨ Added
+- **Orphaned DKMS modules — Drivers tab**: New `get_orphan_dkms_modules()` scanner checks `/var/lib/dkms/<module>/<version>/<kernel>/` for compiled `.ko` files whose source package (`*-dkms`) is no longer installed. Shown as `[DKMS]` entries in the Drivers tab alongside regular driver packages. Removed via `dkms remove` or direct directory deletion + `depmod -a` + `dracut -f`.
+- **Orphaned module references — APT Cache orphans section**: New `get_orphan_module_refs()` scanner detects leftover references to modules from uninstalled packages across five locations:
+  - `/etc/modules` — direct module load entries
+  - `/etc/modules-load.d/` — per-file module load configs
+  - `/etc/modprobe.d/` — modprobe configuration files
+  - systemd unit files (`/etc/systemd/system`, `/lib/systemd/system`, `/usr/lib/systemd/system`) — orphaned service units from VirtualBox, VMware, Hyper-V packages
+  - X11/XDG autostart files (`/etc/X11/Xsession.d/`, `/etc/xdg/autostart/`) — orphaned session scripts from `virtualbox-guest-x11`, `open-vm-tools-desktop`
+- **Automatic reference cleanup on driver removal**: `do_apt_purge` now calls `_cleanup_module_references()` after purging driver packages, removing entries from `/etc/modules` and `/etc/modules-load.d/` before `dracut -f`. Covers VirtualBox (`vboxguest`, `vboxsf`, `vboxvideo`), VMware (`vmw_vmci`, `vmwgfx`, `vsock`, `vmw_balloon`, `vmxnet3`, `pvscsi`), NVIDIA (`nvidia`, `nvidia_drm`, `nvidia_modeset`, `nvidia_uvm`), Broadcom (`wl`), Hyper-V (`hv_vmbus`, `hv_storvsc`, `hv_netvsc`, `hv_utils`, `hv_balloon`).
+- **`clean_module_refs` root action**: New action handles complete cleanup of detected orphaned references — removes module load entries, orphaned modprobe.d files, disables and removes orphaned systemd services (`systemctl disable --now` + file removal + `daemon-reload`), removes orphaned X11/XDG autostart files, then rebuilds initramfs with `dracut -f`.
+- **`remove_dkms_orphans` root action**: New action removes selected DKMS orphan module trees via `dkms remove MODULE/VERSION --all`, with fallback to direct `shutil.rmtree`, followed by `depmod -a` + `dracut -f`.
+
+### 🐛 Fixed
+- **`VBoxClient: the VirtualBox kernel service is not running` notifications**: After removing `virtualbox-guest-x11` via the Drivers tab, `/etc/X11/Xsession.d/98vboxadd-xclient` and `/etc/xdg/autostart/vboxclient.desktop` were left on disk. At every login, `VBoxClient` was launched by these autostart files, failed to find the kernel module, and generated the error notification. The orphaned autostart scanner now detects these files and `clean_module_refs` removes them.
+- **Boot error notifications after any driver removal**: Full coverage — VMware (`/etc/X11/Xsession.d/70vmware-user`, `vmware-user.desktop`, `vmtoolsd.service`, `vmware-vmblock-fuse.service`, `open-vm-tools.service`), NVIDIA (`nvidia-persistenced.service`, `nvidia-hibernate/resume/suspend.service`, `/etc/modprobe.d/nvidia-blacklist-nouveau.conf`, `nvidia.conf`), Broadcom (`/etc/modprobe.d/blacklist-bcm43.conf`, `wl.conf`), Hyper-V (`hv-fcopy/kvp/vss-daemon.service`).
+- **Users who removed drivers before this fix**: The orphaned reference scanner runs on every root scan — leftover files from previous removals are shown in APT Cache → Paquetes huérfanos and can be cleaned from there without reinstalling anything.
+
+---
+
 ## [1.0.2-2] - 2026-05-29
 
 ### ✨ Added

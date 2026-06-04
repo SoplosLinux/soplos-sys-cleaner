@@ -47,6 +47,9 @@ def do_scan(params):
         protection_set = get_firmware_protection_set(hw)
         results['protection_set'] = list(protection_set)
 
+        from scanner.hardware import get_orphan_dkms_modules
+        results['orphan_dkms'] = get_orphan_dkms_modules()
+
         pkgs = get_unnecessary_hardware_packages(
             hw['pci_vendors'],
             hw['usb_vendors'],
@@ -88,6 +91,7 @@ def do_scan(params):
         results['firmware_sizes']    = {}
         results['protection_set']    = []
         results['unnecessary_pkgs']  = []
+        results['orphan_dkms']       = []
         results['hardware_summary']  = []
 
     # Kernels
@@ -114,13 +118,15 @@ def do_scan(params):
 
     # APT cache
     try:
-        from scanner.cache import get_apt_cache_info, get_autoremove_packages, get_apt_cache_debs
-        results['apt_cache']      = get_apt_cache_info()
-        results['apt_cache_debs'] = get_apt_cache_debs()
-        results['autoremove_pkgs'] = get_autoremove_packages()
+        from scanner.cache import get_apt_cache_info, get_autoremove_packages, get_apt_cache_debs, get_orphan_module_refs
+        results['apt_cache']          = get_apt_cache_info()
+        results['apt_cache_debs']     = get_apt_cache_debs()
+        results['autoremove_pkgs']    = get_autoremove_packages()
+        results['orphan_module_refs'] = get_orphan_module_refs()
     except Exception:
-        results['apt_cache']       = {}
-        results['autoremove_pkgs'] = []
+        results['apt_cache']          = {}
+        results['autoremove_pkgs']    = []
+        results['orphan_module_refs'] = []
 
     # Temp files
     try:
@@ -200,10 +206,10 @@ def do_apt_autoremove(params):
 
 
 def do_apt_purge(params):
-    packages         = params.get('packages', [])
-    rebuild          = params.get('rebuild_initrd', False)
+    packages          = params.get('packages', [])
+    rebuild           = params.get('rebuild_initrd', False)
     update_bootloader = params.get('update_bootloader', False)
-    pkg_str  = ' '.join(shlex.quote(p) for p in packages)
+    pkg_str = ' '.join(shlex.quote(p) for p in packages)
     cmds = [
         f'apt purge -y {pkg_str}',
         'apt autoremove -y',
@@ -212,8 +218,71 @@ def do_apt_purge(params):
         cmds.append('dracut -f')
     if update_bootloader:
         cmds.append('update-grub')
+
     result = subprocess.run(['bash', '-c', ' && '.join(cmds)], capture_output=True, text=True)
+
+    if rebuild:
+        _cleanup_module_references(packages)
+
     return {'success': result.returncode == 0, 'stderr': result.stderr.strip()}
+
+
+PKG_MODULES = {
+    # VirtualBox
+    'virtualbox-guest-dkms':     ['vboxguest', 'vboxsf', 'vboxvideo'],
+    'virtualbox-guest-utils':    ['vboxguest', 'vboxsf'],
+    'virtualbox-guest-x11':      ['vboxvideo'],
+    # VMware
+    'open-vm-tools':             ['vmw_vmci', 'vmwgfx', 'vsock', 'vmw_balloon', 'vmxnet3', 'pvscsi'],
+    'open-vm-tools-desktop':     ['vmwgfx'],
+    'xserver-xorg-video-vmware': ['vmwgfx'],
+    # NVIDIA
+    'nvidia-kernel-dkms':        ['nvidia', 'nvidia_drm', 'nvidia_modeset', 'nvidia_uvm'],
+    'nvidia-driver':             ['nvidia', 'nvidia_drm', 'nvidia_modeset', 'nvidia_uvm'],
+    # Broadcom
+    'broadcom-sta-dkms':         ['wl'],
+    'bcmwl-kernel-source':       ['wl'],
+    # Hyper-V
+    'hyperv-daemons':            ['hv_vmbus', 'hv_storvsc', 'hv_netvsc', 'hv_utils', 'hv_balloon'],
+}
+
+
+def _remove_module_entries(modules: set):
+    """Remove entries for the given module names from /etc/modules and /etc/modules-load.d/."""
+    if not modules:
+        return
+
+    def _clean_file(path):
+        try:
+            with open(path) as f:
+                lines = f.readlines()
+            cleaned = [l for l in lines if l.strip().lstrip('#') not in modules]
+            if len(cleaned) == len(lines):
+                return
+            remaining = [l for l in cleaned if l.strip() and not l.strip().startswith('#')]
+            if not remaining:
+                os.remove(path)
+            else:
+                with open(path, 'w') as f:
+                    f.writelines(cleaned)
+        except Exception:
+            pass
+
+    if os.path.isfile('/etc/modules'):
+        _clean_file('/etc/modules')
+
+    modules_load_dir = '/etc/modules-load.d'
+    if os.path.isdir(modules_load_dir):
+        for fname in os.listdir(modules_load_dir):
+            _clean_file(os.path.join(modules_load_dir, fname))
+
+
+def _cleanup_module_references(packages: list[str]):
+    """Resolve package names to module names and clean their references."""
+    modules = set()
+    for pkg in packages:
+        modules.update(PKG_MODULES.get(pkg, []))
+    _remove_module_entries(modules)
 
 
 def do_vacuum_journal(params):
@@ -291,6 +360,84 @@ def do_remove_firmware(params):
     return {'success': len(errors) == 0, 'error': ' | '.join(errors) if errors else None}
 
 
+def _clean_module_refs_action(params):
+    refs    = params.get('refs', [])
+    errors  = []
+
+    module_refs   = [r for r in refs if r.get('type') in ('modules-load', 'modprobe')]
+    systemd_refs  = [r for r in refs if r.get('type') == 'systemd']
+    autostart_refs = [r for r in refs if r.get('type') == 'autostart']
+
+    # Clean module load files
+    modules = {r['module'] for r in module_refs}
+    _remove_module_entries(modules)
+
+    # Remove orphaned modprobe.d files entirely if they only reference uninstalled modules
+    modprobe_paths = {r['path'] for r in refs if r.get('type') == 'modprobe'}
+    for path in modprobe_paths:
+        try:
+            os.remove(path)
+        except Exception as e:
+            errors.append(str(e))
+
+    # Disable and remove orphaned systemd services
+    for ref in systemd_refs:
+        svc  = ref['module']
+        path = ref['path']
+        subprocess.run(['systemctl', 'disable', '--now', svc],
+                       capture_output=True, text=True)
+        try:
+            os.remove(path)
+        except Exception as e:
+            errors.append(str(e))
+    if systemd_refs:
+        subprocess.run(['systemctl', 'daemon-reload'], capture_output=True, text=True)
+
+    # Remove orphaned X11/XDG autostart files
+    for ref in autostart_refs:
+        try:
+            os.remove(ref['path'])
+        except Exception as e:
+            errors.append(str(e))
+
+    result = subprocess.run(['dracut', '-f'], capture_output=True, text=True)
+    if result.returncode != 0:
+        errors.append(result.stderr.strip())
+
+    return {'success': len(errors) == 0, 'stderr': ' | '.join(errors)}
+
+
+def do_remove_dkms_orphans(params):
+    """Remove orphaned DKMS module trees and rebuild initramfs."""
+    orphans = params.get('orphans', [])
+    errors  = []
+
+    for orphan in orphans:
+        name     = orphan.get('name', '')
+        version  = orphan.get('version', '')
+        dkms_dir = orphan.get('dkms_dir', '')
+
+        # Try dkms remove first; fall back to direct deletion
+        result = subprocess.run(
+            ['dkms', 'remove', f'{name}/{version}', '--all'],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0 and dkms_dir and os.path.isdir(dkms_dir):
+            try:
+                import shutil
+                shutil.rmtree(dkms_dir)
+            except Exception as e:
+                errors.append(str(e))
+
+    # Rebuild module dependencies and initramfs
+    subprocess.run(['depmod', '-a'], capture_output=True, text=True)
+    result = subprocess.run(['dracut', '-f'], capture_output=True, text=True)
+    if result.returncode != 0:
+        errors.append(result.stderr.strip())
+
+    return {'success': len(errors) == 0, 'stderr': ' | '.join(errors)}
+
+
 def do_delete_orphan_dirs(params):
     """Remove orphaned kernel dirs (/usr/src/linux-headers-*, /lib/modules/*)."""
     paths  = params.get('paths', [])
@@ -316,7 +463,9 @@ HANDLERS = {
     'delete_locales':     do_delete_locales,
     'delete_docs':        do_delete_docs,
     'remove_firmware':    do_remove_firmware,
-    'delete_orphan_dirs': do_delete_orphan_dirs,
+    'delete_orphan_dirs':   do_delete_orphan_dirs,
+    'remove_dkms_orphans':  do_remove_dkms_orphans,
+    'clean_module_refs':    lambda p: _clean_module_refs_action(p),
 }
 
 
