@@ -444,14 +444,55 @@ def get_orphan_dkms_modules() -> list[dict]:
             if not has_ko:
                 continue
 
-            # Try common package name patterns
-            candidates = [
+            # Primary check: DKMS source directory must exist for this exact version.
+            # /usr/src/<module>-<version>/ is created when the dkms source package
+            # is installed and removed when it is uninstalled.  If it is absent,
+            # this compiled version has no owning package — it is an orphan even if
+            # another version of the same module is currently installed
+            # (e.g. old nvidia 580.126.20 lingering after upgrade to 580.159.04).
+            src_dir = f'/usr/src/{module_name}-{version}'
+            if os.path.isdir(src_dir):
+                continue  # source present, DKMS owns this version
+
+            # Fallback: check installed package version matches the DKMS version.
+            # Covers packaging styles where source lives outside /usr/src/<mod>-<ver>/.
+            # Known DKMS directory name → package name mappings
+            # (covers cases where dkms dir name != package name)
+            DKMS_MODULE_PACKAGES = {
+                'nvidia':            ['nvidia-kernel-dkms', 'nvidia-dkms', 'nvidia-driver'],
+                'vboxguest':         ['virtualbox-guest-dkms'],
+                'vboxhost':          ['virtualbox', 'virtualbox-dkms'],
+                'broadcom-sta':      ['broadcom-sta-dkms'],
+                'wl':                ['broadcom-sta-dkms', 'bcmwl-kernel-source'],
+                'v4l2loopback':      ['v4l2loopback-dkms'],
+                'zfs':               ['zfs-dkms'],
+                'spl':               ['spl-dkms'],
+                'bbswitch':          ['bbswitch-dkms'],
+                'tp-smapi':          ['tp-smapi-dkms'],
+            }
+            candidates = DKMS_MODULE_PACKAGES.get(module_name, [
                 f'{module_name}-dkms',
                 module_name,
                 f'linux-{module_name}',
-            ]
-            if any(is_package_installed(pkg) for pkg in candidates):
-                continue  # package still installed, not orphaned
+            ])
+            pkg_version_matches = False
+            for cand in candidates:
+                if not is_package_installed(cand):
+                    continue
+                try:
+                    pkg_ver = subprocess.check_output(
+                        ['dpkg-query', '-W', '-f=${Version}', cand],
+                        text=True, timeout=5
+                    ).strip()
+                    # DKMS version (e.g. 580.159.04) must appear in the dpkg version string
+                    if version in pkg_ver:
+                        pkg_version_matches = True
+                        break
+                except Exception:
+                    pkg_version_matches = True  # cannot verify, assume valid
+                    break
+            if pkg_version_matches:
+                continue  # installed package version matches this DKMS version
 
             size_kb = 0
             try:

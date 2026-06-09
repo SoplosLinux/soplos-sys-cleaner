@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.2--3-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2--4-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,10 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.2-4 (09/06/2026)
+- Fixed: DKMS orphan detector was showing the active NVIDIA driver (and other installed DKMS drivers) as orphaned — caused by a mismatch between the DKMS directory name (`nvidia`) and the actual package name (`nvidia-kernel-dkms`). Added an explicit name map for all known cases.
+- Fixed: DKMS orphan detector was not detecting old compiled versions left after a driver upgrade (e.g. nvidia 580.126.20 lingering after upgrade to 580.159.04). Now checks for `/usr/src/<module>-<version>/` presence and compares the installed package version to the DKMS directory version.
 
 ### v1.0.2-3 (04/06/2026)
 - Added: orphaned DKMS module detection in the Drivers tab — compiled `.ko` files in `/var/lib/dkms/` with no installed source package, removed via `dkms remove` + `dracut -f`.

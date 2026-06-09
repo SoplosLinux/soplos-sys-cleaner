@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-4] - 2026-06-09
+
+### 🐛 Fixed
+- **DKMS orphan detector — active driver shown as orphan (NVIDIA false positive)**: The DKMS directory for NVIDIA is named `nvidia`, but the code tried package names `nvidia-dkms`, `nvidia` and `linux-nvidia`. None of those exist — the real package is `nvidia-kernel-dkms`. Added `DKMS_MODULE_PACKAGES` mapping covering NVIDIA, VirtualBox guest (`vboxguest` → `virtualbox-guest-dkms`), Broadcom (`broadcom-sta`, `wl` → `broadcom-sta-dkms` / `bcmwl-kernel-source`), ZFS, v4l2loopback, bbswitch and other known mismatches between DKMS directory name and package name.
+- **DKMS orphan detector — old compiled versions not detected after upgrade**: When a driver is upgraded (e.g. NVIDIA 580.126.20 → 580.159.04), the old compiled modules in `/var/lib/dkms/nvidia/580.126.20/<kver>/` were not flagged as orphans because the new `nvidia-kernel-dkms` package was found installed. The detector now first checks for the DKMS source directory `/usr/src/<module>-<version>/` — its absence is the definitive sign that this specific version has no owning package. A version-string comparison against the installed package version is used as fallback for packages that place sources elsewhere.
+
+---
+
 ## [1.0.2-3] - 2026-06-04
 
 ### ✨ Added
