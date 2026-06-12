@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-5] - 2026-06-12
+
+### 🐛 Fixed
+- **Firmware removal was not permanent — files restored on every `apt upgrade`**: `do_remove_firmware` was deleting files from `/lib/firmware/` directly without touching the APT packages that own them (`firmware-realtek`, `firmware-amd-graphics`, `firmware-iwlwifi`, etc.). Any subsequent `apt full-upgrade` restored the deleted files because the packages were still registered as installed. The action now runs `apt purge` for the owning package when all its firmware directories are being removed, covering: `firmware-amd-graphics` (amdgpu, radeon), `firmware-intel-graphics` (i915), `firmware-intel-sound` (intel), `firmware-iwlwifi` (iwlwifi), `firmware-realtek` (rtlwifi, rtw88, rtw89, rtl_bt, rtl8761b–rtl8852c, rtl_nic), `firmware-brcm80211` (brcm), `firmware-atheros` (ath10k, ath11k, ath12k, qca), `firmware-mediatek` (mediatek, mt76), `firmware-libertas` (libertas, mwl8k, mwifiex), `firmware-nvidia-graphics` (nvidia). Generic bundles (`firmware-linux-nonfree`, `firmware-misc-nonfree`) are not purged as they contain firmware for many unrelated hardware families; their directories are deleted directly as before.
+
+---
+
 ## [1.0.2-4] - 2026-06-09
 
 ### 🐛 Fixed

@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.2--4-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2--5-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,9 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.2-5 (12/06/2026)
+- Fixed: firmware removal is now permanent — the action purges the owning APT package (`firmware-realtek`, `firmware-amd-graphics`, `firmware-iwlwifi`, etc.) instead of only deleting files from `/lib/firmware/`. Previously, `apt full-upgrade` restored all removed firmware on every system update because the packages were still installed.
 
 ### v1.0.2-4 (09/06/2026)
 - Fixed: DKMS orphan detector was showing the active NVIDIA driver (and other installed DKMS drivers) as orphaned — caused by a mismatch between the DKMS directory name (`nvidia`) and the actual package name (`nvidia-kernel-dkms`). Added an explicit name map for all known cases.

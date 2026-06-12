@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Soplos Sys Cleaner 1.0.2-4
+Soplos Sys Cleaner 1.0.2-5
 System cleaning tool for Soplos Linux distributions.
 """
 

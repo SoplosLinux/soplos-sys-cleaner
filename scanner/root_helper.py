@@ -347,13 +347,136 @@ def do_delete_docs(params):
 def do_remove_firmware(params):
     families = params.get('families', [])
     errors   = []
+
+    # Map of firmware directory names → owning APT package.
+    # Packages marked 'generic' (firmware-linux-nonfree, firmware-misc-nonfree)
+    # bundle many unrelated hardware families and cannot be safely purged;
+    # their files are deleted directly instead.
+    FIRMWARE_PACKAGES = {
+        # AMD GPU
+        'amdgpu':   'firmware-amd-graphics',
+        'radeon':   'firmware-amd-graphics',
+        # Intel GPU
+        'i915':     'firmware-intel-graphics',
+        # Intel WiFi
+        'iwlwifi':  'firmware-iwlwifi',
+        # Intel sound / DSP (separate package)
+        'intel':    'firmware-intel-sound',
+        # Realtek WiFi / Bluetooth
+        'rtlwifi':  'firmware-realtek',
+        'rtw88':    'firmware-realtek',
+        'rtw89':    'firmware-realtek',
+        'rtl_bt':   'firmware-realtek',
+        'rtl8761b': 'firmware-realtek',
+        'rtl8821c': 'firmware-realtek',
+        'rtl8822c': 'firmware-realtek',
+        'rtl8852a': 'firmware-realtek',
+        'rtl8852b': 'firmware-realtek',
+        'rtl8852c': 'firmware-realtek',
+        'rtl_nic':  'firmware-realtek',
+        # Broadcom WiFi / Bluetooth
+        'brcm':     'firmware-brcm80211',
+        # Qualcomm / Atheros WiFi
+        'ath10k':   'firmware-atheros',
+        'ath11k':   'firmware-atheros',
+        'ath12k':   'firmware-atheros',
+        'qca':      'firmware-atheros',
+        # MediaTek WiFi
+        'mediatek': 'firmware-mediatek',
+        'mt76':     'firmware-mediatek',
+        # Marvell WiFi / network
+        'libertas': 'firmware-libertas',
+        'mwl8k':    'firmware-libertas',
+        'mwifiex':  'firmware-libertas',
+        # NVIDIA GPU
+        'nvidia':   'firmware-nvidia-graphics',
+    }
+
+    # Packages that bundle many unrelated hardware families — purging them
+    # would remove firmware for hardware the user may have.  Delete dirs only.
+    GENERIC_PACKAGES = {
+        'firmware-linux-nonfree',
+        'firmware-misc-nonfree',
+        'firmware-linux',
+        'firmware-linux-free',
+    }
+
+    def _is_installed(pkg):
+        try:
+            r = subprocess.run(
+                ['dpkg-query', '-W', '-f=${Status}', pkg],
+                capture_output=True, text=True, timeout=5
+            )
+            return 'install ok installed' in r.stdout
+        except Exception:
+            return False
+
+    # Group selected families by owning package
+    pkg_families: dict[str, list[str]] = {}   # pkg → [family, ...]
+    unpackaged:   list[str]            = []   # no known package or generic
+
     for family in families:
+        pkg = FIRMWARE_PACKAGES.get(family)
+        if pkg and pkg not in GENERIC_PACKAGES:
+            pkg_families.setdefault(pkg, []).append(family)
+        else:
+            unpackaged.append(family)
+
+    # For each package, check if ALL dirs it owns are being removed.
+    # If yes → apt purge (clean and permanent).
+    # If only partial → fall back to file deletion so we don't remove dirs
+    # the user did not select.
+    PACKAGE_ALL_DIRS: dict[str, set[str]] = {}
+    for family, pkg in FIRMWARE_PACKAGES.items():
+        PACKAGE_ALL_DIRS.setdefault(pkg, set()).add(family)
+
+    purged_pkgs: list[str] = []
+    for pkg, selected in pkg_families.items():
+        if not _is_installed(pkg):
+            # Package not installed — delete dirs directly (manually installed files)
+            for family in selected:
+                path = f'/lib/firmware/{family}'
+                try:
+                    if os.path.isdir(path):
+                        shutil.rmtree(path)
+                except Exception as e:
+                    errors.append(str(e))
+            continue
+
+        all_dirs = PACKAGE_ALL_DIRS.get(pkg, set())
+        # Only dirs that actually exist on disk matter for this check
+        existing_dirs = {d for d in all_dirs if os.path.isdir(f'/lib/firmware/{d}')}
+        removing_dirs = set(selected)
+
+        if existing_dirs and existing_dirs.issubset(removing_dirs):
+            # All existing dirs for this package are being removed → purge
+            result = subprocess.run(
+                ['apt', 'purge', '-y', pkg],
+                capture_output=True, text=True
+            )
+            if result.returncode != 0:
+                errors.append(f'apt purge {pkg}: {result.stderr.strip()}')
+            else:
+                purged_pkgs.append(pkg)
+        else:
+            # Partial removal → delete dirs directly
+            for family in selected:
+                path = f'/lib/firmware/{family}'
+                try:
+                    if os.path.isdir(path):
+                        shutil.rmtree(path)
+                except Exception as e:
+                    errors.append(str(e))
+
+    # Delete dirs with no known dedicated package
+    for family in unpackaged:
         path = f'/lib/firmware/{family}'
         try:
             if os.path.isdir(path):
                 shutil.rmtree(path)
         except Exception as e:
             errors.append(str(e))
+
     result = subprocess.run(['dracut', '-f'], capture_output=True, text=True)
     if result.returncode != 0:
         errors.append(result.stderr.strip())
