@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-6] - 2026-06-14
+
+### 🐛 Fixed
+- **SPICE guest tools shown as removable in KVM/QEMU VMs (virt-manager)**: `VM_GUEST_PACKAGES` has separate entries for `kvm` and `qemu`, both containing `spice-vdagent` and `spice-webdavd`. When `systemd-detect-virt` returns `kvm`, only the `kvm` entry was protected — the `qemu` entry caused the same packages to appear as removable. Added alias logic so that detecting `kvm` also protects `qemu` packages and vice versa.
+
+---
+
 ## [1.0.2-5] - 2026-06-12
 
 ### 🐛 Fixed

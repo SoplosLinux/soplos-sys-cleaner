@@ -371,8 +371,13 @@ def get_unnecessary_hardware_packages(
         'kvm': 'KVM/QEMU', 'qemu': 'KVM/QEMU',
         'microsoft': 'Hyper-V', 'xen': 'Xen',
     }
+    # kvm and qemu are aliases — both use SPICE guest tools.
+    # Protect both entries when either is detected.
+    VM_GUEST_ALIASES = {'kvm': {'qemu'}, 'qemu': {'kvm'}}
+    protected_guest_types = {vm_guest_type} | VM_GUEST_ALIASES.get(vm_guest_type, set())
+
     for guest_type, packages in VM_GUEST_PACKAGES.items():
-        if guest_type == vm_guest_type:
+        if guest_type in protected_guest_types:
             continue
         label = vm_vendor_labels.get(guest_type, guest_type.upper())
         for pkg in packages:
