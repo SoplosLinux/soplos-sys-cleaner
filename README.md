@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.2--6-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2--7-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,10 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.2-7 (24/06/2026)
+- Fixed: VirtualBox (and other hypervisor) guest service files shown as orphans when running inside VM. `get_orphan_module_refs()` now receives `vm_guest_type` to protect all files belonging to the current guest platform (oracle, vmware, microsoft, kvm/qemu).
+- Fixed: Duplicate entries for `98vboxadd-xclient` appearing twice in the orphaned list. Added deduplication by path so each file is reported at most once.
 
 ### v1.0.2-6 (14/06/2026)
 - Fixed: `spice-vdagent` and `spice-webdavd` were shown as removable when running in a KVM/QEMU VM (virt-manager) — caused by duplicate `kvm`/`qemu` entries in `VM_GUEST_PACKAGES` with identical package lists. Detecting `kvm` now also protects `qemu` packages and vice versa.

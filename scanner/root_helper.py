@@ -122,7 +122,9 @@ def do_scan(params):
         results['apt_cache']          = get_apt_cache_info()
         results['apt_cache_debs']     = get_apt_cache_debs()
         results['autoremove_pkgs']    = get_autoremove_packages()
-        results['orphan_module_refs'] = get_orphan_module_refs()
+        results['orphan_module_refs'] = get_orphan_module_refs(
+            vm_guest_type=results.get('vm_guest_type', 'none')
+        )
     except Exception:
         results['apt_cache']          = {}
         results['autoremove_pkgs']    = []

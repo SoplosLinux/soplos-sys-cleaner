@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-7] - 2026-06-24
+
+### 🐛 Fixed
+- **VirtualBox (and other hypervisor) guest service files shown as orphans when running inside VM**: `get_orphan_module_refs()` was unaware of the current hypervisor guest type. When Boro/Tyron runs inside VirtualBox with Guest Additions installed from the ISO (not via apt), files like `vboxadd.service`, `98vboxadd-xclient` and `vboxclient.desktop` existed on disk without a matching dpkg package, so they were incorrectly reported as orphaned. The function now accepts `vm_guest_type` (from `systemd-detect-virt`) and protects all files belonging to the current guest platform: VirtualBox (`oracle`), VMware (`vmware`), Hyper-V (`microsoft`), KVM/QEMU (`kvm`/`qemu`).
+- **Duplicate entries for `98vboxadd-xclient`**: The file `/etc/X11/Xsession.d/98vboxadd-xclient` was listed in both `virtualbox-guest-x11` and `virtualbox-guest-utils` entries of `PKG_AUTOSTART`, causing it to appear twice in the orphans list. Added `seen_paths` deduplication so each file path is reported at most once.
+
+---
+
 ## [1.0.2-6] - 2026-06-14
 
 ### 🐛 Fixed

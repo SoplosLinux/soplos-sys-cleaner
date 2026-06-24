@@ -53,7 +53,7 @@ def get_apt_cache_debs() -> list[dict]:
     return sorted(debs, key=lambda d: d['size_bytes'], reverse=True)
 
 
-def get_orphan_module_refs() -> list[dict]:
+def get_orphan_module_refs(vm_guest_type: str = 'none') -> list[dict]:
     """
     Finds leftover references to kernel modules / services from packages
     that are no longer installed. Checks:
@@ -62,7 +62,37 @@ def get_orphan_module_refs() -> list[dict]:
       - /etc/modprobe.d/
       - systemd unit files for known VM guest services
     Returns list of {'module', 'source', 'path', 'type'}
+
+    vm_guest_type: result of systemd-detect-virt — files belonging to the
+    current guest platform are never flagged as orphans, even when the apt
+    package is absent (Guest Additions installed from the hypervisor ISO).
     """
+    # Packages that belong to each hypervisor guest platform.
+    # All packages for the current guest type are protected.
+    GUEST_PLATFORM_PKGS: dict[str, list[str]] = {
+        'oracle': [
+            'virtualbox-guest-utils', 'virtualbox-guest-dkms',
+            'virtualbox-guest-x11',
+        ],
+        'vmware': [
+            'open-vm-tools', 'open-vm-tools-desktop',
+        ],
+        'microsoft': [
+            'hyperv-daemons',
+        ],
+        'kvm': [
+            'spice-vdagent', 'spice-webdavd',
+        ],
+        'qemu': [
+            'spice-vdagent', 'spice-webdavd',
+        ],
+    }
+    # kvm and qemu are aliases
+    VM_GUEST_ALIASES: dict[str, str] = {'kvm': 'qemu', 'qemu': 'kvm'}
+    protected_pkgs: set[str] = set()
+    for gtype in (vm_guest_type, VM_GUEST_ALIASES.get(vm_guest_type, '')):
+        protected_pkgs.update(GUEST_PLATFORM_PKGS.get(gtype, []))
+
     MODULE_PACKAGES = {
         # VirtualBox
         'vboxguest':    'virtualbox-guest-dkms',
@@ -172,6 +202,12 @@ def get_orphan_module_refs() -> list[dict]:
             return True
 
     orphans = []
+    seen_paths: set[str] = set()
+
+    def _add(entry: dict):
+        if entry['path'] not in seen_paths:
+            seen_paths.add(entry['path'])
+            orphans.append(entry)
 
     # --- /etc/modules and /etc/modules-load.d/ ---
     def _scan_modload_file(path):
@@ -181,8 +217,9 @@ def get_orphan_module_refs() -> list[dict]:
                     mod = line.strip().lstrip('#').strip()
                     if not mod or mod.startswith('#'):
                         continue
-                    if mod in MODULE_PACKAGES and not _is_installed(MODULE_PACKAGES[mod]):
-                        orphans.append({
+                    pkg = MODULE_PACKAGES.get(mod)
+                    if pkg and pkg not in protected_pkgs and not _is_installed(pkg):
+                        _add({
                             'module': mod, 'source': os.path.basename(path),
                             'path': path, 'type': 'modules-load',
                         })
@@ -203,8 +240,10 @@ def get_orphan_module_refs() -> list[dict]:
                 with open(fpath) as f:
                     content = f.read()
                 for mod, pkg in MODULE_PACKAGES.items():
+                    if pkg in protected_pkgs:
+                        continue
                     if mod in content and not _is_installed(pkg):
-                        orphans.append({
+                        _add({
                             'module': mod, 'source': fname,
                             'path': fpath, 'type': 'modprobe',
                         })
@@ -214,24 +253,24 @@ def get_orphan_module_refs() -> list[dict]:
 
     # --- Orphaned systemd service files ---
     for pkg, services in PKG_SERVICES.items():
-        if _is_installed(pkg):
+        if pkg in protected_pkgs or _is_installed(pkg):
             continue
         for svc in services:
             for sdir in SYSTEMD_DIRS:
                 svc_path = os.path.join(sdir, svc)
                 if os.path.exists(svc_path):
-                    orphans.append({
+                    _add({
                         'module': svc, 'source': svc,
                         'path': svc_path, 'type': 'systemd',
                     })
 
     # --- Orphaned X11/XDG autostart files ---
     for pkg, paths in PKG_AUTOSTART.items():
-        if _is_installed(pkg):
+        if pkg in protected_pkgs or _is_installed(pkg):
             continue
         for path in paths:
             if os.path.exists(path):
-                orphans.append({
+                _add({
                     'module': os.path.basename(path),
                     'source': os.path.basename(path),
                     'path': path, 'type': 'autostart',
