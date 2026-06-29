@@ -83,7 +83,7 @@ def get_installed_kernels() -> list[KernelInfo]:
 
         result.append(KernelInfo(
             version=version,
-            is_active=(version in current),
+            is_active=(version == current),
             has_headers=has_headers,
             has_src=has_src,
             has_kbuild=has_kbuild,
@@ -270,7 +270,7 @@ def _find_unmatched_modules_dirs(installed_versions: set[str]) -> list[str]:
     for entry in os.scandir(modules_base):
         if not entry.is_dir():
             continue
-        if entry.name in current:
+        if entry.name == current:
             continue  # never touch the running kernel's modules
         if not _is_installed(f'linux-image-{entry.name}'):
             orphans.append(entry.path)

@@ -198,10 +198,13 @@ class DriversTab(Gtk.Box):
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
 
         def on_dkms_done(result):
+            if not result.get('success', False):
+                on_done(result)
+                return
             # After DKMS cleanup, purge APT packages if any
             if apt_pkgs:
                 self.parent.run_root_action(
-                    {'action': 'apt_purge', 'packages': apt_pkgs, 'rebuild_initrd': False},
+                    {'action': 'apt_purge', 'packages': apt_pkgs, 'rebuild_initrd': True},
                     on_done
                 )
             else:

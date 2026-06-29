@@ -718,9 +718,17 @@ class MainWindow(Gtk.ApplicationWindow):
             logger.error(f"Error deserializing Locales/Docs: {e}")
 
         # Expose hardware summary for the Drivers tab label
+        _vm_labels = {
+            'oracle': 'VirtualBox (guest)', 'vmware': 'VMware (guest)',
+            'kvm': 'KVM (guest)', 'qemu': 'QEMU (guest)',
+            'microsoft': 'Hyper-V (guest)', 'xen': 'Xen (guest)',
+            'parallels': 'Parallels (guest)',
+        }
+        _vm = results.get('vm_guest_type', 'none')
         results['hardware_summary'] = (
             results.get('gpu_vendors_named', []) +
-            (['KVM'] if results.get('kvm_present') else [])
+            (['KVM host'] if results.get('kvm_present') else []) +
+            ([_vm_labels[_vm]] if _vm in _vm_labels else [])
         )
 
         self._scan_results.update(results)

@@ -258,9 +258,6 @@ class CacheTab(Gtk.Box):
             return
 
         btn.set_sensitive(False)
-        mod_refs = getattr(self, '_orphan_module_refs', [])
-        if mod_refs:
-            self.parent.run_root_action({'action': 'clean_module_refs', 'refs': mod_refs}, lambda r: None)
         self.parent.set_ui_state(_("Removing orphaned packages..."), pulse=True)
 
         def on_done(result):
@@ -272,4 +269,12 @@ class CacheTab(Gtk.Box):
                 GLib.timeout_add_seconds(1, lambda: self.parent.start_root_scan())
             GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
 
-        self.parent.run_root_action({'action': 'apt_autoremove'}, on_done)
+        def _run_autoremove():
+            self.parent.run_root_action({'action': 'apt_autoremove'}, on_done)
+
+        mod_refs = getattr(self, '_orphan_module_refs', [])
+        if mod_refs:
+            self.parent.run_root_action({'action': 'clean_module_refs', 'refs': mod_refs},
+                                        lambda r: _run_autoremove())
+        else:
+            _run_autoremove()

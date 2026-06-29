@@ -12,6 +12,101 @@ from core.i18n_manager import _
 from utils.constants import fmt_size as _fmt_size
 
 
+# Preferred hwmon driver names, in order.
+# k10temp (AMD Ryzen Tctl) and coretemp (Intel) give real readings.
+# acpitz is often a stub that returns 20°C on many boards — last resort.
+_HWMON_PRIORITY = ('k10temp', 'coretemp', 'nct6775', 'it87', 'acpitz')
+
+
+def _read_cpu_temp() -> str:
+    """
+    Returns a formatted temperature string (e.g. '65.3°C') or '--'.
+
+    Priority:
+      1. /sys/class/hwmon/*/name — iterate in _HWMON_PRIORITY order;
+         within each hwmon read the first temp*_input whose label contains
+         'Tctl', 'Package', 'Core 0', or just the lowest-numbered input.
+      2. /sys/class/thermal/thermal_zone*/temp — skip zones whose 'type'
+         is 'acpitz' unless no other zone exists.
+    """
+    hwmon_base = '/sys/class/hwmon'
+    if os.path.isdir(hwmon_base):
+        hwmons: dict[str, list[str]] = {}
+        for entry in os.scandir(hwmon_base):
+            name_file = os.path.join(entry.path, 'name')
+            try:
+                with open(name_file) as f:
+                    name = f.read().strip()
+            except Exception:
+                continue
+            hwmons.setdefault(name, []).append(entry.path)
+
+        for driver in _HWMON_PRIORITY:
+            for hwmon_path in hwmons.get(driver, []):
+                t = _hwmon_read_temp(hwmon_path)
+                if t is not None:
+                    return f"{t:.1f}°C"
+
+    # Fallback: thermal_zone, skip acpitz unless nothing else
+    tz_base = '/sys/class/thermal'
+    if os.path.isdir(tz_base):
+        acpitz_vals = []
+        for entry in os.scandir(tz_base):
+            if not entry.name.startswith('thermal_zone'):
+                continue
+            type_file = os.path.join(entry.path, 'type')
+            temp_file = os.path.join(entry.path, 'temp')
+            try:
+                with open(type_file) as f:
+                    tz_type = f.read().strip()
+                with open(temp_file) as f:
+                    val = int(f.read().strip()) / 1000.0
+                if tz_type == 'acpitz':
+                    acpitz_vals.append(val)
+                else:
+                    return f"{val:.1f}°C"
+            except Exception:
+                continue
+        if acpitz_vals:
+            return f"{acpitz_vals[0]:.1f}°C"
+
+    return "--"
+
+
+def _hwmon_read_temp(hwmon_path: str) -> float | None:
+    """Read the best available temperature from a hwmon directory."""
+    inputs = {}
+    try:
+        for fname in os.listdir(hwmon_path):
+            if fname.startswith('temp') and fname.endswith('_input'):
+                idx = fname[4:-6]
+                try:
+                    with open(os.path.join(hwmon_path, fname)) as f:
+                        val = int(f.read().strip()) / 1000.0
+                    inputs[idx] = val
+                except Exception:
+                    continue
+    except Exception:
+        return None
+
+    if not inputs:
+        return None
+
+    # Prefer labeled inputs: Tctl (AMD), Package id 0 / Core 0 (Intel)
+    for idx in sorted(inputs):
+        label_file = os.path.join(hwmon_path, f'temp{idx}_label')
+        try:
+            with open(label_file) as f:
+                label = f.read().strip().lower()
+            if any(k in label for k in ('tctl', 'package', 'core 0')):
+                return inputs[idx]
+        except Exception:
+            pass
+
+    # No labeled match — return lowest-indexed input
+    return inputs[sorted(inputs)[0]]
+
+
 class OverviewTab(Gtk.Box):
 
     def __init__(self, parent_window):
@@ -101,13 +196,7 @@ class OverviewTab(Gtk.Box):
             disk_usage = (disk_used / disk_total) * 100.0
 
             temp = "--"
-            if os.path.exists('/sys/class/thermal/thermal_zone0/temp'):
-                try:
-                    with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
-                        t = int(f.read().strip()) / 1000.0
-                    temp = f"{t:.1f}°C"
-                except Exception:
-                    pass
+            temp = _read_cpu_temp()
 
             cpu_text = f"CPU: <b>{cpu_usage:.1f}%</b>   RAM: <b>{ram_usage:.1f}%</b>"
             disk_text = f"DISK: <b>{disk_usage:.1f}%</b>   TEMP: <b>{temp}</b>"

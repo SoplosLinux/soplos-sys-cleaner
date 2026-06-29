@@ -1,5 +1,5 @@
 """Core module for Soplos Sys Cleaner."""
-__version__ = '1.0.2-7'
+__version__ = '1.0.2-8'
 
 from .application import run_application, create_application
 from .i18n_manager import _, initialize_i18n

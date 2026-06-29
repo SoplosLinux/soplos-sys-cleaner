@@ -29,10 +29,10 @@ def _get_dir_size_kb(path: str) -> int:
     if not os.path.isdir(path):
         return 0
     try:
-        # du -sk returns size in blocks (1K blocks)
-        res = subprocess.run(['du', '-sk', path], capture_output=True, text=True, check=True)
-        size_str = res.stdout.split()[0]
-        return int(size_str)
+        res = subprocess.run(['du', '-sk', path], capture_output=True, text=True)
+        if res.stdout.strip():
+            return int(res.stdout.split()[0])
+        return 0
     except Exception:
         return 0
 

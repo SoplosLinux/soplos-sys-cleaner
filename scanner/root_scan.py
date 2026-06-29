@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Root scan script: runs as root via pkexec, outputs JSON to stdout.
-Covers everything that requires elevated privileges.
+DEPRECATED — use scanner/root_helper.py instead.
+This script is no longer used and will be removed in a future release.
 """
 
 import sys

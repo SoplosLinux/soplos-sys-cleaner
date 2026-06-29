@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.2--7-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.2--8-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,19 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.2-8 (29/06/2026)
+- Fixed: kernel active detection used substring match — old kernel could be marked as active and protected from removal.
+- Fixed: `_clean_file` in `root_helper` mishandled commented module lines — orphaned comments not removed, valid comments incorrectly deleted.
+- Fixed: `clean_module_refs` and `apt_autoremove` dispatched concurrently to `root_helper`, causing JSON protocol corruption on the stdin/stdout pipe.
+- Fixed: hardware detection label included non-GPU PCI vendors (e.g. virtio devices on KVM hosts shown as QEMU/KVM GPU).
+- Fixed: VM guest type (VirtualBox, VMware, Hyper-V etc.) was never shown in the Detected hardware label.
+- Fixed: locale sizes reported as 0 KB when `du` returned exit code 1 on partial read errors — locales disappeared from the cleanup list.
+- Fixed: DKMS orphan scanner only checked the running kernel — compiled modules for other installed kernels were never detected.
+- Fixed: `apt_purge` was dispatched after a failed DKMS cleanup step, leaving the system with purged packages but an outdated initrd. Also fixed: `rebuild_initrd` is now `True` when APT packages follow a successful DKMS step.
+- Fixed: module name detection in `modprobe.d` used plain substring — `wl` matched inside `brcmwl`, potentially deleting valid config files. Now uses word-boundary regex.
+- Fixed: service/autostart files flagged as orphaned when a co-owning package was still installed — `vboxadd.service` appeared as orphan when `virtualbox-guest-utils` was removed but `virtualbox-guest-dkms` was still present, causing DKMS to keep compiling `vboxguest`.
+- Fixed: CPU temperature always showed 20°C on boards where `thermal_zone0` maps to `acpitz` (a stub driver). The overview panel now searches `/sys/class/hwmon/` prioritizing `k10temp` (AMD Tctl), then `coretemp` (Intel Package/Core 0), then other common drivers, falling back to `acpitz`/`thermal_zone` only as a last resort.
 
 ### v1.0.2-7 (24/06/2026)
 - Fixed: VirtualBox (and other hypervisor) guest service files shown as orphans when running inside VM. `get_orphan_module_refs()` now receives `vm_guest_type` to protect all files belonging to the current guest platform (oracle, vmware, microsoft, kvm/qemu).

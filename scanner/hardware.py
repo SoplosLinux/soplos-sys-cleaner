@@ -211,7 +211,7 @@ def get_all_hardware() -> dict:
     pci_vendors       = _scan_pci()
     gpu_pci_vendors   = _scan_gpu_pci_vendors()
     usb_vendors       = _scan_usb()
-    gpu_vendors_named = _detect_gpu_names(pci_vendors)
+    gpu_vendors_named = _detect_gpu_names(gpu_pci_vendors)
     active_fw_files   = _scan_active_firmware()
     kvm_present       = _detect_kvm()
     vm_guest_type     = _detect_vm_guest()
@@ -404,11 +404,12 @@ def get_unnecessary_hardware_packages(
 
 def get_orphan_dkms_modules() -> list[dict]:
     """
-    Finds DKMS modules compiled for the running kernel whose source package
+    Finds DKMS modules compiled for any installed kernel whose source package
     is no longer installed.
 
     Scans /var/lib/dkms/<module>/<version>/<kver>/ for compiled .ko files,
     then checks whether the corresponding *-dkms package is still installed.
+    Covers all kernel versions present in /var/lib/dkms/, not just the running one.
 
     Returns list of dicts: {'name', 'version', 'kernel', 'dkms_dir', 'size_kb'}
     """
@@ -416,13 +417,9 @@ def get_orphan_dkms_modules() -> list[dict]:
     if not os.path.isdir(dkms_base):
         return []
 
-    try:
-        kver = subprocess.check_output(['uname', '-r'], text=True, timeout=5).strip()
-    except Exception:
-        return []
-
     from scanner.packages import is_package_installed
 
+    seen: set[tuple] = set()
     orphans = []
 
     for module_name in os.listdir(dkms_base):
@@ -435,19 +432,30 @@ def get_orphan_dkms_modules() -> list[dict]:
             if not os.path.isdir(version_dir):
                 continue
 
-            # Only consider modules compiled for the running kernel
-            kernel_build_dir = os.path.join(version_dir, kver)
-            if not os.path.isdir(kernel_build_dir):
-                continue
+            # Iterate all kernel subdirs under this version (not just the running one)
+            for kver_entry in os.scandir(version_dir):
+                if not kver_entry.is_dir():
+                    continue
+                kver = kver_entry.name
+                # Skip DKMS internal subdirs (source/, build/, etc.)
+                if not re.match(r'^\d+\.\d+', kver):
+                    continue
+                # Deduplicate: if the module+version is already reported for
+                # another kernel, the source-check result is the same — skip.
+                key = (module_name, version)
+                if key in seen:
+                    continue
 
-            # Check if there are actual compiled .ko files
-            has_ko = any(
-                f.endswith(('.ko', '.ko.xz', '.ko.zst'))
-                for _, _, files in os.walk(kernel_build_dir)
-                for f in files
-            )
-            if not has_ko:
-                continue
+                kernel_build_dir = kver_entry.path
+
+                # Check if there are actual compiled .ko files
+                has_ko = any(
+                    f.endswith(('.ko', '.ko.xz', '.ko.zst'))
+                    for _, _, files in os.walk(kernel_build_dir)
+                    for f in files
+                )
+                if not has_ko:
+                    continue
 
             # Primary check: DKMS source directory must exist for this exact version.
             # /usr/src/<module>-<version>/ is created when the dkms source package
@@ -499,6 +507,7 @@ def get_orphan_dkms_modules() -> list[dict]:
             if pkg_version_matches:
                 continue  # installed package version matches this DKMS version
 
+            seen.add(key)
             size_kb = 0
             try:
                 res = subprocess.run(

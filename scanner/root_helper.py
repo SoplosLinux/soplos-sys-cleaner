@@ -258,7 +258,7 @@ def _remove_module_entries(modules: set):
         try:
             with open(path) as f:
                 lines = f.readlines()
-            cleaned = [l for l in lines if l.strip().lstrip('#') not in modules]
+            cleaned = [l for l in lines if l.strip().lstrip('#').strip() not in modules]
             if len(cleaned) == len(lines):
                 return
             remaining = [l for l in cleaned if l.strip() and not l.strip().startswith('#')]

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-8] - 2026-06-29
+
+### 🐛 Fixed
+- **Kernel false-positive active detection (`kernels.py`)**: `version in current` used substring matching — `6.1.0-2-amd64` was a substring of `6.1.0-27-amd64`, so an old kernel could be marked as active and protected from removal. Changed to exact equality (`==`) in both `get_installed_kernels` and `_find_unmatched_modules_dirs`.
+- **`_clean_file` mishandled commented module entries (`root_helper.py`)**: `l.strip().lstrip('#')` left a leading space on `# vboxguest` → `' vboxguest'` which didn't match the module name, so orphaned comment lines were never removed. Conversely, `#vboxguest` (no space) matched and was deleted. Fixed with `.strip().lstrip('#').strip()`.
+- **Race condition in APT Cache orphan cleanup (`cache_tab.py`)**: `clean_module_refs` (which runs `dracut -f`) and `apt_autoremove` were dispatched to the root_helper concurrently — two threads writing/reading the same stdin/stdout pipe could corrupt the JSON protocol. `apt_autoremove` is now chained in the callback of `clean_module_refs`.
+- **"Detected hardware" label included non-GPU PCI vendors (`hardware.py`)**: `_detect_gpu_names()` received all PCI vendor IDs; on a KVM host, virtio devices (vendor `1af4`) were present in lspci and the label incorrectly showed "QEMU/KVM". Fixed by passing `gpu_pci_vendors` (class 03xx devices only).
+- **VM guest type missing from "Detected hardware" label (`main_window.py`)**: `hardware_summary` only listed GPU vendor names and KVM host status. Running inside VirtualBox, VMware, Hyper-V etc. was never shown. Added human-readable guest VM labels for all supported hypervisors.
+- **Locale sizes reported as 0 KB when `du` has partial read errors (`locales.py`)**: `check=True` caused `CalledProcessError` when `du` returned exit code 1 (common in `/usr/share/locale` due to restricted subdirs), discarding the partial stdout result. Removed `check=True`; stdout is now used regardless of return code.
+- **DKMS orphan scanner only checked the running kernel (`hardware.py`)**: `/var/lib/dkms/<mod>/<ver>/<kver>/` was only scanned for the currently booted kernel. Compiled modules for other installed kernels (not currently active) were never detected. Scanner now iterates all kernel-version subdirs (matched by `^\d+\.\d+`) under each DKMS version directory.
+- **`apt_purge` triggered after failed DKMS cleanup (`drivers_tab.py`)**: `on_dkms_done` did not check the result of the DKMS removal step — even if `dracut -f` failed, `apt_purge` was dispatched next with `rebuild_initrd: False`, leaving the system with purged packages but an outdated initrd. Now aborts on DKMS step failure. Also corrected: when DKMS step succeeds and APT packages follow, `rebuild_initrd` is now `True` so dracut runs after the purge.
+- **Substring match for module names in modprobe.d files (`cache.py`)**: `if mod in content` was a plain substring search — module `'wl'` matched inside `'brcmwl'`, potentially flagging valid config files as orphaned and deleting them. Replaced with `re.search(r'\b<mod>\b', content)` for word-boundary matching.
+- **Service/autostart files flagged as orphans when a co-owning package is still installed (`cache.py`)**: `vboxadd.service` is listed under both `virtualbox-guest-utils` and `virtualbox-guest-dkms`. When only `virtualbox-guest-utils` was autoremoved, the service was shown as orphaned even though `virtualbox-guest-dkms` (still installed) legitimately owns it. The user cleaned the file but DKMS kept compiling `vboxguest`. Added reverse-map check: a file is only flagged as orphaned when ALL packages that list it are uninstalled.
+- **`root_scan.py` referenced non-existent fields (`root_scan.py`)**: This script was superseded by `root_helper.py` but still referenced `k.packages` (removed from `KernelInfo`) and lacked calls to `get_orphan_module_refs`, `get_firmware_sizes` and other newer scanners. Marked as deprecated — `root_helper.py` is the active entry point.
+- **CPU temperature always showed 20°C on some boards (`overview_tab.py`)**: The overview panel read `/sys/class/thermal/thermal_zone0/temp` directly, which on many AMD/Ryzen boards (and the Zyren) maps to `acpitz` — a stub driver that always returns 20°C. Replaced with a prioritized hwmon reader: searches `/sys/class/hwmon/*/name` for `k10temp` (AMD Tctl) first, then `coretemp` (Intel Package/Core 0), then other common drivers, and only falls back to `acpitz`/`thermal_zone` as a last resort. Within each hwmon, labeled inputs (Tctl, Package, Core 0) are preferred over lowest-indexed.
+
+---
+
 ## [1.0.2-7] - 2026-06-24
 
 ### 🐛 Fixed

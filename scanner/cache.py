@@ -3,6 +3,7 @@ APT cache scanner: measures cache size and orphaned packages.
 """
 
 import os
+import re
 import subprocess
 
 
@@ -242,7 +243,7 @@ def get_orphan_module_refs(vm_guest_type: str = 'none') -> list[dict]:
                 for mod, pkg in MODULE_PACKAGES.items():
                     if pkg in protected_pkgs:
                         continue
-                    if mod in content and not _is_installed(pkg):
+                    if re.search(rf'\b{re.escape(mod)}\b', content) and not _is_installed(pkg):
                         _add({
                             'module': mod, 'source': fname,
                             'path': fpath, 'type': 'modprobe',
@@ -251,11 +252,26 @@ def get_orphan_module_refs(vm_guest_type: str = 'none') -> list[dict]:
             except Exception:
                 pass
 
+    # Reverse maps: file → all packages that own it.
+    # A file is only orphaned when ALL owning packages are uninstalled.
+    svc_to_pkgs: dict[str, list[str]] = {}
+    for _pkg, _svcs in PKG_SERVICES.items():
+        for _s in _svcs:
+            svc_to_pkgs.setdefault(_s, []).append(_pkg)
+
+    path_to_pkgs: dict[str, list[str]] = {}
+    for _pkg, _paths in PKG_AUTOSTART.items():
+        for _p in _paths:
+            path_to_pkgs.setdefault(_p, []).append(_pkg)
+
     # --- Orphaned systemd service files ---
     for pkg, services in PKG_SERVICES.items():
         if pkg in protected_pkgs or _is_installed(pkg):
             continue
         for svc in services:
+            other_owners = [p for p in svc_to_pkgs.get(svc, []) if p != pkg and _is_installed(p)]
+            if other_owners:
+                continue
             for sdir in SYSTEMD_DIRS:
                 svc_path = os.path.join(sdir, svc)
                 if os.path.exists(svc_path):
@@ -269,6 +285,9 @@ def get_orphan_module_refs(vm_guest_type: str = 'none') -> list[dict]:
         if pkg in protected_pkgs or _is_installed(pkg):
             continue
         for path in paths:
+            other_owners = [p for p in path_to_pkgs.get(path, []) if p != pkg and _is_installed(p)]
+            if other_owners:
+                continue
             if os.path.exists(path):
                 _add({
                     'module': os.path.basename(path),
