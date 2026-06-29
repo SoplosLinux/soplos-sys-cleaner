@@ -432,82 +432,66 @@ def get_orphan_dkms_modules() -> list[dict]:
             if not os.path.isdir(version_dir):
                 continue
 
-            # Iterate all kernel subdirs under this version (not just the running one)
-            for kver_entry in os.scandir(version_dir):
-                if not kver_entry.is_dir():
-                    continue
-                kver = kver_entry.name
-                # Skip DKMS internal subdirs (source/, build/, etc.)
-                if not re.match(r'^\d+\.\d+', kver):
-                    continue
-                # Deduplicate: if the module+version is already reported for
-                # another kernel, the source-check result is the same — skip.
-                key = (module_name, version)
-                if key in seen:
-                    continue
-
-                kernel_build_dir = kver_entry.path
-
-                # Check if there are actual compiled .ko files
-                has_ko = any(
-                    f.endswith(('.ko', '.ko.xz', '.ko.zst'))
-                    for _, _, files in os.walk(kernel_build_dir)
-                    for f in files
-                )
-                if not has_ko:
-                    continue
-
-            # Primary check: DKMS source directory must exist for this exact version.
-            # /usr/src/<module>-<version>/ is created when the dkms source package
-            # is installed and removed when it is uninstalled.  If it is absent,
-            # this compiled version has no owning package — it is an orphan even if
-            # another version of the same module is currently installed
-            # (e.g. old nvidia 580.126.20 lingering after upgrade to 580.159.04).
+            # 1. Primary check: DKMS source directory must exist for this exact version.
+            is_legitimate = False
             src_dir = f'/usr/src/{module_name}-{version}'
             if os.path.isdir(src_dir):
-                continue  # source present, DKMS owns this version
-
-            # Fallback: check installed package version matches the DKMS version.
-            # Covers packaging styles where source lives outside /usr/src/<mod>-<ver>/.
-            # Known DKMS directory name → package name mappings
-            # (covers cases where dkms dir name != package name)
-            DKMS_MODULE_PACKAGES = {
-                'nvidia':            ['nvidia-kernel-dkms', 'nvidia-dkms', 'nvidia-driver'],
-                'vboxguest':         ['virtualbox-guest-dkms'],
-                'vboxhost':          ['virtualbox', 'virtualbox-dkms'],
-                'broadcom-sta':      ['broadcom-sta-dkms'],
-                'wl':                ['broadcom-sta-dkms', 'bcmwl-kernel-source'],
-                'v4l2loopback':      ['v4l2loopback-dkms'],
-                'zfs':               ['zfs-dkms'],
-                'spl':               ['spl-dkms'],
-                'bbswitch':          ['bbswitch-dkms'],
-                'tp-smapi':          ['tp-smapi-dkms'],
-            }
-            candidates = DKMS_MODULE_PACKAGES.get(module_name, [
-                f'{module_name}-dkms',
-                module_name,
-                f'linux-{module_name}',
-            ])
-            pkg_version_matches = False
-            for cand in candidates:
-                if not is_package_installed(cand):
-                    continue
-                try:
-                    pkg_ver = subprocess.check_output(
-                        ['dpkg-query', '-W', '-f=${Version}', cand],
-                        text=True, timeout=5
-                    ).strip()
-                    # DKMS version (e.g. 580.159.04) must appear in the dpkg version string
-                    if version in pkg_ver:
+                is_legitimate = True
+            else:
+                # 2. Fallback: check if an owning package is installed.
+                DKMS_MODULE_PACKAGES = {
+                    'nvidia':            ['nvidia-kernel-dkms', 'nvidia-dkms', 'nvidia-driver'],
+                    'vboxguest':         ['virtualbox-guest-dkms'],
+                    'vboxhost':          ['virtualbox', 'virtualbox-dkms'],
+                    'broadcom-sta':      ['broadcom-sta-dkms'],
+                    'wl':                ['broadcom-sta-dkms', 'bcmwl-kernel-source'],
+                    'v4l2loopback':      ['v4l2loopback-dkms'],
+                    'zfs':               ['zfs-dkms'],
+                    'spl':               ['spl-dkms'],
+                    'bbswitch':          ['bbswitch-dkms'],
+                    'tp-smapi':          ['tp-smapi-dkms'],
+                }
+                candidates = DKMS_MODULE_PACKAGES.get(module_name, [
+                    f'{module_name}-dkms',
+                    module_name,
+                    f'linux-{module_name}',
+                ])
+                
+                pkg_installed = False
+                pkg_version_matches = False
+                for cand in candidates:
+                    if not is_package_installed(cand):
+                        continue
+                    pkg_installed = True
+                    try:
+                        pkg_ver = subprocess.check_output(
+                            ['dpkg-query', '-W', '-f=${Version}', cand],
+                            text=True, timeout=5
+                        ).strip()
+                        if version in pkg_ver:
+                            pkg_version_matches = True
+                            break
+                    except Exception:
                         pkg_version_matches = True
                         break
-                except Exception:
-                    pkg_version_matches = True  # cannot verify, assume valid
-                    break
-            if pkg_version_matches:
-                continue  # installed package version matches this DKMS version
+                
+                if pkg_version_matches:
+                    is_legitimate = True
+                elif pkg_installed:
+                    # 3. Soplos specific fallback: if the package is installed but the version string
+                    # mismatches (because Soplos Kernel Installer renames the DKMS version to the kernel name),
+                    # protect it if it looks like a Soplos kernel or corresponds to a currently installed kernel.
+                    if version.startswith('kernel-') or os.path.isdir(f'/lib/modules/{version}'):
+                        is_legitimate = True
 
-            seen.add(key)
+            if is_legitimate:
+                continue
+
+            # If we reach here, it's an orphan. Find all compiled kernels for it.
+            key = (module_name, version)
+            if key in seen:
+                continue
+                
             size_kb = 0
             try:
                 res = subprocess.run(
@@ -518,13 +502,30 @@ def get_orphan_dkms_modules() -> list[dict]:
             except Exception:
                 pass
 
-            orphans.append({
-                'name': module_name,
-                'version': version,
-                'kernel': kver,
-                'dkms_dir': version_dir,
-                'size_kb': size_kb,
-            })
+            # Iterate all kernel subdirs under this version to find those with compiled .ko files
+            for kver_entry in os.scandir(version_dir):
+                if not kver_entry.is_dir():
+                    continue
+                kver = kver_entry.name
+                # Skip DKMS internal subdirs (source/, build/, etc.)
+                if not re.match(r'^\d+\.\d+', kver):
+                    continue
+                
+                kernel_build_dir = kver_entry.path
+                has_ko = any(
+                    f.endswith(('.ko', '.ko.xz', '.ko.zst'))
+                    for _, _, files in os.walk(kernel_build_dir)
+                    for f in files
+                )
+                if has_ko:
+                    seen.add(key)
+                    orphans.append({
+                        'name': module_name,
+                        'version': version,
+                        'kernel': kver,
+                        'dkms_dir': version_dir,
+                        'size_kb': size_kb,
+                    })
 
     return orphans
 

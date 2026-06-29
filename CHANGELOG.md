@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.2-9] - 2026-06-29
+
+### 🐛 Fixed
+- **DKMS orphan false positives (Soplos kernel)**: Fixed indentation logic bug in `get_orphan_dkms_modules` and added specific protections for Soplos kernels (like `bore-ntsync`). If a package like `v4l2loopback-dkms` or `nvidia-driver` is installed, its compiled modules will no longer be marked for deletion even if the version string is injected with `kernel-` prefix.
+
+---
+
 ## [1.0.2-8] - 2026-06-29
 
 ### 🐛 Fixed
