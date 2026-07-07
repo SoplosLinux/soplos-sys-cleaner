@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.2--9-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.3-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,9 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.3 (07/07/2026)
+- Build dependency `python3-all` replaced with `python3`.
 
 ### v1.0.2-9 (29/06/2026)
 - **DKMS orphan false positives**: Fixed logic bug and protected active Soplos kernel DKMS modules from deletion.

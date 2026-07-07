@@ -3,12 +3,12 @@ Section: utils
 Priority: optional
 Maintainer: Sergi Perich <info@soploslinux.com>
 Build-Depends: debhelper-compat (= 13),
-               python3-all,
+               python3,
                dh-python,
                python3-setuptools
 
 Package: soplos-sys-cleaner
-Version: 1.0.2-9
+Version: 1.0.3
 Architecture: all
 Depends: ${python3:Depends},
          ${misc:Depends},
