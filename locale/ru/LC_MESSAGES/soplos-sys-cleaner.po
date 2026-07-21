@@ -441,6 +441,15 @@ msgstr "Удаление прошивок и восстановление initra
 msgid "Firmware removed and initramfs regenerated."
 msgstr "Прошивка удалена и initramfs восстановлен."
 
+#: ui/tabs/firmware_tab.py:148
+msgid ""
+"Temporary: part of the {} package — will reappear on its next "
+"update. Frees space now, but is not a permanent removal."
+msgstr ""
+"Временно: является частью пакета {} — появится снова при следующем "
+"обновлении. Освобождает место сейчас, но не является постоянным "
+"удалением."
+
 #: ui/tabs/temp_tab.py:35
 msgid "Keep files from the last:"
 msgstr "Хранить файлы за последние:"

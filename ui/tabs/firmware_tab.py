@@ -95,6 +95,7 @@ class FirmwareTab(Gtk.Box):
         families = results.get('firmware_families', [])
         is_protected = results.get('is_firmware_protected', lambda x: False)
         sizes = results.get('firmware_sizes', {})
+        owning_pkg = results.get('firmware_owning_pkg', {})
 
         self.count_label.set_text(
             _("{} firmware families detected").format(len(families))
@@ -135,6 +136,19 @@ class FirmwareTab(Gtk.Box):
                 lock_icon = Gtk.Image.new_from_icon_name('changes-prevent', Gtk.IconSize.MENU)
                 lock_icon.set_tooltip_text(_("Protected: hardware present in this system"))
                 row_box.pack_end(lock_icon, False, False, 0)
+            else:
+                pkg = owning_pkg.get(family)
+                if pkg:
+                    # Bundled inside a big generic firmware package (e.g.
+                    # firmware-linux-nonfree) — dpkg will re-extract this
+                    # directory the next time that package updates, so the
+                    # removal only reclaims space now, it is not permanent.
+                    temp_icon = Gtk.Image.new_from_icon_name('dialog-warning', Gtk.IconSize.MENU)
+                    temp_icon.set_tooltip_text(
+                        _("Temporary: part of the {} package — will reappear on its next "
+                          "update. Frees space now, but is not a permanent removal.").format(pkg)
+                    )
+                    row_box.pack_end(temp_icon, False, False, 0)
 
             size_label = Gtk.Label(label=_fmt_size(size_kb * 1024))
             size_label.get_style_context().add_class('dim-label')

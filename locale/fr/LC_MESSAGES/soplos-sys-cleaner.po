@@ -443,6 +443,15 @@ msgstr "Suppression des firmwares et régénération de l'initramfs..."
 msgid "Firmware removed and initramfs regenerated."
 msgstr "Firmware supprimé et initramfs régénéré."
 
+#: ui/tabs/firmware_tab.py:148
+msgid ""
+"Temporary: part of the {} package — will reappear on its next "
+"update. Frees space now, but is not a permanent removal."
+msgstr ""
+"Temporaire : fait partie du paquet {} — réapparaîtra lors de sa "
+"prochaine mise à jour. Libère de l'espace maintenant, mais ce n'est "
+"pas une suppression permanente."
+
 #: ui/tabs/temp_tab.py:35
 msgid "Keep files from the last:"
 msgstr "Conserver les fichiers des derniers :"

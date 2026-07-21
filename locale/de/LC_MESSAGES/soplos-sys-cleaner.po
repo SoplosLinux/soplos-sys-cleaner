@@ -442,6 +442,15 @@ msgstr "Firmware wird entfernt und initramfs wird neu generiert..."
 msgid "Firmware removed and initramfs regenerated."
 msgstr "Firmware entfernt und initramfs neu generiert."
 
+#: ui/tabs/firmware_tab.py:148
+msgid ""
+"Temporary: part of the {} package — will reappear on its next "
+"update. Frees space now, but is not a permanent removal."
+msgstr ""
+"Vorübergehend: Teil des Pakets {} — erscheint beim nächsten Update "
+"erneut. Gibt jetzt Speicherplatz frei, ist aber keine dauerhafte "
+"Entfernung."
+
 #: ui/tabs/temp_tab.py:35
 msgid "Keep files from the last:"
 msgstr "Dateien der letzten behalten:"

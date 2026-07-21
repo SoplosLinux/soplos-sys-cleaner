@@ -68,58 +68,19 @@ def get_orphan_module_refs(vm_guest_type: str = 'none') -> list[dict]:
     current guest platform are never flagged as orphans, even when the apt
     package is absent (Guest Additions installed from the hypervisor ISO).
     """
-    # Packages that belong to each hypervisor guest platform.
-    # All packages for the current guest type are protected.
-    GUEST_PLATFORM_PKGS: dict[str, list[str]] = {
-        'oracle': [
-            'virtualbox-guest-utils', 'virtualbox-guest-dkms',
-            'virtualbox-guest-x11',
-        ],
-        'vmware': [
-            'open-vm-tools', 'open-vm-tools-desktop',
-        ],
-        'microsoft': [
-            'hyperv-daemons',
-        ],
-        'kvm': [
-            'spice-vdagent', 'spice-webdavd',
-        ],
-        'qemu': [
-            'spice-vdagent', 'spice-webdavd',
-        ],
-    }
+    # Packages that belong to each hypervisor guest platform, and the
+    # package -> module mapping below: both come from scanner/hardware.py,
+    # the single source of truth (this file and root_helper.py used to keep
+    # separate hand-written copies that drifted out of sync).
+    from scanner.hardware import VM_GUEST_PACKAGES, get_module_to_package_map
+    GUEST_PLATFORM_PKGS = VM_GUEST_PACKAGES
     # kvm and qemu are aliases
     VM_GUEST_ALIASES: dict[str, str] = {'kvm': 'qemu', 'qemu': 'kvm'}
     protected_pkgs: set[str] = set()
     for gtype in (vm_guest_type, VM_GUEST_ALIASES.get(vm_guest_type, '')):
         protected_pkgs.update(GUEST_PLATFORM_PKGS.get(gtype, []))
 
-    MODULE_PACKAGES = {
-        # VirtualBox
-        'vboxguest':    'virtualbox-guest-dkms',
-        'vboxsf':       'virtualbox-guest-dkms',
-        'vboxvideo':    'virtualbox-guest-dkms',
-        # VMware
-        'vmw_vmci':     'open-vm-tools',
-        'vmwgfx':       'open-vm-tools',
-        'vsock':        'open-vm-tools',
-        'vmw_balloon':  'open-vm-tools',
-        'vmxnet3':      'open-vm-tools',
-        'pvscsi':       'open-vm-tools',
-        # NVIDIA
-        'nvidia':           'nvidia-kernel-dkms',
-        'nvidia_drm':       'nvidia-kernel-dkms',
-        'nvidia_modeset':   'nvidia-kernel-dkms',
-        'nvidia_uvm':       'nvidia-kernel-dkms',
-        # Broadcom
-        'wl':           'broadcom-sta-dkms',
-        # Hyper-V
-        'hv_vmbus':     'hyperv-daemons',
-        'hv_storvsc':   'hyperv-daemons',
-        'hv_netvsc':    'hyperv-daemons',
-        'hv_utils':     'hyperv-daemons',
-        'hv_balloon':   'hyperv-daemons',
-    }
+    MODULE_PACKAGES = get_module_to_package_map()
 
     # Systemd services installed by each package
     PKG_SERVICES = {
@@ -294,6 +255,55 @@ def get_orphan_module_refs(vm_guest_type: str = 'none') -> list[dict]:
                     'source': os.path.basename(path),
                     'path': path, 'type': 'autostart',
                 })
+
+    # --- Orphaned /etc/dracut.conf.d/*.conf left behind by driver installers ---
+    # These are written with a plain `echo >` by the installer script (see
+    # Welcome's NVIDIA install scripts), never as a package conffile — dpkg
+    # never removes them when the driver is purged, so they survive forever
+    # unless checked explicitly here.
+    #
+    # NEVER treat soplos.conf / i18n.conf / local.conf as orphans: those are
+    # deliberate, versioned distro policy shipped by the os-update package
+    # (soplos.conf forces WiFi firmware into the initrd to prevent users
+    # losing network after reboot — a real, confirmed recurring bug, not a
+    # driver leftover). Excluded by filename, never by content inspection.
+    NEVER_TOUCH_DRACUT_CONFS = {'soplos.conf', 'i18n.conf', 'local.conf'}
+
+    dracut_dir = '/etc/dracut.conf.d'
+    if os.path.isdir(dracut_dir):
+        from scanner.hardware import PCI_VENDOR_PACKAGES
+        nvidia_pkgs = PCI_VENDOR_PACKAGES.get('10de', [])
+
+        for fname in os.listdir(dracut_dir):
+            if fname in NEVER_TOUCH_DRACUT_CONFS or not fname.endswith('.conf'):
+                continue
+            fpath = os.path.join(dracut_dir, fname)
+
+            # Known NVIDIA installer files: always created as a pair and only
+            # meaningful while an NVIDIA driver package is installed.
+            if fname in ('nvidia.conf', 'blacklist-nouveau.conf'):
+                if not any(_is_installed(p) for p in nvidia_pkgs):
+                    _add({'module': fname, 'source': fname, 'path': fpath, 'type': 'dracut'})
+                continue
+
+            # Generic fallback: match add_drivers/install_items module names
+            # against the same MODULE_PACKAGES map used above for
+            # modprobe.d/modules-load.d, in case another installer drops its
+            # own dracut conf in the future.
+            try:
+                with open(fpath) as f:
+                    content = f.read()
+            except Exception:
+                continue
+
+            referenced_pkgs = {
+                pkg for mod, pkg in MODULE_PACKAGES.items()
+                if re.search(rf'\b{re.escape(mod)}\b', content)
+            }
+            if referenced_pkgs and not any(
+                pkg in protected_pkgs or _is_installed(pkg) for pkg in referenced_pkgs
+            ):
+                _add({'module': fname, 'source': fname, 'path': fpath, 'type': 'dracut'})
 
     return orphans
 

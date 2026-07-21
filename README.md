@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.3-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.3--1-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,14 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.3-1 (21/07/2026)
+- Fixed: NVIDIA firmware deletion left the driver package fully installed if it wasn't the dedicated `firmware-*` package — now purges the full driver stack before touching files.
+- Fixed: `virt-viewer`/`virt-manager`/`libvirt-clients` false positive — these are remote clients (e.g. Proxmox), not tied to local KVM support, no longer flagged as unused.
+- Fixed: orphaned `/etc/dracut.conf.d/*.conf` from driver installers (`nvidia.conf`, `blacklist-nouveau.conf`) were never detected or cleaned. Now scanned and removed, with a hard exclusion for distro-policy files (`soplos.conf`, `i18n.conf`, `local.conf`).
+- Fixed: VirtualBox Guest Additions were never fully uninstalled — only leftover service/autostart files were removed. Now runs the official `uninstall.sh`/`rcvboxadd cleanup` first when present.
+- Added: firmware families without a dedicated package (bundled in `firmware-linux-nonfree`/`firmware-misc-nonfree`) are now marked "temporary" via real `dpkg -S` ownership lookup — removing them only reclaims space until the next package update.
+- Changed: unified the package↔kernel-module mapping across `hardware.py`, `cache.py` and `root_helper.py` into a single source of truth — the two files had already drifted out of sync.
 
 ### v1.0.3 (07/07/2026)
 - Build dependency `python3-all` replaced with `python3`.

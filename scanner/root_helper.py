@@ -44,6 +44,9 @@ def do_scan(params):
         results['firmware_families'] = families
         results['firmware_sizes']    = get_firmware_sizes(families)
 
+        from scanner.hardware import get_firmware_owning_packages
+        results['firmware_owning_pkg'] = get_firmware_owning_packages(families)
+
         protection_set = get_firmware_protection_set(hw)
         results['protection_set'] = list(protection_set)
 
@@ -229,24 +232,8 @@ def do_apt_purge(params):
     return {'success': result.returncode == 0, 'stderr': result.stderr.strip()}
 
 
-PKG_MODULES = {
-    # VirtualBox
-    'virtualbox-guest-dkms':     ['vboxguest', 'vboxsf', 'vboxvideo'],
-    'virtualbox-guest-utils':    ['vboxguest', 'vboxsf'],
-    'virtualbox-guest-x11':      ['vboxvideo'],
-    # VMware
-    'open-vm-tools':             ['vmw_vmci', 'vmwgfx', 'vsock', 'vmw_balloon', 'vmxnet3', 'pvscsi'],
-    'open-vm-tools-desktop':     ['vmwgfx'],
-    'xserver-xorg-video-vmware': ['vmwgfx'],
-    # NVIDIA
-    'nvidia-kernel-dkms':        ['nvidia', 'nvidia_drm', 'nvidia_modeset', 'nvidia_uvm'],
-    'nvidia-driver':             ['nvidia', 'nvidia_drm', 'nvidia_modeset', 'nvidia_uvm'],
-    # Broadcom
-    'broadcom-sta-dkms':         ['wl'],
-    'bcmwl-kernel-source':       ['wl'],
-    # Hyper-V
-    'hyperv-daemons':            ['hv_vmbus', 'hv_storvsc', 'hv_netvsc', 'hv_utils', 'hv_balloon'],
-}
+# Single source of truth for package -> kernel module(s): scanner/hardware.py
+from scanner.hardware import PKG_MODULES
 
 
 def _remove_module_entries(modules: set):
@@ -350,7 +337,9 @@ def do_remove_firmware(params):
     families = params.get('families', [])
     errors   = []
 
-    # Map of firmware directory names → owning APT package.
+    from scanner.hardware import PCI_VENDOR_FIRMWARE, PCI_VENDOR_PACKAGES
+
+    # Map of firmware directory names → owning "firmware-only" APT package.
     # Packages marked 'generic' (firmware-linux-nonfree, firmware-misc-nonfree)
     # bundle many unrelated hardware families and cannot be safely purged;
     # their files are deleted directly instead.
@@ -403,6 +392,35 @@ def do_remove_firmware(params):
         'firmware-linux-free',
     }
 
+    # Firmware family → full driver package stack (kernel modules, dkms, xorg
+    # driver...), on top of the firmware-only package above. Without this, a
+    # family like 'nvidia' could have its firmware directory deleted while
+    # firmware-nvidia-graphics is not installed (the driver was pulled in via
+    # the bigger nvidia-driver package instead) — files gone, driver still
+    # fully installed. Reuses hardware.py's vendor→package map so this stays
+    # in sync with the Drivers tab instead of duplicating package names here.
+    _family_vendor: dict[str, str] = {}
+    for vendor_id, fams in PCI_VENDOR_FIRMWARE.items():
+        for fam in fams:
+            _family_vendor[fam] = vendor_id
+    DRIVER_PACKAGES: dict[str, list[str]] = {
+        fam: PCI_VENDOR_PACKAGES[vid]
+        for fam, vid in _family_vendor.items()
+        if vid in PCI_VENDOR_PACKAGES
+    }
+
+    # Every package (firmware or driver) mapped to the full set of firmware
+    # families it is associated with, across the whole map — not just the
+    # families selected for removal — so we can tell whether purging it would
+    # also affect firmware the user did NOT select.
+    PACKAGE_ALL_FAMILIES: dict[str, set[str]] = {}
+    for fam, pkg in FIRMWARE_PACKAGES.items():
+        if pkg not in GENERIC_PACKAGES:
+            PACKAGE_ALL_FAMILIES.setdefault(pkg, set()).add(fam)
+    for fam, pkgs in DRIVER_PACKAGES.items():
+        for pkg in pkgs:
+            PACKAGE_ALL_FAMILIES.setdefault(pkg, set()).add(fam)
+
     def _is_installed(pkg):
         try:
             r = subprocess.run(
@@ -413,65 +431,35 @@ def do_remove_firmware(params):
         except Exception:
             return False
 
-    # Group selected families by owning package
-    pkg_families: dict[str, list[str]] = {}   # pkg → [family, ...]
-    unpackaged:   list[str]            = []   # no known package or generic
+    selected = set(families)
 
-    for family in families:
-        pkg = FIRMWARE_PACKAGES.get(family)
-        if pkg and pkg not in GENERIC_PACKAGES:
-            pkg_families.setdefault(pkg, []).append(family)
-        else:
-            unpackaged.append(family)
+    # Packages potentially touched by this removal: firmware-only + full
+    # driver stack for every selected family.
+    candidate_pkgs: set[str] = set()
+    for fam in selected:
+        fw_pkg = FIRMWARE_PACKAGES.get(fam)
+        if fw_pkg and fw_pkg not in GENERIC_PACKAGES:
+            candidate_pkgs.add(fw_pkg)
+        candidate_pkgs.update(DRIVER_PACKAGES.get(fam, []))
 
-    # For each package, check if ALL dirs it owns are being removed.
-    # If yes → apt purge (clean and permanent).
-    # If only partial → fall back to file deletion so we don't remove dirs
-    # the user did not select.
-    PACKAGE_ALL_DIRS: dict[str, set[str]] = {}
-    for family, pkg in FIRMWARE_PACKAGES.items():
-        PACKAGE_ALL_DIRS.setdefault(pkg, set()).add(family)
-
-    purged_pkgs: list[str] = []
-    for pkg, selected in pkg_families.items():
+    for pkg in candidate_pkgs:
         if not _is_installed(pkg):
-            # Package not installed — delete dirs directly (manually installed files)
-            for family in selected:
-                path = f'/lib/firmware/{family}'
-                try:
-                    if os.path.isdir(path):
-                        shutil.rmtree(path)
-                except Exception as e:
-                    errors.append(str(e))
             continue
-
-        all_dirs = PACKAGE_ALL_DIRS.get(pkg, set())
-        # Only dirs that actually exist on disk matter for this check
-        existing_dirs = {d for d in all_dirs if os.path.isdir(f'/lib/firmware/{d}')}
-        removing_dirs = set(selected)
-
-        if existing_dirs and existing_dirs.issubset(removing_dirs):
-            # All existing dirs for this package are being removed → purge
-            result = subprocess.run(
-                ['apt', 'purge', '-y', pkg],
-                capture_output=True, text=True
-            )
+        owned_families = PACKAGE_ALL_FAMILIES.get(pkg, set())
+        existing_owned = {f for f in owned_families if os.path.isdir(f'/lib/firmware/{f}')}
+        if existing_owned and existing_owned.issubset(selected):
+            # Every firmware family this package owns is being removed —
+            # safe to purge the whole package (firmware + driver together).
+            result = subprocess.run(['apt', 'purge', '-y', pkg], capture_output=True, text=True)
             if result.returncode != 0:
                 errors.append(f'apt purge {pkg}: {result.stderr.strip()}')
-            else:
-                purged_pkgs.append(pkg)
-        else:
-            # Partial removal → delete dirs directly
-            for family in selected:
-                path = f'/lib/firmware/{family}'
-                try:
-                    if os.path.isdir(path):
-                        shutil.rmtree(path)
-                except Exception as e:
-                    errors.append(str(e))
+        # else: this package also owns firmware for a family that was NOT
+        # selected — leave it installed, only the selected dirs get wiped below.
 
-    # Delete dirs with no known dedicated package
-    for family in unpackaged:
+    # Delete whatever remains on disk for every selected family: manually
+    # installed files with no owning package, and any package left installed
+    # above because it also serves an unselected family.
+    for family in selected:
         path = f'/lib/firmware/{family}'
         try:
             if os.path.isdir(path):
@@ -493,6 +481,37 @@ def _clean_module_refs_action(params):
     systemd_refs  = [r for r in refs if r.get('type') == 'systemd']
     autostart_refs = [r for r in refs if r.get('type') == 'autostart']
 
+    # VirtualBox Guest Additions installed via the official .run installer
+    # (VBoxLinuxAdditions.run) are never tracked by dpkg — there is no
+    # package to purge, so the generic per-file cleanup below can only ever
+    # remove the systemd unit and the X11 autostart script, leaving the
+    # kernel modules, DKMS entries and /opt/VBoxGuestAdditions-*/ payload
+    # fully installed. Run the official uninstaller first when present: it
+    # correctly tears down modules, DKMS, systemd units and X11 configs in
+    # one shot. Whatever it doesn't cover still falls through to the manual
+    # cleanup below (idempotent — os.remove is skipped if already gone).
+    VBOX_SYSTEMD_UNITS   = {'vboxadd.service', 'vboxadd-service.service', 'vbox-guest-utils.service'}
+    VBOX_AUTOSTART_NAMES = {'98vboxadd-xclient', 'vboxclient.desktop'}
+    is_vbox_ref = (
+        any(r.get('type') == 'systemd' and r.get('module') in VBOX_SYSTEMD_UNITS for r in refs) or
+        any(r.get('type') == 'autostart' and r.get('module') in VBOX_AUTOSTART_NAMES for r in refs)
+    )
+    if is_vbox_ref:
+        import glob
+        uninstaller = next(iter(sorted(
+            glob.glob('/opt/VBoxGuestAdditions-*/uninstall.sh'), reverse=True
+        )), None)
+        if uninstaller and os.access(uninstaller, os.X_OK):
+            result = subprocess.run([uninstaller], capture_output=True, text=True)
+            if result.returncode != 0:
+                errors.append(f'VBoxGuestAdditions uninstall.sh: {result.stderr.strip() or result.stdout.strip()}')
+        else:
+            rcvboxadd = shutil.which('rcvboxadd') or (
+                '/sbin/rcvboxadd' if os.path.exists('/sbin/rcvboxadd') else None
+            )
+            if rcvboxadd:
+                subprocess.run([rcvboxadd, 'cleanup'], capture_output=True, text=True)
+
     # Clean module load files
     modules = {r['module'] for r in module_refs}
     _remove_module_entries(modules)
@@ -501,27 +520,45 @@ def _clean_module_refs_action(params):
     modprobe_paths = {r['path'] for r in refs if r.get('type') == 'modprobe'}
     for path in modprobe_paths:
         try:
-            os.remove(path)
+            if os.path.exists(path):
+                os.remove(path)
         except Exception as e:
             errors.append(str(e))
 
-    # Disable and remove orphaned systemd services
+    # Disable and remove orphaned systemd services (no-op if the VBox
+    # uninstaller above already removed the unit)
     for ref in systemd_refs:
         svc  = ref['module']
         path = ref['path']
         subprocess.run(['systemctl', 'disable', '--now', svc],
                        capture_output=True, text=True)
         try:
-            os.remove(path)
+            if os.path.exists(path):
+                os.remove(path)
         except Exception as e:
             errors.append(str(e))
     if systemd_refs:
         subprocess.run(['systemctl', 'daemon-reload'], capture_output=True, text=True)
 
-    # Remove orphaned X11/XDG autostart files
+    # Remove orphaned X11/XDG autostart files (no-op if already removed above)
     for ref in autostart_refs:
         try:
-            os.remove(ref['path'])
+            if os.path.exists(ref['path']):
+                os.remove(ref['path'])
+        except Exception as e:
+            errors.append(str(e))
+
+    # Remove orphaned /etc/dracut.conf.d/*.conf left by driver installers.
+    # Hard safety net: never delete distro-policy confs, even if a future
+    # detection bug in cache.py ever flagged one of these by mistake.
+    NEVER_TOUCH_DRACUT_CONFS = {'soplos.conf', 'i18n.conf', 'local.conf'}
+    dracut_refs = [r for r in refs if r.get('type') == 'dracut']
+    for ref in dracut_refs:
+        path = ref['path']
+        if os.path.basename(path) in NEVER_TOUCH_DRACUT_CONFS:
+            continue
+        try:
+            os.remove(path)
         except Exception as e:
             errors.append(str(e))
 

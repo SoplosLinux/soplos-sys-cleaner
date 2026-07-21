@@ -177,11 +177,61 @@ VM_GUEST_PACKAGES: dict[str, list[str]] = {
     ],
 }
 
+# ---------------------------------------------------------------------------
+# Package → kernel module(s) it ships — single source of truth.
+# Used by cache.py (scanning /etc/modules, modules-load.d, modprobe.d for
+# references to modules whose owning package is no longer installed) and by
+# root_helper.py (cleaning those same references after a purge). Both used to
+# keep their own hand-written copy of this mapping (in opposite directions),
+# which drifted — cache.py's NVIDIA entry only listed 'nvidia-kernel-dkms'
+# while root_helper.py's also listed 'nvidia-driver' for the same modules.
+# ---------------------------------------------------------------------------
+PKG_MODULES: dict[str, list[str]] = {
+    # VirtualBox
+    'virtualbox-guest-dkms':     ['vboxguest', 'vboxsf', 'vboxvideo'],
+    'virtualbox-guest-utils':    ['vboxguest', 'vboxsf'],
+    'virtualbox-guest-x11':      ['vboxvideo'],
+    # VMware
+    'open-vm-tools':             ['vmw_vmci', 'vmwgfx', 'vsock', 'vmw_balloon', 'vmxnet3', 'pvscsi'],
+    'open-vm-tools-desktop':     ['vmwgfx'],
+    'xserver-xorg-video-vmware': ['vmwgfx'],
+    # NVIDIA
+    'nvidia-kernel-dkms':        ['nvidia', 'nvidia_drm', 'nvidia_modeset', 'nvidia_uvm'],
+    'nvidia-driver':             ['nvidia', 'nvidia_drm', 'nvidia_modeset', 'nvidia_uvm'],
+    # Broadcom
+    'broadcom-sta-dkms':         ['wl'],
+    'bcmwl-kernel-source':       ['wl'],
+    # Hyper-V
+    'hyperv-daemons':            ['hv_vmbus', 'hv_storvsc', 'hv_netvsc', 'hv_utils', 'hv_balloon'],
+}
+
+
+def get_module_to_package_map() -> dict[str, str]:
+    """
+    Inverse of PKG_MODULES: module name → owning package.
+    If more than one package claims the same module, the first one wins
+    (only NVIDIA does this today: nvidia-kernel-dkms and nvidia-driver
+    share the same module set).
+    """
+    result: dict[str, str] = {}
+    for pkg, modules in PKG_MODULES.items():
+        for mod in modules:
+            result.setdefault(mod, pkg)
+    return result
+
+
 # KVM is not a PCI vendor ID — detected separately via /dev/kvm + lsmod
+#
+# Only host-only packages belong here: they are useless unless THIS machine
+# itself is a KVM/QEMU hypervisor. virt-manager/virt-viewer/libvirt-clients
+# are deliberately excluded — they are remote-capable client tools that
+# connect to ANY libvirt/QEMU/SPICE host over the network (e.g. a Proxmox
+# server), completely independent of local KVM support. Flagging them here
+# produced a false positive: a user accessing their Proxmox host via
+# virt-viewer from a non-KVM (VMware guest) machine had it marked "unused".
 KVM_PACKAGES = [
     'qemu-system-x86', 'qemu-system-common', 'qemu-utils',
     'qemu-block-extra', 'libvirt-daemon', 'libvirt-daemon-system',
-    'libvirt-clients', 'virt-manager', 'virt-viewer',
     'bridge-utils', 'dnsmasq-base', 'ovmf', 'cpu-checker',
     'libguestfs-tools',
 ]
@@ -311,6 +361,50 @@ def get_firmware_sizes(families: list[str]) -> dict[str, int]:
     return sizes
 
 
+def get_firmware_owning_packages(families: list[str]) -> dict[str, str | None]:
+    """
+    Returns {family_name: owning_package_or_None} by asking dpkg directly,
+    instead of guessing from a hardcoded map.
+
+    A family owned by a package (almost always firmware-linux-nonfree or
+    firmware-misc-nonfree for the hundreds of small vendor dirs not covered
+    by PCI_VENDOR_PACKAGES/FIRMWARE_PACKAGES) will be re-extracted by dpkg
+    the next time that package is upgraded or reinstalled — deleting the
+    directory only reclaims space temporarily, it does NOT survive an
+    update. None means the directory is genuinely unowned (no package
+    tracks it) and deleting it is permanent.
+    """
+    owners: dict[str, str | None] = {}
+    for family in families:
+        path = f'/lib/firmware/{family}'
+        # On merged-usr systems /lib is itself a symlink to /usr/lib, but
+        # dpkg's database only records the resolved /usr/lib/... form —
+        # querying dpkg -S with the unresolved /lib/... path always misses,
+        # even for files dpkg genuinely owns. Resolve first.
+        real_path = os.path.realpath(path)
+        owner = None
+        try:
+            r = subprocess.run(['dpkg', '-S', real_path], capture_output=True, text=True, timeout=5)
+            if r.returncode == 0 and r.stdout.strip():
+                owner = r.stdout.split(':', 1)[0].strip()
+        except Exception:
+            pass
+        if owner is None:
+            # The directory entry itself may not be individually tracked —
+            # check one representative file inside it instead.
+            try:
+                with os.scandir(real_path) as it:
+                    first = next(iter(it), None)
+                if first is not None:
+                    r = subprocess.run(['dpkg', '-S', first.path], capture_output=True, text=True, timeout=5)
+                    if r.returncode == 0 and r.stdout.strip():
+                        owner = r.stdout.split(':', 1)[0].strip()
+            except Exception:
+                pass
+        owners[family] = owner
+    return owners
+
+
 def get_unnecessary_hardware_packages(
     pci_vendors: list[str],
     usb_vendors: list[str],
@@ -376,12 +470,18 @@ def get_unnecessary_hardware_packages(
     VM_GUEST_ALIASES = {'kvm': {'qemu'}, 'qemu': {'kvm'}}
     protected_guest_types = {vm_guest_type} | VM_GUEST_ALIASES.get(vm_guest_type, set())
 
+    # 'kvm' and 'qemu' list the same SPICE packages under separate keys — track
+    # names already added so a non-kvm/qemu guest doesn't get them twice.
+    seen_vm_pkgs: set[str] = set()
     for guest_type, packages in VM_GUEST_PACKAGES.items():
         if guest_type in protected_guest_types:
             continue
         label = vm_vendor_labels.get(guest_type, guest_type.upper())
         for pkg in packages:
+            if pkg in seen_vm_pkgs:
+                continue
             if is_package_installed(pkg):
+                seen_vm_pkgs.add(pkg)
                 results.append({
                     'name': pkg,
                     'description': get_package_description(pkg),

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.3-1] - 2026-07-21
+
+### 🐛 Fixed
+- **NVIDIA firmware deletion left the driver package fully installed (`root_helper.py`)**: `do_remove_firmware` only checked the dedicated `firmware-*` package before deciding whether to delete files directly; if the real driver stack (`nvidia-driver`, `nvidia-kernel-dkms`, etc.) was installed under a different package, its firmware got wiped while the driver stayed installed. Now checks the full driver package stack from `hardware.py` before purging.
+- **`virt-viewer`/`virt-manager`/`libvirt-clients` false positive in `KVM_PACKAGES`**: these are remote-capable client tools that connect to any libvirt/QEMU/SPICE host over the network, independent of local KVM support. A user accessing a remote Proxmox host via `virt-viewer` from a non-KVM machine had it flagged as "unused". Removed from the host-only package list.
+- **Orphaned `/etc/dracut.conf.d/*.conf` from driver installers never cleaned (`cache.py`, `root_helper.py`)**: files like `nvidia.conf`/`blacklist-nouveau.conf` are written directly (`echo >`) by driver install scripts, not as package conffiles, so `apt purge` never removes them. Added as a fifth orphan-reference source in `get_orphan_module_refs()`, with a hard exclusion list for distro-policy files (`soplos.conf`, `i18n.conf`, `local.conf`) that must never be touched.
+- **VirtualBox Guest Additions never fully uninstalled (`root_helper.py`)**: orphan cleanup only removed the leftover systemd service/autostart files, never the actual kernel modules/DKMS/`/opt/VBoxGuestAdditions-*` payload installed by the official `.run` installer (not tracked by dpkg). Now runs the official `uninstall.sh` (or `rcvboxadd cleanup`) first when present.
+
+### ✨ Added
+- **Firmware families without a dedicated package now marked "temporary" (`hardware.py`, `firmware_tab.py`)**: families bundled inside `firmware-linux-nonfree`/`firmware-misc-nonfree` (most small vendor dirs) are resolved via real `dpkg -S` ownership lookup (fixed for merged-usr `/lib` → `/usr/lib` symlink resolution) and shown with a warning icon: deleting them only reclaims space until the next package update, it is not permanent.
+
+### 🔧 Changed
+- **Unified package/module mapping across `hardware.py`, `cache.py`, `root_helper.py`**: `cache.py` and `root_helper.py` each kept a hand-written copy of "package ↔ kernel module" (in opposite directions), which had already drifted — `cache.py` only protected `nvidia-kernel-dkms` while `root_helper.py` also protected `nvidia-driver` for the same modules. Consolidated into a single `PKG_MODULES` dict in `hardware.py`, with `get_module_to_package_map()` deriving the inverse direction.
+
+---
+
 ## [1.0.3] - 2026-07-07
 
 ### 🔧 Changed
