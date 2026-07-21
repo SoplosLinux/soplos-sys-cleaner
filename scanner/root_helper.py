@@ -613,6 +613,74 @@ def do_delete_orphan_dirs(params):
     return {'success': len(errors) == 0, 'error': ' | '.join(errors) if errors else None}
 
 
+ROOT_DESKTOP_PATH = '/usr/share/applications/org.soplos.sys-cleaner-root.desktop'
+ROOT_DESKTOP_CONTENT = """[Desktop Entry]
+Name=Soplos Sys Cleaner (Administrator)
+Name[es]=Soplos Limpiador del Sistema (Administrador)
+Name[en]=Soplos Sys Cleaner (Administrator)
+Name[fr]=Nettoyeur du système Soplos (Administrateur)
+Name[de]=Soplos Systemreiniger (Administrator)
+Name[pt]=Soplos Limpador de Sistema (Administrador)
+Name[it]=Soplos Pulitore di Sistema (Amministratore)
+Name[ro]=Curățătorul sistemului Soplos (Administrator)
+Name[ru]=Свистки очистка системы (Администратор)
+Comment=System cleaner and optimizer for Soplos Linux, launched directly in Administrator mode
+Comment[es]=Limpiador y optimizador de sistema para Soplos Linux, iniciado directamente en modo Administrador
+Comment[en]=System cleaner and optimizer for Soplos Linux, launched directly in Administrator mode
+Comment[fr]=Nettoyeur et optimiseur de système pour Soplos Linux, lancé directement en mode Administrateur
+Comment[de]=Systemreiniger und Optimierer für Soplos Linux, direkt im Administratormodus gestartet
+Comment[pt]=Limpador e otimizador de sistema para Soplos Linux, iniciado diretamente em modo Administrador
+Comment[it]=Pulitore e ottimizzatore di sistema per Soplos Linux, avviato direttamente in modalità Amministratore
+Comment[ro]=Curățător și optimizator de sistem pentru Soplos Linux, pornit direct în modul Administrator
+Comment[ru]=Очистка и оптимизация системы для Soplos Linux, запуск сразу в режиме администратора
+Exec=soplos-sys-cleaner --root
+Icon=org.soplos.sys-cleaner
+Terminal=false
+Type=Application
+Categories=System;Settings;
+StartupNotify=true
+GenericName=System Cleaner (Administrator)
+GenericName[en]=System Cleaner (Administrator)
+GenericName[es]=Limpiador del Sistema (Administrador)
+GenericName[fr]=Nettoyeur du Système (Administrateur)
+GenericName[de]=Systemreiniger (Administrator)
+GenericName[pt]=Limpador de Sistema (Administrador)
+GenericName[it]=Pulitore di Sistema (Amministratore)
+GenericName[ro]=Curățător de Sistem (Administrator)
+GenericName[ru]=Очистка системы (Администратор)
+Keywords=clean;optimize;space;maintenance;cache;kernels;root;admin;
+Keywords[en]=clean;optimize;space;maintenance;cache;kernels;root;admin;
+Keywords[es]=limpiar;optimizar;espacio;mantenimiento;caché;núcleos;root;administrador;
+Keywords[fr]=nettoyer;optimiser;espace;maintenance;cache;noyaux;root;administrateur;
+Keywords[de]=reinigen;optimieren;speicherplatz;wartung;cache;kernel;root;administrator;
+Keywords[pt]=limpar;otimizar;espaço;manutenção;cache;núcleos;root;administrador;
+Keywords[it]=pulire;ottimizzare;spazio;manutenzione;cache;kernel;root;amministratore;
+Keywords[ro]=curăță;optimizează;spațiu;întreținere;cache;nuclee;root;administrator;
+Keywords[ru]=очистить;оптимизировать;место;обслуживание;кэш;ядра;root;администратор;
+"""
+
+
+def do_ensure_root_desktop(params):
+    """
+    Write the Administrator .desktop launcher to /usr/share/applications/ if
+    it isn't there yet. Runs inside the persistent root session that's
+    already established for "scan as administrator" — piggybacks the
+    existing pkexec authentication instead of prompting for a password
+    just to drop a launcher file. Idempotent: checks existence first, only
+    writes once ever (a user who deletes it afterwards is not overridden).
+    """
+    if os.path.exists(ROOT_DESKTOP_PATH):
+        return {'success': True, 'created': False}
+    try:
+        os.makedirs(os.path.dirname(ROOT_DESKTOP_PATH), exist_ok=True)
+        with open(ROOT_DESKTOP_PATH, 'w') as f:
+            f.write(ROOT_DESKTOP_CONTENT)
+        os.chmod(ROOT_DESKTOP_PATH, 0o644)
+        return {'success': True, 'created': True}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
+
+
 # ─── Dispatch ─────────────────────────────────────────────────────────────────
 
 HANDLERS = {
@@ -628,6 +696,7 @@ HANDLERS = {
     'delete_orphan_dirs':   do_delete_orphan_dirs,
     'remove_dkms_orphans':  do_remove_dkms_orphans,
     'clean_module_refs':    lambda p: _clean_module_refs_action(p),
+    'ensure_root_desktop':  do_ensure_root_desktop,
 }
 
 

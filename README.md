@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.3--1-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.3--2-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,11 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.3-2 (21/07/2026)
+- Added: `--root` launch flag and a new "Administrator" `.desktop` launcher that opens the app directly in Administrator mode via `pkexec`, propagating the GUI session environment. The launcher is created automatically in `/usr/share/applications/` the first time a root session is established, reusing that same authentication instead of prompting again.
+- Fixed: `spice-vdagent`/`spice-webdavd` appeared twice in the Drivers tab on non-KVM/QEMU guests (e.g. VMware) — `VM_GUEST_PACKAGES` lists the same packages under both the `kvm` and `qemu` keys with no deduplication, which also broke "Select all" for one of the two duplicate rows.
+- Fixed: Intel GPU firmware (`i915`) was locked as "required" in the Firmwares tab even without a real Intel GPU, when a VM (e.g. VMware on an AMD host) exposes an emulated Intel-vendor chipset/bridge device. Firmware protection now only locks `i915` when a genuine GPU-class Intel device is detected, matching the same distinction already used for Intel driver packages.
 
 ### v1.0.3-1 (21/07/2026)
 - Fixed: NVIDIA firmware deletion left the driver package fully installed if it wasn't the dedicated `firmware-*` package — now purges the full driver stack before touching files.

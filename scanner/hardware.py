@@ -295,8 +295,24 @@ def get_firmware_protection_set(hardware: dict) -> set[str]:
     protected.update(hardware.get('dracut_fw_dirs', set()))
 
     # Layer 1: PCI vendors
+    # Intel (8086) needs special handling: chipset/bridge/USB-controller
+    # devices commonly expose vendor 8086 in lspci even without a real Intel
+    # GPU (e.g. VMware emulates an Intel-vendor chipset regardless of the
+    # physical host's actual CPU vendor). Only protect the GPU-specific
+    # firmware (i915) when a genuine Intel GPU-class device is present;
+    # 'intel' (sound/misc) and 'iwlwifi' are not GPU-specific and keep the
+    # broader check. Mirrors the same distinction already used for Intel
+    # driver packages in get_unnecessary_hardware_packages().
+    gpu_only = set(hardware.get('gpu_pci_vendors', []))
     for vid in hardware.get('pci_vendors', []):
-        protected.update(PCI_VENDOR_FIRMWARE.get(vid, []))
+        families = PCI_VENDOR_FIRMWARE.get(vid, [])
+        if vid == '8086':
+            for fam in families:
+                if fam == 'i915' and '8086' not in gpu_only:
+                    continue
+                protected.add(fam)
+        else:
+            protected.update(families)
 
     # KVM
     if hardware.get('kvm_present'):

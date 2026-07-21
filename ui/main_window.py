@@ -586,6 +586,18 @@ class MainWindow(Gtk.ApplicationWindow):
                     )
                     self._root_process = proc
 
+                    # Drop the Administrator .desktop launcher the first time
+                    # a root session is ever established — piggybacks this
+                    # existing pkexec authentication instead of prompting for
+                    # a password just for this. No-op on every scan after the
+                    # first (do_ensure_root_desktop checks existence itself).
+                    try:
+                        proc.stdin.write(_json.dumps({'action': 'ensure_root_desktop'}) + '\n')
+                        proc.stdin.flush()
+                        proc.stdout.readline()
+                    except Exception:
+                        pass
+
                 # Send scan command and wait for result
                 proc.stdin.write(_json.dumps({'action': 'scan'}) + '\n')
                 proc.stdin.flush()
@@ -659,6 +671,7 @@ class MainWindow(Gtk.ApplicationWindow):
             hw_snapshot = {
                 'dracut_fw_dirs': set(results.get('dracut_fw_dirs', [])),
                 'pci_vendors':    results.get('pci_vendors', []),
+                'gpu_pci_vendors': results.get('gpu_pci_vendors', []),
                 'usb_vendors':    results.get('usb_vendors', []),
                 'kvm_present':    results.get('kvm_present', False),
                 'active_fw_files': set(results.get('active_fw_files', [])),

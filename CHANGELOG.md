@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.3-2] - 2026-07-21
+
+### ✨ Added
+- **`--root` launch flag and Administrator `.desktop` launcher (`core/application.py`, `scanner/root_helper.py`, `ui/main_window.py`)**: new CLI flag relaunches the whole app via `pkexec env <session vars> python3 main.py` straight into Administrator mode, reusing the existing (previously unused) environment-propagation logic. A second `.desktop` entry (`org.soplos.sys-cleaner-root.desktop`, `Exec=soplos-sys-cleaner --root`) is written to `/usr/share/applications/` automatically by a new `ensure_root_desktop` root-helper action, fired once the first time a root session is ever established — piggybacks that existing `pkexec` authentication instead of prompting again just to drop a launcher file. Idempotent: checks for the file's existence first.
+
+### 🐛 Fixed
+- **Duplicate `spice-vdagent`/`spice-webdavd` entries on non-KVM/QEMU guests (`hardware.py`)**: `VM_GUEST_PACKAGES` lists the same two packages under both the `kvm` and `qemu` keys. On any other guest type (e.g. VMware), `get_unnecessary_hardware_packages()` iterated both keys independently with no cross-key deduplication, listing each package twice — which also broke "Select all" for one of the two duplicate rows, since the checkbox dict is keyed by package name and the second row's checkbox silently overwrote the first's. Added a `seen_vm_pkgs` set to dedupe by package name across the whole loop.
+- **Intel GPU firmware (`i915`) locked without a real Intel GPU (`hardware.py`, `main_window.py`)**: `get_firmware_protection_set()`'s PCI-vendor layer protected `i915`/`intel`/`iwlwifi` firmware whenever *any* PCI device with vendor `8086` (Intel) was present — including chipset/bridge/USB-controller devices that VMware and other hypervisors commonly emulate with an Intel vendor ID regardless of the physical host's actual CPU vendor (confirmed on an AMD host). `i915` is now only protected when a genuine GPU-class Intel device is present (`gpu_pci_vendors`), mirroring the same distinction already used for Intel driver packages in `get_unnecessary_hardware_packages()`. Also added the missing `gpu_pci_vendors` key to the client-side `hw_snapshot` rebuild in `main_window.py`, without which the fix would always see an empty GPU set.
+
+---
+
 ## [1.0.3-1] - 2026-07-21
 
 ### 🐛 Fixed
