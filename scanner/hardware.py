@@ -16,6 +16,7 @@ needs.  Anything not matched by any layer is a candidate for removal.
 
 import os
 import re
+import sys
 import subprocess
 
 from utils.constants import PROTECTED_FIRMWARE_ALWAYS
@@ -250,6 +251,8 @@ def get_all_hardware() -> dict:
       'dracut_fw_dirs'     : set[str]  — firmware dirs declared in dracut conf (layer 0)
       'pci_vendors'        : list[str] — PCI vendor IDs detected (e.g. ['1002','8086'])
       'gpu_pci_vendors'    : list[str] — vendor IDs of GPU-class PCI devices only (class 03xx)
+      'network_pci_vendors': list[str] — vendor IDs of network-class PCI devices only (class 02xx)
+      'audio_pci_vendors'  : list[str] — vendor IDs of audio-class PCI devices only (class 04xx)
       'usb_vendors'        : list[str] — USB vendor IDs detected
       'gpu_vendors_named'  : list[str] — human names of GPU vendors (for UI label)
       'active_fw_files'    : set[str]  — firmware file paths loaded by lsmod+modinfo
@@ -257,19 +260,23 @@ def get_all_hardware() -> dict:
       'vm_guest_type'      : str       — 'none' on bare metal, else 'kvm','vmware','oracle',
                                          'microsoft','xen','qemu','parallels', etc.
     """
-    dracut_fw_dirs    = _scan_dracut_conf()
-    pci_vendors       = _scan_pci()
-    gpu_pci_vendors   = _scan_gpu_pci_vendors()
-    usb_vendors       = _scan_usb()
-    gpu_vendors_named = _detect_gpu_names(gpu_pci_vendors)
-    active_fw_files   = _scan_active_firmware()
-    kvm_present       = _detect_kvm()
-    vm_guest_type     = _detect_vm_guest()
+    dracut_fw_dirs      = _scan_dracut_conf()
+    pci_vendors         = _scan_pci()
+    gpu_pci_vendors     = _scan_gpu_pci_vendors()
+    network_pci_vendors = _scan_network_pci_vendors()
+    audio_pci_vendors   = _scan_audio_pci_vendors()
+    usb_vendors         = _scan_usb()
+    gpu_vendors_named   = _detect_gpu_names(gpu_pci_vendors)
+    active_fw_files     = _scan_active_firmware()
+    kvm_present         = _detect_kvm()
+    vm_guest_type       = _detect_vm_guest()
 
     return {
         'dracut_fw_dirs': dracut_fw_dirs,
         'pci_vendors': list(pci_vendors),
         'gpu_pci_vendors': list(gpu_pci_vendors),
+        'network_pci_vendors': list(network_pci_vendors),
+        'audio_pci_vendors': list(audio_pci_vendors),
         'usb_vendors': list(usb_vendors),
         'gpu_vendors_named': gpu_vendors_named,
         'active_fw_files': active_fw_files,
@@ -296,19 +303,25 @@ def get_firmware_protection_set(hardware: dict) -> set[str]:
 
     # Layer 1: PCI vendors
     # Intel (8086) needs special handling: chipset/bridge/USB-controller
-    # devices commonly expose vendor 8086 in lspci even without a real Intel
-    # GPU (e.g. VMware emulates an Intel-vendor chipset regardless of the
-    # physical host's actual CPU vendor). Only protect the GPU-specific
-    # firmware (i915) when a genuine Intel GPU-class device is present;
-    # 'intel' (sound/misc) and 'iwlwifi' are not GPU-specific and keep the
-    # broader check. Mirrors the same distinction already used for Intel
-    # driver packages in get_unnecessary_hardware_packages().
-    gpu_only = set(hardware.get('gpu_pci_vendors', []))
+    # devices commonly expose vendor 8086 in lspci even without any real
+    # Intel GPU or WiFi card (e.g. QEMU/VMware emulate an Intel-vendor
+    # i440FX/PIIX/ICH9 chipset regardless of the physical host's actual
+    # hardware — including the ICH9 HDA audio controller QEMU emulates by
+    # default, vendor 8086 but not real hardware). /lib/firmware/intel/
+    # holds Bluetooth/WiFi-combo firmware, not audio codec blobs, so both
+    # 'intel' and 'iwlwifi' are gated on a real network-class device, same
+    # as i915 is gated on a real GPU-class device. Mirrors the same
+    # distinction already used for Intel driver packages in
+    # get_unnecessary_hardware_packages().
+    gpu_only     = set(hardware.get('gpu_pci_vendors', []))
+    network_only = set(hardware.get('network_pci_vendors', []))
+    INTEL_FAMILY_CLASS = {'i915': gpu_only, 'iwlwifi': network_only, 'intel': network_only}
     for vid in hardware.get('pci_vendors', []):
         families = PCI_VENDOR_FIRMWARE.get(vid, [])
         if vid == '8086':
             for fam in families:
-                if fam == 'i915' and '8086' not in gpu_only:
+                class_vendors = INTEL_FAMILY_CLASS.get(fam)
+                if class_vendors is not None and '8086' not in class_vendors:
                     continue
                 protected.add(fam)
         else:
@@ -737,25 +750,43 @@ def _scan_pci() -> set[str]:
     return vendors
 
 
-def _scan_gpu_pci_vendors() -> set[str]:
+def _scan_pci_vendors_by_class(class_prefix: str) -> set[str]:
     """
-    Return vendor IDs of GPU/display-class PCI devices only (class 03xx).
+    Return vendor IDs of PCI devices matching a given class prefix only
+    (e.g. '03' for GPU/display, '02' for network, '04' for multimedia/audio).
 
     Uses 'lspci -n' numeric output:  addr class: vendor:device
     This prevents Intel chipset/bridge devices (always present in VMs via
-    i440FX / ICH9 emulation) from being mistaken for Intel GPU hardware.
+    i440FX / ICH9 emulation) from being mistaken for a real Intel GPU, WiFi
+    card or audio device of that class.
     """
     vendors: set[str] = set()
     try:
         output = subprocess.check_output(['lspci', '-n'], text=True, timeout=10)
+        pattern = re.compile(rf'[\w:.]+ {class_prefix}[0-9a-fA-F]{{2}}: ([0-9a-fA-F]{{4}}):')
         for line in output.splitlines():
             # e.g. "00:02.0 0300: 8086:1234 (rev 02)"
-            match = re.match(r'[\w:.]+ 03[0-9a-fA-F]{2}: ([0-9a-fA-F]{4}):', line)
+            match = pattern.match(line)
             if match:
                 vendors.add(match.group(1).lower())
     except Exception as e:
-        print(f'[hardware] lspci -n error: {e}')
+        print(f'[hardware] lspci -n error: {e}', file=sys.stderr)
     return vendors
+
+
+def _scan_gpu_pci_vendors() -> set[str]:
+    """Vendor IDs of GPU/display-class PCI devices only (class 03xx)."""
+    return _scan_pci_vendors_by_class('03')
+
+
+def _scan_network_pci_vendors() -> set[str]:
+    """Vendor IDs of network-class PCI devices only (class 02xx)."""
+    return _scan_pci_vendors_by_class('02')
+
+
+def _scan_audio_pci_vendors() -> set[str]:
+    """Vendor IDs of multimedia/audio-class PCI devices only (class 04xx)."""
+    return _scan_pci_vendors_by_class('04')
 
 
 def _scan_usb() -> set[str]:
@@ -803,10 +834,42 @@ def _find_modinfo() -> str | None:
     return None
 
 
+def _module_bound_to_device(mod: str) -> bool:
+    """
+    True if this loaded module is actually bound to a real device (has a
+    driver directory under /sys/module/<mod>/drivers/ containing at least
+    one bus-address entry), as opposed to merely being loaded in memory
+    with nothing attached to it.
+
+    lsmod's "Used by" column only reflects the module dependency graph
+    (e.g. cfg80211 shows iwlwifi as a user regardless of whether real WiFi
+    hardware exists), so it cannot tell "loaded" apart from "in use by
+    real hardware" — this checks the actual device binding instead.
+    """
+    drivers_dir = f'/sys/module/{mod}/drivers'
+    if not os.path.isdir(drivers_dir):
+        return False
+    try:
+        for driver_name in os.listdir(drivers_dir):
+            driver_path = os.path.join(drivers_dir, driver_name)
+            for entry in os.listdir(driver_path):
+                # Bus device addresses contain ':' (PCI "0000:00:02.0",
+                # USB "1-2:1.0"); 'module', 'uevent' etc. do not.
+                if ':' in entry:
+                    return True
+    except Exception:
+        pass
+    return False
+
+
 def _scan_active_firmware() -> set[str]:
     """
-    Layer 3: query modinfo for every loaded module to get firmware files
-    that the running kernel is actually using.
+    Layer 3: query modinfo for every loaded module that is actually bound
+    to a real device, to get firmware files the running kernel is really
+    using. Modules loaded but not bound to anything (e.g. nouveau/iwlwifi
+    auto-probed with no matching hardware, common in VMs) are skipped —
+    modinfo -F firmware lists everything the driver could ever need across
+    every chip it supports, not what this system actually needs.
 
     Layer 3b: parse dmesg for 'Direct firmware load for <path>' messages —
     catches drivers that load firmware dynamically without declaring it in
@@ -816,7 +879,7 @@ def _scan_active_firmware() -> set[str]:
     """
     fw_files: set[str] = set()
 
-    # Layer 3: modinfo per loaded module
+    # Layer 3: modinfo per loaded module that is actually bound to hardware
     modinfo_bin = _find_modinfo()
     if modinfo_bin:
         try:
@@ -828,6 +891,8 @@ def _scan_active_firmware() -> set[str]:
                     modules.append(parts[0])
 
             for mod in modules:
+                if not _module_bound_to_device(mod):
+                    continue
                 try:
                     info = subprocess.check_output(
                         [modinfo_bin, '-F', 'firmware', mod],
@@ -840,7 +905,7 @@ def _scan_active_firmware() -> set[str]:
                 except Exception:
                     pass
         except Exception as e:
-            print(f'[hardware] lsmod/modinfo error: {e}')
+            print(f'[hardware] lsmod/modinfo error: {e}', file=sys.stderr)
 
     # Layer 3b: kernel log — firmware actually requested at boot
     # journalctl -k persists across reboots; dmesg is a fallback for systems without systemd

@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.3--2-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.3--3-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,12 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.3-3 (22/07/2026)
+- Removed: `--root` launch flag and the "Administrator" `.desktop` launcher added in v1.0.3-2 — `Gio.Application`'s single-instance D-Bus registration collided between the relaunched root process and the normal unprivileged instance, so clicking the launcher opened the user-mode window instead of Administrator mode. `root_helper.py` now removes the leftover `.desktop` file the first time a root session starts after upgrading (soplos-packager doesn't support postinst maintainer scripts yet).
+- Fixed: `intel`/`iwlwifi`/`nvidia` firmware falsely locked as "required" on VMs and machines with no matching real hardware — `modinfo -F firmware` on a *loaded* kernel module (e.g. `nouveau`, `iwlwifi` auto-probed with nothing attached) lists every firmware file that driver could ever need across every chip it supports, not what this system actually uses. Now only trusted for modules actually bound to a real device (checked via `/sys/module/<mod>/drivers/`).
+- Fixed: `intel` firmware family was still locked by an emulated Intel chipset/audio device (e.g. QEMU/VMware's i440FX/ICH9) even after the earlier `i915`-only fix — `intel` and `iwlwifi` now both require a genuine Intel *network*-class PCI device (`/lib/firmware/intel/` is WiFi/Bluetooth-combo firmware, not audio), not just any device exposing vendor `8086`.
+- Fixed: VirtualBox Guest Additions uninstall result (success or failure) was silently discarded when triggered from "Remove orphaned packages" — the generic autoremove message always displayed regardless of what actually happened. The VBox-specific error, if any, is now included in the final message.
 
 ### v1.0.3-2 (21/07/2026)
 - Added: `--root` launch flag and a new "Administrator" `.desktop` launcher that opens the app directly in Administrator mode via `pkexec`, propagating the GUI session environment. The launcher is created automatically in `/usr/share/applications/` the first time a root session is established, reusing that same authentication instead of prompting again.

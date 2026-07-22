@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.3-3] - 2026-07-22
+
+### 🔧 Changed
+- **Removed the `--root` launch flag and Administrator `.desktop` launcher added in 1.0.3-2 (`core/application.py`, `scanner/root_helper.py`, `ui/main_window.py`)**: `Gio.Application` enforces one registered instance per `application_id` over D-Bus. The relaunched root process and the normal unprivileged instance shared the same ID and fought over that registration — whichever lost simply forwarded its command line back to the other, so the Administrator launcher opened the user-mode window instead of an elevated one. Rather than giving the root process a separate `application_id` (its own scope of new edge cases), the feature is removed outright. Since `soplos-packager` doesn't support `postinst` maintainer scripts yet, `root_helper.py` now deletes the leftover `.desktop` file the first time a root session starts after upgrading (this process already runs as root for "scan as administrator" anyway).
+
+### 🐛 Fixed
+- **`intel`/`iwlwifi`/`nvidia` firmware falsely locked as "required" with no matching real hardware (`scanner/hardware.py::_scan_active_firmware`)**: Layer 3 ran `modinfo -F firmware` on every kernel module reported by `lsmod`, regardless of whether that module was actually bound to a device. A module loaded but unused (e.g. `nouveau`/`iwlwifi` auto-probed on a VM with no matching GPU/WiFi hardware) still returns modinfo's full list of firmware for *every* chip that driver supports — hundreds of paths for hardware that was never present. Confirmed live on a Proxmox VM (`lsmod` showed `nouveau`/`iwlwifi` loaded with 0 users each). Added `_module_bound_to_device()`, checking `/sys/module/<mod>/drivers/` for an actual bus-address entry before trusting a module's declared firmware list.
+- **`intel` firmware family still locked by an emulated Intel chipset/audio device (`scanner/hardware.py::get_firmware_protection_set`)**: the `i915`-only exception added in 1.0.3-2 didn't cover `intel` (Bluetooth/WiFi-combo firmware) or `iwlwifi`, so QEMU/VMware's emulated i440FX/PIIX chipset — or even a real ICH9 HDA audio device the hypervisor emulates (vendor `8086`, unrelated to `/lib/firmware/intel/`) — still forced the lock. Added `_scan_network_pci_vendors()`/`_scan_audio_pci_vendors()` (PCI class-based, like the existing GPU-only scan) and now gate `intel` and `iwlwifi` on a genuine Intel *network*-class device, not audio or any Intel-vendor device.
+- **VirtualBox Guest Additions uninstall result silently discarded (`ui/tabs/cache_tab.py::_on_autoremove`)**: when orphaned VBox systemd/autostart refs triggered `clean_module_refs` (which runs the official `uninstall.sh`) before `apt_autoremove`, its result was thrown away — the generic "Orphaned packages removed" message showed regardless of whether VBox actually uninstalled. Its error, if any, is now appended to the final message.
+
 ## [1.0.3-2] - 2026-07-21
 
 ### ✨ Added

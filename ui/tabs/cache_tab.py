@@ -260,21 +260,28 @@ class CacheTab(Gtk.Box):
         btn.set_sensitive(False)
         self.parent.set_ui_state(_("Removing orphaned packages..."), pulse=True)
 
-        def on_done(result):
-            success = result.get('success', False)
-            msg = _("Orphaned packages removed.") if success else f"Error: {result.get('stderr', '')}"
-            self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
-            btn.set_sensitive(True)
-            if success:
-                GLib.timeout_add_seconds(1, lambda: self.parent.start_root_scan())
-            GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
+        def _run_autoremove(mod_refs_result=None):
+            def on_done(result):
+                success = result.get('success', False)
+                msg = _("Orphaned packages removed.") if success else f"Error: {result.get('stderr', '')}"
+                # Surface clean_module_refs failures (e.g. VirtualBox
+                # uninstall.sh) instead of silently discarding them —
+                # otherwise this generic message is the only thing the
+                # user ever sees, whether VBox actually uninstalled or not.
+                if mod_refs_result is not None and not mod_refs_result.get('success', False):
+                    vbox_err = mod_refs_result.get('stderr', '')
+                    msg = f"{msg} — {vbox_err}" if vbox_err else msg
+                self.parent.set_ui_state(msg, 1.0 if success else 0.0, False, True)
+                btn.set_sensitive(True)
+                if success:
+                    GLib.timeout_add_seconds(1, lambda: self.parent.start_root_scan())
+                GLib.timeout_add_seconds(4, lambda: self.parent.set_ui_state("", visible=False))
 
-        def _run_autoremove():
             self.parent.run_root_action({'action': 'apt_autoremove'}, on_done)
 
         mod_refs = getattr(self, '_orphan_module_refs', [])
         if mod_refs:
             self.parent.run_root_action({'action': 'clean_module_refs', 'refs': mod_refs},
-                                        lambda r: _run_autoremove())
+                                        _run_autoremove)
         else:
             _run_autoremove()

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="soplos-sys-cleaner",
-    version="1.0.3-2",
+    version="1.0.3-3",
     packages=find_packages(),
     install_requires=[
         'PyGObject>=3.40.0',

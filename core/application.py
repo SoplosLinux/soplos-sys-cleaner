@@ -75,45 +75,15 @@ class SoplosCleanerApplication(Gtk.Application):
             for arg in args[1:]:
                 if arg in ['--help', '-h']:
                     print(f"Soplos Sys Cleaner {APPLICATION_VERSION}")
-                    print("Usage: soplos-sys-cleaner [--help] [--version] [--debug] [--root]")
+                    print("Usage: soplos-sys-cleaner [--help] [--version] [--debug]")
                     return 0
                 elif arg in ['--version', '-v']:
                     print(f"Soplos Sys Cleaner {APPLICATION_VERSION}")
                     return 0
                 elif arg == '--debug':
                     os.environ['SOPLOS_DEBUG'] = '1'
-                elif arg == '--root':
-                    if os.geteuid() != 0:
-                        if self._relaunch_as_root():
-                            return 0
-                        logger.error("Failed to relaunch as root, starting in normal mode instead.")
         self.activate()
         return 0
-
-    def _relaunch_as_root(self) -> bool:
-        """Relaunch main.py with pkexec, propagating the GUI session
-        environment needed for the window to display correctly as root.
-        Used by the "--root" launch flag (see the Administrator .desktop
-        entry), so the app opens straight into Administrator mode instead
-        of requiring the user to trigger it from within the running app."""
-        import shutil
-        import subprocess
-        important_vars = [
-            'DISPLAY', 'XAUTHORITY', 'XDG_RUNTIME_DIR', 'DBUS_SESSION_BUS_ADDRESS',
-            'WAYLAND_DISPLAY', 'XDG_CURRENT_DESKTOP', 'XDG_SESSION_TYPE',
-            'SOPLOS_DESKTOP', 'LANG', 'HOME', 'PATH', 'GDK_BACKEND', 'GTK_THEME',
-        ]
-        env_vars = [f"{v}={os.environ[v]}" for v in important_vars if v in os.environ]
-        env_vars += ['NO_AT_BRIDGE=1', 'GSETTINGS_BACKEND=memory', 'GIO_USE_VFS=local']
-        script_path = str(self.app_path / 'main.py')
-        pkexec_path = shutil.which('pkexec') or 'pkexec'
-        cmd = [pkexec_path, 'env'] + env_vars + [sys.executable, script_path]
-        try:
-            subprocess.Popen(cmd)
-            return True
-        except Exception as e:
-            logger.error(f"Failed to relaunch as root: {e}")
-            return False
 
     def on_shutdown(self, app):
         logger.info("Closing Soplos Sys Cleaner...")

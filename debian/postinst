@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # Previous versions dropped an "Administrator" .desktop launcher
+        # (soplos-sys-cleaner --root) at runtime via root_helper.py. The
+        # --root flag never worked reliably (GApplication single-instance
+        # collision with the normal, unprivileged instance) and has been
+        # removed — clean up the leftover launcher file on upgrade.
+        rm -f /usr/share/applications/org.soplos.sys-cleaner-root.desktop
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
