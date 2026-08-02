@@ -17,7 +17,9 @@
 
 window { background-color: @soplos_light_bg; color: @soplos_dark_text; }
 
-
+dialog, messagedialog { background-color: @soplos_light_bg; color: @soplos_dark_text; }
+dialog .background, messagedialog .background { background-color: @soplos_light_bg; color: @soplos_dark_text; }
+dialog > box, messagedialog > box { background-color: @soplos_light_bg; }
 
 notebook { background-color: @soplos_lighter_bg; border: 1px solid @soplos_border; }
 notebook > header { background-color: @soplos_light_bg; }
@@ -26,17 +28,51 @@ notebook > header tab:hover { background-color: #f0f0f0; }
 notebook > header tab:checked { background-color: @soplos_lighter_bg; color: @soplos_orange; border-top: 3px solid @soplos_orange; font-weight: 600; }
 notebook > stack { background-color: @soplos_lighter_bg; }
 
+/* HeaderBar */
+headerbar,
+.titlebar {
+    background-color: @soplos_lighter_bg;
+    color: @soplos_dark_text;
+    border-bottom: 1px solid @soplos_border;
+    box-shadow: none;
+}
+
+headerbar button.titlebutton {
+    color: @soplos_dark_text;
+    background: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+}
+
+headerbar button.titlebutton:hover {
+    background-color: #e0e0e0;
+}
+
+headerbar button.titlebutton.close:hover {
+    background-color: @soplos_error;
+    color: white;
+}
+
 button { background-color: @soplos_lighter_bg; color: @soplos_dark_text; border: 1px solid @soplos_border; border-radius: 4px; }
 button:hover { background-color: #e8e8e8; border-color: @soplos_orange; }
+
+stackswitcher button { border-radius: 100px; background-color: @soplos_light_bg; background-image: none; border: 1px solid @soplos_border; font-weight: normal; padding: 4px 16px; box-shadow: none; color: @soplos_dark_text; }
+stackswitcher button:hover { background-color: #e8e8e8; border-color: @soplos_orange; }
+stackswitcher button:checked { background-color: #e0e0e0; }
 button.suggested-action { background-color: @soplos_orange; color: #fff; border-color: @soplos_orange_hover; font-weight: bold; }
+button.suggested-action:hover { background-color: @soplos_orange_hover; }
 button.destructive-action { background-color: @soplos_error; color: #fff; }
 
 progressbar trough { background-color: #e0e0e0; border: 1px solid @soplos_border; border-radius: 4px; }
 progressbar progress { background-color: @soplos_orange; border-radius: 4px; }
 
-entry { background-color: @soplos_lighter_bg; border: 1px solid @soplos_border; }
+entry { background-color: @soplos_lighter_bg; color: @soplos_dark_text; border: 1px solid @soplos_border; }
 entry:focus { border-color: @soplos_orange; }
 
+scrolledwindow viewport { background-color: @soplos_light_bg; }
+list, treeview { background-color: @soplos_light_bg; color: @soplos_dark_text; }
+list row:selected, treeview row:selected { background-color: @soplos_orange; color: #fff; }
 
 .summary-card { background-color: @soplos_lighter_bg; border-color: @soplos_border; }
 .summary-card-value { color: @soplos_orange; }

@@ -1,7 +1,7 @@
 # Soplos Sys Cleaner
 
 [![License: GPL-3.0+](https://img.shields.io/badge/License-GPL--3.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Version](https://img.shields.io/badge/version-1.0.3--3-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.3--4-green.svg)]()
 
 A system cleaning and optimization utility designed specifically for Soplos Linux.
 
@@ -119,6 +119,11 @@ Contact: info@soploslinux.com
 - [Help](https://soplos.org)
 
 ## 📦 Versions
+
+### v1.0.3-4 (02/08/2026)
+- Changed: light/dark theme detection is now routed per desktop environment — the same package runs on Tyron (XFCE), Tyson (Plasma) and Boro (GNOME), and each one exposes its dark/light preference somewhere different. XFCE now reads the active GTK theme name from `xfconf-query` (the `gsettings` `color-scheme` key is GNOME-specific and never updates on XFCE), Plasma reads `ColorScheme` from `kdeglobals` with a window-background luminance fallback, and GNOME reads `color-scheme`. Ported from `soplos-welcome`, the implementation already confirmed working across desktops.
+- Fixed: the light theme was incomplete compared to the dark one — widgets it never covered fell back to the system theme and clashed with the parts Soplos does style. `light.css` is now at full parity with `dark.css` (header bar, dialogs, notebook tabs, stackswitcher, progress bars, entries, lists and summary cards).
+- Note: the theme is detected once at startup; switching the desktop between light and dark with the application open does not restyle the running window. Per-desktop detection has not yet been verified on real XFCE, Plasma and GNOME sessions — any branch that does not match falls back to the light theme.
 
 ### v1.0.3-3 (22/07/2026)
 - Removed: `--root` launch flag and the "Administrator" `.desktop` launcher added in v1.0.3-2 — `Gio.Application`'s single-instance D-Bus registration collided between the relaunched root process and the normal unprivileged instance, so clicking the launcher opened the user-mode window instead of Administrator mode. `root_helper.py` now removes the leftover `.desktop` file the first time a root session starts after upgrading (soplos-packager doesn't support postinst maintainer scripts yet).

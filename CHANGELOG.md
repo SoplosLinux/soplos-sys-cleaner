@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/lang/en/).
 
+## [1.0.3-4] - 2026-08-02
+
+### 🔧 Changed
+- **Light/dark theme detection now routed per desktop environment (`core/environment.py`)**: the same package ships on Tyron (XFCE), Tyson (Plasma) and Boro (GNOME), and each desktop exposes its dark/light preference in a completely different place, so a single detection path could never be right on all three. `_detect_theme_type()` now dispatches to a dedicated per-desktop probe, ported from `soplos-welcome`'s `core/environment.py`: XFCE reads the active GTK theme name from `xfconf-query -c xsettings -p /Net/ThemeName` (the `gsettings` `color-scheme` key is GNOME-specific and stays at a stale default on XFCE, never updated when the theme changes); Plasma reads `ColorScheme` from `~/.config/kdeglobals`, falling back to the luminance of `Colors:Window`'s `BackgroundNormal` and then to `gtk-3.0/settings.ini`; GNOME reads `color-scheme` with a `gtk-theme` fallback. `_detect_desktop()` also gained a `DESKTOP_SESSION` fallback for sessions that leave `XDG_CURRENT_DESKTOP` unset. The port drops the enums and the extra window-manager/GTK-version/Qt-version probing from the original, which this application never used, and the default on an unrecognised desktop is now `light` instead of `unknown`.
+
+### 🐛 Fixed
+- **Light theme was incomplete against the dark one (`assets/themes/light.css`)**: the light stylesheet was missing rules the dark one already had, so on a light desktop the widgets it never covered fell back to the system theme's colors and clashed with the parts Soplos does style. It is now at full selector parity with `dark.css` — header bar and its title buttons, dialogs and message dialogs, notebook tabs, `stackswitcher`, `progressbar`, `entry`, lists/treeviews and `.summary-card` all styled in both variants.
+
+### ⚠️ Known limitations
+- The theme is detected once at startup (`core/application.py::on_startup`); changing the desktop between light and dark while the application is open does not restyle the running window.
+- This release ships ahead of the final ISOs and the per-desktop detection has **not** been verified on a real XFCE, Plasma and GNOME session yet. Each branch depends on a value only the installed system can confirm: XFCE requires the active GTK theme name to contain `dark`, Plasma requires `ColorScheme` to contain `dark`/`black` (or `Colors:Window` to be present for the luminance fallback), and GNOME requires `color-scheme` to be `prefer-dark` rather than `default`. Any branch that does not match falls back to the light theme.
+
+---
+
 ## [1.0.3-3] - 2026-07-22
 
 ### 🔧 Changed
